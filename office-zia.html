@@ -2559,7 +2559,7 @@ function callNum(n){
   if(state.busy||state.stage!=='idle')return;
   state.busy=true;state.preview=null;render();
   setTimeout(()=>{const q=byN(n);state.busy=false;if(!q){render();return}
-    q.pos='called';state.cur=n;state.stage='call';state.calledAt=Date.now();state.recalls=0;state.board=n;state.tab='q';cmd('вызов '+n);render();if(state.boardOff)toast('Табло не работает — назовите голосом: «'+n+', окно '+ME.win+'»')},450);
+    q.pos='called';state.cur=n;state.stage='call';state.calledAt=Date.now();state.recalls=0;state.board=n;state.tab='q';cmd('вызов '+n);render();callSay(n);if(state.boardOff)toast('Табло не работает — назовите голосом: «'+n+', окно '+ME.win+'»')},450);
 }
 // при смене шага главная колонка — к началу, панель шага в кадре; при прочих перерисовках прокрутка колонок не меняется
 function showFocus(){const p=document.querySelector('#colC .panel.focus');if(p)p.scrollIntoView({block:'nearest'})}
@@ -2595,7 +2595,7 @@ function act(a){
     case 'walk':startWalk();break;
     case 'board':state.boardOff=!state.boardOff;if(state.boardOff)state.boardOffAt=nowHM();toast(state.boardOff?'Демо: табло не отвечает — вызов голосом или приём без очереди':'Табло снова работает');render();break;
     case 'wnext':case 'wback':case 'wcancel':case 'wnow':case 'wqueue':case 'wline':case 'wdone':wkAct(a);break;
-    case 'recall':if(state.stage==='call'){state.recalls++;state.calledAt=Date.now();cmd('повторный вызов');toast('Повторный вызов: '+q.n+' → окно '+ME.win);render()}break;
+    case 'recall':if(state.stage==='call'){state.recalls++;state.calledAt=Date.now();cmd('повторный вызов');toast('Повторный вызов: '+q.n+' → окно '+ME.win);render();callSay(q.n)}break;
     case 'noshow':if(state.stage==='call')noShow();break;
     case 'arrived':if(state.stage==='call'){q.pos='here';q.arrivedAt=Date.now();state.board=null;setStage('client')}break;
     case 'sign':case 'services':case 'total':setStage(a);break;
@@ -5466,6 +5466,18 @@ function diagShow(){
   document.body.appendChild(el);
 }
 if(/diag/.test(location.hash))setTimeout(diagShow,1200);
+// ----- Голосовой вызов (владелец, 20.11.2026: «можешь озвучить при нажатии» — «Повторить»): номер и окно вслух по-русски.
+// В офисе вызов звучит из колонок табло; здесь — с рабочего места оператора, для показа. Только номер и окно — без ФИО (CLAUDE.md, «Правила данных»).
+const RU1=['ноль','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+const RU10=['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'],RU100=['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+function ruNum(n){n=+n;if(n<20)return RU1[n];if(n<100)return RU10[Math.floor(n/10)]+(n%10?' '+RU1[n%10]:'');return RU100[Math.floor(n/100)]+(n%100?' '+ruNum(n%100):'')}
+// «О-015» → «О, ноль пятнадцать»: ведущие нули читаем, как на табло
+function callWords(n){const m=/^(\D+?)\W*(\d+)$/u.exec(String(n).replace(/\s/g,''));if(!m)return String(n);const lead=(m[2].match(/^0+/)||[''])[0].length,rest=m[2].slice(lead);return m[1].replace(/[^\p{L}]/gu,'')+', '+[...Array(lead)].map(()=>'ноль').concat(rest?[ruNum(rest)]:[]).join(' ')}
+function callSay(n){
+  const text='Номер '+callWords(n)+'. Пройдите к окну '+ruNum(ME.win)+'.';
+  try{if(typeof trGoogle==='function'&&(!state.tr||state.tr.cloud!==false)){trGoogle(text,'ru');return}}catch(e){}
+  if(typeof sayText==='function')sayText('call',text,'ru');
+}
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
