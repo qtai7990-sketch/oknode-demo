@@ -1940,6 +1940,24 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .sim-left.low{color:var(--amber)}
 .diag{position:fixed;left:12px;right:12px;top:12px;z-index:50;display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:14px;background:var(--panel-solid);border:2px solid var(--amber);font-size:14px;color:var(--text);overflow-wrap:anywhere}
 .diag .btn{align-self:flex-start}
+/* планшет вертикально (Galaxy Tab Active5 повёрнут: 600×960, при масштабе 80% — 750×1200). Владелец 20.11.2026: «кнопки разъезжались».
+   Узкое правило агента (до 860) прятало меню и ставило главную колонку в первый столбец — в виде «планшет» она попадала в столбец меню шириной 72.
+   Здесь меню остаётся узкой колонкой слева, всё остальное — во втором столбце; в шапке — без имени оператора. */
+@media (max-width:860px){
+  .tab .app{grid-template-columns:72px minmax(0,1fr)}
+  .tab .side{display:flex}
+  .tab .steps,.tab .main,.tab .foot{grid-column:2}
+  .tab .top .who b{display:none}
+  .tab .top .net{margin-right:6px}
+  .tab .foot{flex-wrap:wrap}
+  .tab .foot .fsum{flex-basis:100%}
+}
+/* страница входа партнёра — светлая, как сам портал партнёра (в тёмной теме заголовок был тёмным на тёмном) */
+.pl-login .pl-body{background:#f5f7fb;color:#0f172a;border-color:#dbe3ee}
+.pl-login .pl-body b{color:#0f172a}
+.pl-login .pl-body small{color:#556274}
+.pl-login .pl-body input{background:#fff;color:#0f172a;border-color:#cbd5e1}
+.pl-login .pl-mark{background:#e3f4fa;color:#0f172a}
 
 </style>
 <script>
@@ -5486,7 +5504,9 @@ const TAB_ZOOMS=[[1,'Крупно · 100%'],[0.9,'Обычно · 90%'],[0.8,'П
 let tabZoom=0.8;try{const v=+localStorage.getItem('tabZoom');if(TAB_ZOOMS.some(z=>z[0]===v))tabZoom=v}catch(e){}
 function applyZoom(){const r=document.documentElement,real=r.classList.contains('tab')&&!r.classList.contains('preview'),z=real?tabZoom:1;
   r.style.zoom=z===1?'':String(z);if(z!==1)r.style.setProperty('--vh',(innerHeight/z)+'px');else r.style.removeProperty('--vh')}
-addEventListener('resize',applyZoom);document.addEventListener('fullscreenchange',()=>setTimeout(applyZoom,50));applyZoom();
+addEventListener('resize',applyZoom);document.addEventListener('fullscreenchange',()=>setTimeout(applyZoom,50));
+// вид «планшет» включается позже этой части — следим за классом корня, иначе при открытии масштаб не срабатывал
+new MutationObserver(applyZoom).observe(document.documentElement,{attributes:true,attributeFilter:['class']});setTimeout(applyZoom,0);
 const zoomHtml=()=>`<div class="panel"><div class="ph"><div class="ic">${ico('scan',18)}</div><div><h2>Масштаб на планшете</h2><div class="sub">Galaxy Tab Active5 · 8″ · 1920×1200: Chrome показывает страницу как 960×600; меньше масштаб — больше строк на экране</div></div></div>`+
   `<div class="seg wrap">${TAB_ZOOMS.map(([z,t])=>`<button class="${tabZoom===z?'sel':''}" data-tzoom="${z}" aria-pressed="${tabZoom===z}">${t}</button>`).join('')}</div>`+
   `<p class="hint">Работает в виде «планшет». На компьютере в предпросмотре планшета масштаб не меняется.</p></div>`;
