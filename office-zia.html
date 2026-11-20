@@ -2108,8 +2108,9 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .dots{display:block;width:4px;height:20px;border-radius:3px;background:radial-gradient(circle,currentColor 1.5px,transparent 1.9px) 0 0/4px 8px repeat-y;box-shadow:0 0 0 4px var(--bg);pointer-events:none}
 /* край меню: вся полоса — щелчок, точки вверху (посередине — точки колонок) */
 .sideEdge{color:var(--muted);opacity:.6;transition:opacity .15s,color .15s}
-.sideEdge .dots{position:absolute;left:50%;top:1px;height:18px;transform:translateX(-50%);background-size:4px 7px}   /* в отступе над пунктами: в свёрнутом меню активный пункт доходит до края и закрывал точки */
-.sideEdge::after{content:'';position:absolute;left:50%;top:-8px;width:32px;height:40px;transform:translateX(-50%)}   /* точки легко попасть пальцем */
+/* 21.11.2026 владелец: «сделай все 3 точки одинаковые по размеру» и стрелкой — вниз, на высоту точек колонок: размер — как у .dots колонок, высота — та же (--dots-y ставит oz32.js) */
+.sideEdge .dots{position:absolute;left:50%;top:var(--dots-y,50%);transform:translate(-50%,-50%)}
+.sideEdge::after{content:'';position:absolute;left:50%;top:var(--dots-y,50%);width:28px;height:52px;transform:translate(-50%,-50%)}   /* точки легко попасть пальцем — как у колонок */
 .sideEdge:hover,.sideEdge:focus-visible{opacity:1;color:var(--cyan)}
 .sideEdge:focus-visible{outline:none}
 .sideEdge:focus-visible .dots{box-shadow:0 0 0 4px var(--bg),0 0 0 6px rgb(var(--cyan-rgb, 34 211 238) / .6)}
@@ -5904,6 +5905,10 @@ function colGrips(){
     const x=((c.side==='left'?cr.left:cr.right)-mr.left)/z;g.style.left=(c.side==='left'?x-12:x+4)+'px';
     const b=g.querySelector('.colTgl'),t=(h?'Показать ':'Спрятать ')+c.t;if(b.title!==t){b.title=t+(h?'':' · потяните — ширина');b.setAttribute('aria-label',t)}
     b.setAttribute('aria-expanded',String(!h));g.classList.toggle('off',h)}
+  // точки на краю меню — на той же высоте, что точки колонок (владелец, 21.11.2026)
+  const se=document.getElementById('sideEdge'),gq=document.getElementById('grip-q');
+  if(se){if(gq&&!gq.hidden){const a=gq.querySelector('.colTgl').getBoundingClientRect(),s=se.getBoundingClientRect(),z=se.offsetHeight?s.height/se.offsetHeight:1;
+    const y=Math.round((a.top+a.height/2-s.top)/z)+'px';if(se.style.getPropertyValue('--dots-y')!==y)se.style.setProperty('--dots-y',y)}else se.style.removeProperty('--dots-y')}
 }
 // нажатие на точки: колонка, открытая сама (переводчик, «Ответы»), — закрыть их; иначе спрятать или показать
 function colToggle(k){
