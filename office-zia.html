@@ -1978,6 +1978,31 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .side-mini.tab .side{display:none!important}
 .side-mini.tab .brand .mark{border-right:0}
 @media (max-width:860px){.side-mini.tab .app{grid-template-columns:0 minmax(0,1fr)}}
+/* начало смены: группы — отдельные карточки, проверки — плитки (владелец, 20.11.2026: «разносы между блоками, чтоб в кашу не сливалось») */
+.shiftp .sh-who{margin-bottom:6px}
+.shg{margin-top:18px;padding:14px 16px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2)}
+.shg-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.shg-h b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.shg-h span{font-size:13px;font-weight:600;color:var(--muted)}
+.shg-req{border-color:rgb(var(--cyan-rgb, 34 211 238) / 0.35)}
+.shg .shc{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+.shg .shr{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);align-items:center}
+.shg .shr:last-child{border:1px solid var(--line)}
+.shg .shr.warn,.shg .shr.bad{grid-column:1/-1;border-color:rgb(var(--amber-rgb) / 0.55);background:rgb(var(--amber-rgb) / 0.07)}
+.shg .shr b{font-size:14.5px}
+.shg .shr small{margin-top:3px;font-size:12.5px;line-height:1.4}
+.shg .shr.hand{border-bottom:1px solid var(--line)}
+.shg .shr.hand.ok{border-color:rgb(var(--green-rgb) / 0.4)}
+.tab .shg{padding:12px 12px 14px}
+.tab .shg .shc{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+:root[data-theme="light"] .shg{background:var(--soft-c, #f3f7fb)}
+/* остальные экраны: больше воздуха между блоками */
+.col{gap:18px}
+.tab .col{gap:14px}
+.plan .pg+.pg{margin-top:14px}
+.panel .listh{margin-bottom:10px}
+.shg-h .shg-n{font-variant-numeric:tabular-nums;text-transform:none;letter-spacing:0}
+.shg-h .shg-n{white-space:nowrap}
 
 </style>
 <script>
@@ -3554,7 +3579,7 @@ const SHIFT_GROUPS=[['req','Обязательно — без этого окн�
 const SHIFT_CHECKS=[
   ['login','req','Вход оператора','своя учётная запись, роль «Оператор», окно по графику'],
   ['net','req','Связь с сервером','очередь, карточки клиентов, журнал аудита'],
-  ['kkt','req','Онлайн-касса (ККТ)','на связи; смена кассы открыта; фискальный накопитель не заканчивается; неотправленных в ОФД чеков нет; бумага в кассе есть — касса сама сообщает «бумага заканчивается» [проверить на модели]'],
+  ['kkt','req','Онлайн-касса (ККТ)','на связи, смена открыта, фискальный накопитель не на исходе, чеки ушли в ОФД, бумага есть — касса сама сообщает «бумага заканчивается» [проверить на модели]'],
   ['card','alt','Платёжный терминал','связь с банком-эквайером · нет — оплата по QR'],
   ['qr','alt','Оплата по QR (СБП)','платёжный партнёр отвечает · нет — оплата картой'],
   ['printer','alt','Принтер А4','на связи, бумага в лотке, тонер · нет — пакет уходит в «Мой маршрут»'],
@@ -3613,7 +3638,9 @@ function renderShiftCard(){
   const sh=state.shift,done=shiftDone(),blk=shiftBlock().length,n=shiftIssues();
   let h=`<div class="panel focus shiftp"><div class="ph"><div class="ic">${ico('op',18)}</div><div><h2>Начало смены · окно ${ME.win}</h2><div class="sub">окно закрыто: проверьте рабочее место и откройте окно</div></div>${pl(!done?'c':blk?'r':n?'a':'g',!done?'проверяем…':blk?'окно не открыть':n?'замечаний: '+n:'всё готово')}</div>`;
   h+=`<div class="fields dfl sh-who"><div class="f"><small>Оператор</small><b>${ME.name}</b></div><div class="f"><small>Роль</small><b>Оператор · линия «Оператор»</b></div><div class="f"><small>Окно</small><b>${ME.win} · по графику</b></div><div class="f"><small>Смена</small><b class="num2">${SHIFT.from}–${SHIFT.to}</b></div></div>`;
-  SHIFT_GROUPS.forEach(([g,gt])=>{h+=`<div class="wks"><small class="wkl">${gt}</small><div class="shc">${SHIFT_CHECKS.filter(c=>c[1]===g).map(shiftRow).join('')}</div></div>`});
+  SHIFT_GROUPS.forEach(([g,gt])=>{const L=SHIFT_CHECKS.filter(c=>c[1]===g),okN=L.filter(([k])=>g==='hand'?state.shift.hand.has(k):shiftRes(k)==='ok').length,bad=c=>g!=='hand'&&['warn','bad'].includes(shiftRes(c[0]));
+    const sorted=[...L.filter(bad),...L.filter(c=>!bad(c))];   // замечания — наверх группы
+    h+=`<section class="shg shg-${g}"><div class="shg-h"><b>${gt}</b><span class="shg-n">${g==='hand'?'отмечено':'в порядке'} ${okN} из ${L.length}</span></div><div class="shc">${sorted.map(shiftRow).join('')}</div></section>`});
   if(done)h+=`<button class="lnk" data-shcheck="all">Проверить всё заново</button>`;
   h+=`<p class="hint">Состояние устройств передаёт агент рабочего места: служба печати, драйвер кассы, мост к устройствам. Какие датчики есть — зависит от модели [проверить на закупаемых моделях]. Проверки — демо.</p></div>`;
   $('#colC').innerHTML=h;
