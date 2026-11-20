@@ -5776,8 +5776,11 @@ setTimeout(towerFit,0);setTimeout(towerFit,400);
 
 // ----- Печать чека на принтер чеков у окна (владелец, 20.11.2026: «смогу с сайта отправить чек при нажатии отдельной кнопки „Напечатать чек“? Только чек, А4 не надо»).
 // Принтер — Mertech HM-E200 по Bluetooth, лента только 58 мм (владелец, 21.11.2026: «надо настроить, бумага там только 58 мм, выбирать её не нужно»).
-// Проверка планшета 21.11.2026: HM-E200 привязан как классический Bluetooth (SPP), не BLE — Web Bluetooth его не видит, поэтому печать идёт через Web Serial
-// (порт RFCOMM; в Chrome 157 на Galaxy Tab Active5 navigator.serial есть). Прежний путь по USB убран: «совместимые устройства не найдены» — принтер не на кабеле.
+// Проверка планшета 21.11.2026: HM-E200 привязан как классический Bluetooth (SPP), не BLE — Web Bluetooth его не видит. Web Serial умеет SPP только на компьютере
+// (Chrome 117+); на Android выбор порта пуст даже без фильтров — проверено на планшете, и Google пишет, что на Android это не поддерживается.
+// Поэтому на планшете чек уходит в приложение-драйвер RawBT (печать ESC/POS на Bluetooth-принтеры): страница открывает intent со строкой чека в base64,
+// RawBT печатает на выбранный в нём принтер. Нет приложения — Chrome откроет его страницу в Google Play. Формат intent — [проверить на планшете].
+// На компьютере — Web Serial напрямую. В продукте — мост к устройству в оболочке Android (apps/android, интерфейс Hardware), без стороннего приложения.
 // Команды — ESC/POS (их понимают принтеры чеков Mertech [проверить на модели]); русские буквы — кодовая страница PC866 (ESC t 17 [проверить на модели]).
 // ВАЖНО: это не кассовый чек. Кассовый чек печатает только онлайн-касса (ККТ); Mertech без фискального накопителя печатает копию-квитанцию [проверить у бухгалтера].
 const RCP_COLS=32;   // символов в строке на ленте 58 мм
@@ -5817,7 +5820,12 @@ async function rcpBtPort(ask){
   if(!rcpPort)throw new Error('принтер не выбран');
   return rcpPort;
 }
+const rcpAndroid=/Android/i.test(navigator.userAgent);
+// планшет: строка ESC/POS в base64 → приложение RawBT (ru.a402d.rawbtprinter)
+function rcpRawBt(data){let s='';for(const b of data)s+=String.fromCharCode(b);
+  location.href='intent:base64,'+btoa(s)+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end'}
 async function rcpSend(data){
+  if(rcpAndroid){rcpRawBt(data);return 'rawbt'}
   const port=await rcpBtPort(true);
   if(!port.writable)await port.open({baudRate:9600});   // у Bluetooth скорость не важна, но поле обязательно
   const wr=port.writable.getWriter();
@@ -5831,16 +5839,18 @@ const rcpErr=e=>e&&e.name==='NotFoundError'?'принтер не выбран �
 async function rcpPrint(){
   const q=state.cur&&byN(state.cur);if(!q||rcpBusy)return;const w=ws(q);
   rcpBusy=true;render();
-  try{await rcpSend(rcpBytes(q,w));audit(w,'Квитанция напечатана на принтере чеков у окна (Bluetooth)');toast('Чек отправлен на принтер')}
+  try{const via=await rcpSend(rcpBytes(q,w));
+    if(via==='rawbt'){audit(w,'Квитанция передана на принтер чеков у окна (Bluetooth, через RawBT)');toast('Чек передан в RawBT — он печатает на HM-E200')}
+    else{audit(w,'Квитанция напечатана на принтере чеков у окна (Bluetooth)');toast('Чек отправлен на принтер')}}
   catch(e){rcpPort=null;console.warn('печать чека:',e&&e.name);toast('Чек не напечатался: '+rcpErr(e))}
   rcpBusy=false;render();
 }
 // строка в «Итог и выдача»: отдельная кнопка «Напечатать чек» — только чек, без памятки А4; лента одна (58 мм), выбирать нечего
 function rcpRow(q,w){
-  const due=sums(w,true).client,paid=!!w.pay.paid||!due,can=!!navigator.serial;
-  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${pl(rcpPort?'g':'d',can?'Mertech HM-E200 · Bluetooth · 58 мм':'нужен Chrome с Bluetooth')}</div>`+
+  const due=sums(w,true).client,paid=!!w.pay.paid||!due,can=rcpAndroid||!!navigator.serial;
+  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${pl(rcpPort?'g':'d',can?'Mertech HM-E200 · Bluetooth · 58 мм'+(rcpAndroid?' · через RawBT':''):'нужен Chrome с Bluetooth')}</div>`+
     `<button class="btn ${paid?'go2':'ghost'} sm" data-rcpprint="1"${rcpBusy||!can?' disabled':''}>${ico('printer',18)}${rcpBusy?'Печать…':'Напечатать чек'}</button></div>`+
-    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера]. Первый раз Chrome спросит принтер — выберите HM-E200.</p>`;
+    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера]. ${rcpAndroid?'На планшете печатает приложение RawBT: один раз выберите в нём HM-E200.':'Первый раз Chrome спросит принтер — выберите HM-E200.'}</p>`;
 }
 document.addEventListener('click',e=>{const b=e.target.closest('button[data-rcpprint]');if(b&&!b.disabled)rcpPrint()});
 if(navigator.serial)navigator.serial.addEventListener('disconnect',e=>{if(rcpPort&&e.target===rcpPort){rcpPort=null;render()}});
