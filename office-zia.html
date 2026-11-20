@@ -2136,6 +2136,9 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 @media (prefers-reduced-motion:reduce){.main.oz{transition:none!important}}
 /* «как на компьютере» на планшете: у шапки зазор 6 — линия под знаком уезжала на 6 правее края меню (угол над «Вызовом») */
 .pcview .top>.title{margin-left:-6px}
+/* планшет вертикально (владелец, 21.11.2026: «фото и остальное влево уехало сверху»): заголовок окна скрыт, и шапке нечем было заполнить середину —
+   кнопки и фото прижимались к логотипу. Логотип слева, всё остальное — к правому краю */
+@media (max-width:860px){.top>.brand{margin-right:auto}}
 
 </style>
 <script>
