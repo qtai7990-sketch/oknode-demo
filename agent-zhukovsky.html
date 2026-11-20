@@ -1166,15 +1166,17 @@ svg{flex:none}
 .tkmock .tm-c::after{content:'';display:block;margin:2.4cqh auto 0;width:80cqw;border-top:1.5px dotted var(--ink-3)}
 .tkmock canvas,.tab #fvp .tkmock canvas{width:auto;height:52cqh;margin:3cqh 0}
 .tkmock .tm-n,.tab #fvp .tkmock .tm-n{font-size:6.4cqh;letter-spacing:.08em;white-space:nowrap;padding:.6cqh 3cqh;border-width:1.5px}
-/* экран поиска (владелец, 21.11.2026: «чуть крупнее, вниз само поле раздвинь до нижнего блока»): панель QR — на всю высоту до нижней панели,
-   рамка сканера забирает свободное место, талон в ней растёт вместе с рамкой. Горизонтально; вертикально панели стоят одна под другой */
+/* экран поиска (владелец, 21.11.2026: «чуть крупнее, вниз само поле раздвинь до нижнего блока»; «крупнее, а надо как все»):
+   на компьютере панель QR — на всю высоту до нижней панели, рамка сканера забирает свободное место, талон растёт вместе с ней;
+   на планшете рамка — как на остальных шагах (2:1, было 2,5:1 — ниже других), талон в ней — по высоте рамки */
 @media (min-aspect-ratio:1/1){
-  .main:has(#viewFind:not([hidden]))>div{height:100%}
-  #viewFind{height:100%;align-items:stretch}
-  #viewFind>.panel.pscan{display:flex;flex-direction:column}
-  #viewFind #fvp,.tab #viewFind #fvp{flex:1 1 auto;aspect-ratio:auto;min-height:190px}
+  :root:not(.tab) .main:has(#viewFind:not([hidden]))>div{height:100%}
+  :root:not(.tab) #viewFind{height:100%;align-items:stretch}
+  :root:not(.tab) #viewFind>.panel.pscan{display:flex;flex-direction:column}
+  :root:not(.tab) #viewFind #fvp{flex:1 1 auto;aspect-ratio:auto;min-height:190px}
   #viewFind .tkmock{max-height:380px}
 }
+.tab #fvp{aspect-ratio:2/1}
 
 </style>
 <script>
