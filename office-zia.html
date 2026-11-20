@@ -1958,6 +1958,26 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .pl-login .pl-body small{color:#556274}
 .pl-login .pl-body input{background:#fff;color:#0f172a;border-color:#cbd5e1}
 .pl-login .pl-mark{background:#e3f4fa;color:#0f172a}
+/* сворачивание левого меню (oz30.js, sideApply) */
+.sideBtn{flex:none;width:40px;height:40px;margin:0 0 0 10px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.sideBtn:hover{color:var(--text);background:var(--hover)}
+.sideBtn svg{transition:transform .2s}
+.side-mini .sideBtn svg{transform:rotate(180deg)}
+.tab .sideBtn{margin-left:8px}
+/* компьютер и «как на компьютере», свёрнуто: только значки */
+.side-mini:not(.tab) .app{grid-template-columns:76px minmax(0,1fr)}
+.side-mini:not(.tab) .brand{width:auto;padding-left:6px}
+.side-mini:not(.tab) .brand .bt{display:none}
+.side-mini:not(.tab) .side{padding:12px 0 0}
+.side-mini:not(.tab) .nav{position:relative;justify-content:center;gap:0;padding:0;width:70px;height:58px;font-size:0;border-radius:0 12px 12px 0}
+.side-mini:not(.tab) .nav svg{width:26px;height:26px}
+.side-mini:not(.tab) .nav .cnt{position:absolute;top:7px;right:7px;margin:0;font-size:10px;font-weight:700;padding:1px 6px}
+.side-mini:not(.tab) .route .rt{display:none}
+/* планшет, свёрнуто: меню скрыто */
+.side-mini.tab .app{grid-template-columns:0 minmax(0,1fr)}
+.side-mini.tab .side{display:none!important}
+.side-mini.tab .brand .mark{border-right:0}
+@media (max-width:860px){.side-mini.tab .app{grid-template-columns:0 minmax(0,1fr)}}
 
 </style>
 <script>
@@ -5451,6 +5471,9 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyT'&&state.section==='desk'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&!e.ctrlKey&&!e.metaKey&&!e.altKey){trOpen();e.preventDefault()}
 });
 
+// ----- Не сообщать сайтам адрес нашей страницы (владелец, 20.11.2026: голос перевода молчал на планшете). Голос Google (translate_tts) не отдаёт звук,
+// если в запросе есть ссылка на чужой сайт: с github.io браузер её отправлял — ответ блокировался (ERR_BLOCKED_BY_ORB). С файла на диске ссылки нет, поэтому на компьютере работало.
+document.head.insertAdjacentHTML('afterbegin','<meta name="referrer" content="no-referrer">');
 // ----- Вход в системы партнёров и запас болванок SIM (владелец, 20.11.2026).
 // «Входить в системы партнёров будет при первом оформлении внутри»: перед первым окном партнёра за смену — страница входа портала;
 // логин сотрудника точки продаж подставлен из профиля оператора, пароль вводит оператор, мы его не храним. Дальше окна этого партнёра открываются сразу.
@@ -5505,15 +5528,34 @@ function callSay(n){
 // Только на настоящем планшете (вид «планшет» без предпросмотра на ПК); выбор запоминается в браузере. Переключатель — меню «Демо».
 const TAB_ZOOMS=[[1,'Крупно · 100%'],[0.9,'Обычно · 90%'],[0.8,'Плотно · 80%']];
 let tabZoom=0.8;try{const v=+localStorage.getItem('tabZoom');if(TAB_ZOOMS.some(z=>z[0]===v))tabZoom=v}catch(e){}
-function applyZoom(){const r=document.documentElement,real=r.classList.contains('tab')&&!r.classList.contains('preview'),z=real?tabZoom:1;
+// «Как на компьютере» на планшете (владелец, 20.11.2026: «в мобильном браузере вариант открывать как на компьютере»): три колонки, раскладка шириной 1280 — экран 960 при масштабе 75%.
+// Удобнее горизонтально; вертикально раскладка тоже не ломается, но мелкая.
+let pcView=false;try{pcView=localStorage.getItem('pcView')==='1'}catch(e){}
+function applyZoom(){const r=document.documentElement;
+  if(pcView&&innerWidth<=1300&&!r.classList.contains('preview')){if(r.classList.contains('tab'))r.classList.remove('tab');if(!r.classList.contains('pcview'))r.classList.add('pcview');const z=Math.max(0.6,Math.min(1,innerWidth/1280));r.style.zoom=String(z);r.style.setProperty('--vh',(innerHeight/z)+'px');return}
+  if(r.classList.contains('pcview'))r.classList.remove('pcview');   // менять класс только если он другой: наблюдатель за классом иначе зацикливается
+  const real=r.classList.contains('tab')&&!r.classList.contains('preview'),z=real?tabZoom:1;
   r.style.zoom=z===1?'':String(z);if(z!==1)r.style.setProperty('--vh',(innerHeight/z)+'px');else r.style.removeProperty('--vh')}
 addEventListener('resize',applyZoom);document.addEventListener('fullscreenchange',()=>setTimeout(applyZoom,50));
 // вид «планшет» включается позже этой части — следим за классом корня, иначе при открытии масштаб не срабатывал
 new MutationObserver(applyZoom).observe(document.documentElement,{attributes:true,attributeFilter:['class']});setTimeout(applyZoom,0);
 const zoomHtml=()=>`<div class="panel"><div class="ph"><div class="ic">${ico('scan',18)}</div><div><h2>Масштаб на планшете</h2><div class="sub">Galaxy Tab Active5 · 8″ · 1920×1200: Chrome показывает страницу как 960×600; меньше масштаб — больше строк на экране</div></div></div>`+
   `<div class="seg wrap">${TAB_ZOOMS.map(([z,t])=>`<button class="${tabZoom===z?'sel':''}" data-tzoom="${z}" aria-pressed="${tabZoom===z}">${t}</button>`).join('')}</div>`+
-  `<p class="hint">Работает в виде «планшет». На компьютере в предпросмотре планшета масштаб не меняется.</p></div>`;
+  `<small class="wkl mt">Вид на планшете</small><div class="seg wrap"><button class="${pcView?'':'sel'}" data-pcview="0" aria-pressed="${!pcView}">Планшет · вкладки</button><button class="${pcView?'sel':''}" data-pcview="1" aria-pressed="${pcView}">Как на компьютере · три колонки</button></div>`+
+  `<p class="hint">Масштаб работает в виде «планшет». «Как на компьютере» — очередь, клиент и услуги сразу на экране, мельче; удобнее горизонтально. На компьютере не меняется.</p></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pcview]');if(!b)return;pcView=b.dataset.pcview==='1';try{localStorage.setItem('pcView',pcView?'1':'0')}catch(x){}
+  if(!pcView&&typeof applyMode==='function')applyMode();applyZoom();render()});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tzoom]');if(!b)return;tabZoom=+b.dataset.tzoom;try{localStorage.setItem('tabZoom',String(tabZoom))}catch(x){}applyZoom();render()});
+// ----- Сворачивание левого меню (владелец, 20.11.2026: «ужатие боковой левой колонки… на компьютере тоже, но по умолчанию на компьютере — раскрытой»).
+// Кнопка в шапке слева. Компьютер: раскрыто → только значки. Планшет (там меню и так из значков): свёрнуто — меню скрыто, вся ширина под работу.
+// Выбор запоминается отдельно для компьютера и планшета; по умолчанию раскрыто.
+const sideKey=()=>document.documentElement.classList.contains('tab')?'sideMini:tab':'sideMini:wide';
+function sideGet(){try{return localStorage.getItem(sideKey())==='1'}catch(e){return false}}
+function sideApply(){const r=document.documentElement,on=sideGet();if(r.classList.contains('side-mini')!==on)r.classList.toggle('side-mini',on);
+  const b=document.getElementById('sideBtn');if(b){b.setAttribute('aria-expanded',String(!on));b.title=on?'Развернуть меню':'Свернуть меню';b.setAttribute('aria-label',b.title)}}
+(()=>{const top=document.querySelector('header.top');if(top&&!document.getElementById('sideBtn'))top.insertAdjacentHTML('afterbegin','<button class="sideBtn" id="sideBtn" aria-expanded="true" title="Свернуть меню" aria-label="Свернуть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>')})();
+document.addEventListener('click',e=>{const b=e.target.closest('#sideBtn');if(!b)return;const on=!sideGet();try{localStorage.setItem(sideKey(),on?'1':'0')}catch(x){}sideApply()});
+new MutationObserver(sideApply).observe(document.documentElement,{attributes:true,attributeFilter:['class']});setTimeout(sideApply,0);
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
