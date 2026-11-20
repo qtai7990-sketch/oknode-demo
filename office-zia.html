@@ -3619,7 +3619,7 @@ function renderDemo(){
   $('#demo').innerHTML=`<div class="panel"><div class="ph"><div class="ic">${ico('route',18)}</div><div><h2>Пути с начала</h2><div class="sub">идёте сами по кнопкам, от начала до конца</div></div></div><div class="dmp">`+
     DEMO_PATHS.map(([h,t,d],i)=>`<button class="dmc${cur===h?' on':''}" data-demo="${h}"><span class="dmn">${i+1}</span><span><b>${t}</b><small>${d}</small></span></button>`).join('')+`</div></div>`+
     `<div class="panel"><div class="ph"><div class="ic">${ico('task',18)}</div><div><h2>Готовые ситуации</h2><div class="sub">сразу на нужном шаге — посмотреть экран</div></div></div><div class="dms">`+
-    DEMO_SITS.map(([h,t])=>`<button class="var${cur===h?' sel':''}" data-demo="${h}">${t}</button>`).join('')+`</div></div>`+scenMenuHtml(cur);
+    DEMO_SITS.map(([h,t])=>`<button class="var${cur===h?' sel':''}" data-demo="${h}">${t}</button>`).join('')+`</div></div>`+scenMenuHtml(cur)+(typeof zoomHtml==='function'?zoomHtml():'');   // масштаб на планшете (oz30.js)
 }
 
 // ----- Формы задач и предпросмотр услуги (владелец, 19.11.2026: «висит задача — почему нет формы, по которой я её исполняю? и так же к другим»).
@@ -5478,6 +5478,19 @@ function callSay(n){
   try{if(typeof trGoogle==='function'&&(!state.tr||state.tr.cloud!==false)){trGoogle(text,'ru');return}}catch(e){}
   if(typeof sayText==='function')sayText('call',text,'ru');
 }
+// ----- Плотность на планшете (владелец, 20.11.2026: «Galaxy Tab Active5, 8″, 1920×1200 — нам надо под него оптимизировать, там же HD»).
+// Chrome на нём удваивает пиксели: страница видит экран 960×600, поэтому всё крупное. Масштаб 80% даёт раскладке 1200×750 — больше строк на экране,
+// кнопка 48 → 38 единиц вёрстки (около 7 мм на этом экране; в docs/04 для планшета офиса — от 48 [макет отступает по просьбе владельца]).
+// Только на настоящем планшете (вид «планшет» без предпросмотра на ПК); выбор запоминается в браузере. Переключатель — меню «Демо».
+const TAB_ZOOMS=[[1,'Крупно · 100%'],[0.9,'Обычно · 90%'],[0.8,'Плотно · 80%']];
+let tabZoom=0.8;try{const v=+localStorage.getItem('tabZoom');if(TAB_ZOOMS.some(z=>z[0]===v))tabZoom=v}catch(e){}
+function applyZoom(){const r=document.documentElement,real=r.classList.contains('tab')&&!r.classList.contains('preview'),z=real?tabZoom:1;
+  r.style.zoom=z===1?'':String(z);if(z!==1)r.style.setProperty('--vh',(innerHeight/z)+'px');else r.style.removeProperty('--vh')}
+addEventListener('resize',applyZoom);document.addEventListener('fullscreenchange',()=>setTimeout(applyZoom,50));applyZoom();
+const zoomHtml=()=>`<div class="panel"><div class="ph"><div class="ic">${ico('scan',18)}</div><div><h2>Масштаб на планшете</h2><div class="sub">Galaxy Tab Active5 · 8″ · 1920×1200: Chrome показывает страницу как 960×600; меньше масштаб — больше строк на экране</div></div></div>`+
+  `<div class="seg wrap">${TAB_ZOOMS.map(([z,t])=>`<button class="${tabZoom===z?'sel':''}" data-tzoom="${z}" aria-pressed="${tabZoom===z}">${t}</button>`).join('')}</div>`+
+  `<p class="hint">Работает в виде «планшет». На компьютере в предпросмотре планшета масштаб не меняется.</p></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tzoom]');if(!b)return;tabZoom=+b.dataset.tzoom;try{localStorage.setItem('tabZoom',String(tabZoom))}catch(x){}applyZoom();render()});
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
