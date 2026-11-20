@@ -1063,7 +1063,8 @@ svg{flex:none}
 .desk-n svg{flex:none}
 .hold-n{font-size:12px;font-weight:600;color:var(--amber);display:flex;align-items:center;gap:6px}
 /* номер в офис */
-.paper .tline{font-size:12px;font-weight:700;color:var(--ink-2);text-align:center}
+/* окно — над номером, как на талоне очереди (владелец, 21.11.2026: «окно выше надо поставить, гармонизируй») */
+.paper .tline{font-size:12px;font-weight:700;color:var(--ink-2);text-align:center;margin-bottom:-2px}
 .paper .tline b{display:block;font-size:15px;color:var(--ink)}
 .paper .tsv li.tk-nx{justify-content:center;font-weight:600}
 .paper .tsv li.tk-nx::before{display:none}
@@ -1332,8 +1333,8 @@ svg{flex:none}
           <div class="paperwrap"><div class="paper" id="paper">
             <div class="tk-head"><svg class="tk-mark" viewBox="0 0 52 44" aria-hidden="true"><g transform="translate(27 20) rotate(-36) scale(.8)"><path class="tk-pl" d="M22 0C21-1.6 18.5-2.6 15-2.6H4L-6-18h-4.5L-4-2.6l-10 .2L-19-9h-3l2.5 7.4c-1 .6-1 2.6 0 3.2L-22 9h3l5-6.6 10 .2L-10.5 18H-6L4 2.6h11c3.5 0 6-1 7-2.6zM-1.2-10.4h5.2a1.4 1.4 0 0 1 0 2.8h-5.2zM-1.2 7.6h5.2a1.4 1.4 0 0 1 0 2.8h-5.2z"/></g></svg><div class="tk-brand"><div class="tb">ДОКУМЕНТ ЭКСПРЕСС</div><div class="tcap">Номер в офис · 2-й этаж</div></div></div>
             <div class="tsep"></div>
-            <div class="tcode" id="tCode"></div>
             <div class="tline" id="tFirst"></div>
+            <div class="tcode" id="tCode"></div>
             <canvas id="tQr" width="296" height="296"></canvas>
             <ul class="tsv" id="tSv"></ul>
             <div class="tsep"></div>
@@ -2361,46 +2362,61 @@ if(HASH==='#history'){state.section='history';render()}
 // Общий модуль макетов агентов (agent-neon, agent-zia); сборки вставляют его в страницу. Как в окне оператора (office-zia/parts/oz31.js):
 //   планшет (Android) — чек уходит в приложение RawBT (intent, ESC/POS в base64; HM-E200 там выбран принтером по умолчанию, печать без окна);
 //   компьютер — Web Serial по Bluetooth (SPP), Chrome один раз спросит принтер. Web Serial на Android классический Bluetooth не видит — проверено 21.11.2026.
-// Талон печатается КАРТИНКОЙ (растр ESC/POS GS v 0, 384 точки = 48 мм ленты 58 мм): таджикские, узбекские буквы, галочки и QR выходят как на экране,
-// кодовая страница принтера не важна. Берём то, что уже нарисовано на бумажном талоне (#paper): номер, первая строка, QR, услуги, надпись на языке клиента.
+// Талон — текстом принтера и картинками только там, где без них нельзя (владелец, 21.11.2026: талон целиком картинкой «напечатал только немного»,
+// номер «разъехался О - 014»). Заголовок, номер (двойной размер), строки и услуги — шрифтом HM-E200, кириллица PC866 (ESC t 17, проверено пробной полоской);
+// QR и надпись на таджикском/узбекском/киргизском (букв ӣ ӯ ҳ қ ғ ҷ ў нет в PC866) — растром ESC/POS GS v 0 шириной 384 точки (48 мм ленты 58 мм).
+// Данных втрое меньше, чем у талона целиком картинкой. Берём то, что уже нарисовано на бумажном талоне (#paper).
 // ПДн на талоне нет (CLAUDE.md, «Правила данных»): печатаем ровно предпросмотр, в котором их нет. Демо-состояния принтера (бумага кончилась, нет связи) остаются
 // имитацией: настоящая печать идёт только в состоянии «готов». Включается переключателем в панели принтера; по умолчанию — включена на планшете.
 (()=>{
-const HM_W=384,HM_SPP=['00001101-0000-1000-8000-00805f9b34fb','e5b152ed-6b46-09e9-4678-665e9a972cbc'];
+const HM_W=384,HM_COLS=32,HM_SPP=['00001101-0000-1000-8000-00805f9b34fb','e5b152ed-6b46-09e9-4678-665e9a972cbc'];
 const hmAndroid=/Android/i.test(navigator.userAgent);
 let hmOn=hmAndroid;try{const v=localStorage.getItem('hmPrint');if(v==='1'||v==='0')hmOn=v==='1'}catch(e){}
 let hmPort=null;
 const say=m=>{if(typeof toast==='function')toast(m)};
-// ---- талон → картинка 384 точки
-function hmWrap(ctx,text,w){const out=[];for(const para of String(text).split('\n')){let line='';for(const word of para.split(/\s+/)){const t=line?line+' '+word:word;if(ctx.measureText(t).width>w&&line){out.push(line);line=word}else line=t}if(line)out.push(line)}return out}
-function hmCanvas(paper){
-  const font=getComputedStyle(document.body).fontFamily||'sans-serif',W=HM_W,pad=8,c=document.createElement('canvas'),x=c.getContext('2d');
-  const txt=s=>paper.querySelector(s)?paper.querySelector(s).innerText.trim():'';
-  const head=txt('.tk-head'),code=txt('#tCode'),first=txt('#tFirst'),note=txt('#tNote'),qr=paper.querySelector('#tQr');
+// ---- кириллица → PC866; null — в строке есть буква, которой в PC866 нет (тогда строка печатается картинкой)
+function cp866(s){const out=[];for(const ch of String(s)){const c=ch.codePointAt(0);
+  if(c<128)out.push(c);else if(c>=0x410&&c<=0x42F)out.push(c-0x410+0x80);else if(c>=0x430&&c<=0x43F)out.push(c-0x430+0xA0);else if(c>=0x440&&c<=0x44F)out.push(c-0x440+0xE0);
+  else if(c===0x401)out.push(0xF0);else if(c===0x451)out.push(0xF1);else if(c===0x2116)out.push(0xFC);else if(c===0x2713||c===0x2714||c===0x221A)out.push(0xFB);
+  else if(c===0xA0||c===0x202F||c===0x2009)out.push(32);else if(c===0x2014||c===0x2013)out.push(45);else if(c===0xAB||c===0xBB)out.push(34);else if(c===0xB7||c===0x2022)out.push(0xFA);
+  else return null}return out}
+// перенос по словам на ширину ленты
+function wrapCols(s,n){const out=[];let line='';for(const w of String(s).split(/\s+/).filter(Boolean)){const t=line?line+' '+w:w;if(t.length>n&&line){out.push(line);line=w}else line=t}if(line)out.push(line);return out}
+// ---- картинка (canvas) → GS v 0 полосами по 48 строк
+function raster(c){const W=c.width,H=c.height,bw=W/8,d=c.getContext('2d').getImageData(0,0,W,H).data,B=[];
+  for(let y0=0;y0<H;y0+=48){const h=Math.min(48,H-y0);B.push(0x1D,0x76,0x30,0,bw&255,bw>>8,h&255,h>>8);
+    for(let y=y0;y<y0+h;y++)for(let bx=0;bx<bw;bx++){let v=0;for(let k=0;k<8;k++){const i=(y*W+bx*8+k)*4;if(d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11<150)v|=0x80>>k}B.push(v)}}
+  return B}
+function blank(h){const c=document.createElement('canvas');c.width=HM_W;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,HM_W,h);x.fillStyle='#000';return [c,x]}
+// QR с экрана → 240 точек по центру ленты, без сглаживания (модули остаются чёткими)
+function qrImg(qr){const S=240,[c,x]=blank(S+8);x.imageSmoothingEnabled=false;x.drawImage(qr,(HM_W-S)/2,4,S,S);return c}
+// строка, которой нет в PC866, — картинкой по центру
+function textImg(s,px){const font=getComputedStyle(document.body).fontFamily||'sans-serif',[m,mx]=blank(10);mx.font='600 '+px+'px '+font;
+  const lines=[];let line='';for(const w of String(s).split(/\s+/).filter(Boolean)){const t=line?line+' '+w:w;if(mx.measureText(t).width>HM_W-16&&line){lines.push(line);line=w}else line=t}if(line)lines.push(line);
+  const lh=Math.round(px*1.3),[c,x]=blank(lines.length*lh+6);x.font='600 '+px+'px '+font;x.textAlign='center';x.textBaseline='top';lines.forEach((l,i)=>x.fillText(l,HM_W/2,3+i*lh));return c}
+function hmBytes(paper){
+  const B=[],cmd=(...a)=>B.push(...a),line=s=>{const e=cp866(s);if(e){B.push(...e,10);return true}return false};
+  const txt=s=>{const e=paper.querySelector(s);return e?e.innerText.trim():''};
+  const text=(s,center)=>{cmd(0x1B,0x61,center?1:0);for(const l of wrapCols(s,HM_COLS))if(!line(l)){cmd(0x1B,0x61,1);B.push(...raster(textImg(l,20)))}};
+  const sep=()=>{cmd(0x1B,0x61,0);line('-'.repeat(HM_COLS))};
+  cmd(0x1B,0x40,0x1C,0x2E,0x1B,0x74,17);   // сброс; выключить китайский режим; PC866
+  const head=txt('.tk-head').split('\n').map(s=>s.trim()).filter(Boolean);
+  if(head.length){cmd(0x1B,0x61,1,0x1B,0x45,1);text(head[0],true);cmd(0x1B,0x45,0);head.slice(1).forEach(h=>text(h,true))}
+  const gap=n=>cmd(0x1B,0x4A,n);   // прогон на n точек — ровные отступы между блоками (владелец: «гармонизируй»)
+  sep();gap(6);
+  // окно — над номером, как на экранном талоне (агент Жуковский: «Окно / Оператор · окна 14–16»); подпись «Окно» не печатаем — строка и так про окно
+  const first=txt('#tFirst').split('\n').map(s=>s.trim()).filter(s=>s&&s!=='Окно');
+  if(first.length){cmd(0x1B,0x45,1);first.forEach(s=>text(s,true));cmd(0x1B,0x45,0);gap(4)}
+  // номер — двойной ширины и высоты, жирный; текст номера без пробелов (на экране между символами — разрядка, в тексте её нет)
+  const code=(paper.querySelector('#tCode')||{}).textContent||'';
+  if(code.trim()){cmd(0x1B,0x61,1,0x1B,0x45,1,0x1D,0x21,0x11);line(code.replace(/\s+/g,''));cmd(0x1D,0x21,0x00,0x1B,0x45,0);gap(8)}
+  const qr=paper.querySelector('#tQr');if(qr&&qr.width){cmd(0x1B,0x61,1);B.push(...raster(qrImg(qr)));gap(6)}
   const svc=[...paper.querySelectorAll('#tSv li')].map(li=>li.innerText.trim()).filter(Boolean);
-  // сначала считаем высоту, потом рисуем
-  const ops=[];let y=pad;const add=(h,f)=>{ops.push([y,f]);y+=h};
-  x.font='700 22px '+font;hmWrap(x,head,W-2*pad).forEach(l=>add(28,(Y)=>{x.font='700 22px '+font;x.textAlign='center';x.fillText(l,W/2,Y+21)}));
-  add(14,Y=>{x.setLineDash([2,4]);x.beginPath();x.moveTo(pad,Y+7);x.lineTo(W-pad,Y+7);x.stroke();x.setLineDash([])});
-  // номер в рамке: шрифт уменьшается, пока номер (DYU-3C232B длиннее, чем О-014) не влезет; рамка — по ширине номера
-  if(code)add(78,Y=>{let fs=46;do{x.font='800 '+fs+'px '+font;fs-=2}while(x.measureText(code).width>W-2*pad-36&&fs>20);
-    const tw=x.measureText(code).width;x.lineWidth=3;x.strokeRect(W/2-tw/2-16,Y+4,tw+32,66);x.textAlign='center';x.fillText(code,W/2,Y+37+fs*0.36);x.lineWidth=1});
-  if(first){x.font='700 20px '+font;hmWrap(x,first,W-2*pad).forEach(l=>add(26,Y=>{x.font='700 20px '+font;x.textAlign='center';x.fillText(l,W/2,Y+20)}))}
-  if(qr&&qr.width)add(262,Y=>{x.imageSmoothingEnabled=false;x.drawImage(qr,W/2-126,Y+4,252,252)});
-  x.font='500 19px '+font;svc.forEach(s=>hmWrap(x,'✓ '+s,W-2*pad).forEach(l=>add(25,Y=>{x.font='500 19px '+font;x.textAlign='left';x.fillText(l,pad,Y+19)})));
-  if(note){add(14,Y=>{x.setLineDash([2,4]);x.beginPath();x.moveTo(pad,Y+7);x.lineTo(W-pad,Y+7);x.stroke();x.setLineDash([])});
-    x.font='600 19px '+font;hmWrap(x,note,W-2*pad-8).forEach(l=>add(25,Y=>{x.font='600 19px '+font;x.textAlign='center';x.fillText(l,W/2,Y+19)}))}
-  add(pad,()=>{});
-  c.width=W;c.height=Math.ceil(y);x.fillStyle='#fff';x.fillRect(0,0,W,c.height);x.fillStyle='#000';x.strokeStyle='#000';x.textBaseline='alphabetic';
-  for(const [Y,f] of ops)f(Y);
-  return c;
-}
-// ---- картинка → ESC/POS: GS v 0 полосами по 120 строк (у мобильных принтеров маленький буфер)
-function hmRaster(c){
-  const W=c.width,H=c.height,bw=W/8,d=c.getContext('2d').getImageData(0,0,W,H).data,B=[0x1B,0x40];
-  for(let y0=0;y0<H;y0+=120){const h=Math.min(120,H-y0);B.push(0x1D,0x76,0x30,0,bw&255,bw>>8,h&255,h>>8);
-    for(let y=y0;y<y0+h;y++)for(let bx=0;bx<bw;bx++){let v=0;for(let k=0;k<8;k++){const i=(y*W+bx*8+k)*4,lum=d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11;if(lum<150)v|=0x80>>k}B.push(v)}}
-  B.push(0x1B,0x64,4);return new Uint8Array(B);
+  svc.forEach(s=>text('√ '+s,false));
+  // надпись на языке клиента — целиком одним способом: если хоть одной буквы нет в PC866 (таджикский, узбекский), вся надпись — картинкой, а не вперемешку
+  const note=txt('#tNote');if(note){gap(4);sep();gap(4);if(cp866(note.replace(/\s+/g,' ')))text(note,true);else{cmd(0x1B,0x61,1);B.push(...raster(textImg(note,21)))}}
+  cmd(0x1B,0x61,0,0x1B,0x64,4);
+  return new Uint8Array(B);
 }
 // ---- отправка
 function hmRawBt(data){let s='';for(const b of data)s+=String.fromCharCode(b);location.href='intent:base64,'+btoa(s)+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end'}
@@ -2414,7 +2430,7 @@ async function hmSerial(data){
 }
 async function hmPrintPaper(){
   const paper=document.getElementById('paper');if(!paper)return;
-  try{const data=hmRaster(hmCanvas(paper));if(hmAndroid){hmRawBt(data);return}await hmSerial(data);say('Талон отправлен на HM-E200')}
+  try{const data=hmBytes(paper);if(hmAndroid){hmRawBt(data);return}await hmSerial(data);say('Талон отправлен на HM-E200')}
   catch(e){hmPort=null;console.warn('печать талона:',e&&e.name);say('HM-E200 не напечатал: '+(e&&e.name==='NotFoundError'?'принтер не выбран — привяжите его в настройках Bluetooth':e&&e.message||e))}
 }
 // ---- переключатель в панели принтера и перехват кнопки «Напечатать»
@@ -2428,7 +2444,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest('#printBtn')&&hmOn&&(typeof prMode==='undefined'||prMode==='ok')&&!(typeof state!=='undefined'&&state.ticket&&state.ticket.printing))hmPrintPaper();   // сразу, в том же нажатии: с задержкой Chrome спрашивал «Открыть приложение RawBT?» (планшет, 21.11.2026)
 },true);
 setTimeout(hmPaint,0);
-window.hmPrintPaper=hmPrintPaper;window.hmCanvas=hmCanvas;
+window.hmPrintPaper=hmPrintPaper;window.hmBytes=hmBytes;
 })();
 
 // ----- Голосовой переводчик «агент ↔ клиент» для макетов агентов (владелец, 21.11.2026: «добавь туда тоже … переводы»).
