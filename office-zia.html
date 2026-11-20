@@ -2105,11 +2105,13 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .pcview .colTgl{width:34px;height:56px;border-radius:17px}
 /* 21.11.2026 владелец: складывание — незаметные «три точки» вместо круглой кнопки и пилюли; угол шапки и картинка меню без разъезда */
 /* три точки: серые и бледные, ярче при наведении; под точками — кусочек фона, чтобы линия края не шла сквозь них */
-.dots{display:block;width:4px;height:20px;border-radius:3px;background:radial-gradient(circle,currentColor 1.5px,transparent 1.9px) 0 0/4px 8px repeat-y;box-shadow:0 0 0 4px var(--bg);pointer-events:none}
+/* три одинаковых кружка по 4 px через 4 px (владелец, 21.11.2026: «верхние больше нижней» — повторяющийся узор срезал нижнюю точку) */
+.dots{display:block;width:4px;height:20px;--dot:radial-gradient(circle closest-side,currentColor 85%,transparent 100%);background:var(--dot) 0 0/4px 4px no-repeat,var(--dot) 0 8px/4px 4px no-repeat,var(--dot) 0 16px/4px 4px no-repeat;box-shadow:0 0 0 4px var(--bg);border-radius:2px;pointer-events:none}
 /* край меню: вся полоса — щелчок, точки вверху (посередине — точки колонок) */
 .sideEdge{color:var(--muted);opacity:.6;transition:opacity .15s,color .15s}
 /* 21.11.2026 владелец: «сделай все 3 точки одинаковые по размеру» и стрелкой — вниз, на высоту точек колонок: размер — как у .dots колонок, высота — та же (--dots-y ставит oz32.js) */
-.sideEdge .dots{position:absolute;left:50%;top:var(--dots-y,50%);transform:translate(-50%,-50%)}
+.sideEdge .dots{position:absolute;left:-2px;top:var(--dots-y,50%);transform:translateY(-50%);box-shadow:none}   /* целиком внутри меню: на линии края правую половину кружков срезало */
+.side-mini.tab .sideEdge .dots{left:50%;transform:translate(-50%,-50%)}
 .sideEdge::after{content:'';position:absolute;left:50%;top:var(--dots-y,50%);width:28px;height:52px;transform:translate(-50%,-50%)}   /* точки легко попасть пальцем — как у колонок */
 .sideEdge:hover,.sideEdge:focus-visible{opacity:1;color:var(--cyan)}
 .sideEdge:focus-visible{outline:none}
