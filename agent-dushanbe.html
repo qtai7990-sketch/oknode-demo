@@ -2466,6 +2466,49 @@ const sig=document.getElementById('sig');if(!sig||typeof ResizeObserver==='undef
 new ResizeObserver(()=>{const r=sig.getBoundingClientRect();if(!r.width||!r.height)return;const h=Math.round(sig.width*r.height/r.width);
   if(Math.abs(h-sig.height)>2){sig.height=h;if(typeof redrawSig==='function')redrawSig()}}).observe(sig);
 })();
+
+// ----- Раскладка карточек услуг у агентов (владелец, 21.11.2026: «блоки раскидай в выборе услуг, длинные к длинным, чтобы было гармонично,
+// только первые 3 — SIM, банк и полис — не трогай»). В каждом ряду сетки — карточки близкой высоты: меньше пустоты под короткими.
+// Порядок задаётся CSS-свойством order (разметку перерисовывает страница при каждом нажатии — порядок держится сам).
+// Высоты меряются один раз, когда раздел виден, и заново только при смене числа колонок или ширины — не при выборе варианта,
+// иначе карточки прыгали бы под пальцем.
+(()=>{
+const PIN=['sim','bank','dms'];   // первые три — на своих местах
+const grids=[...document.querySelectorAll('.grid[data-sec]')];if(!grids.length)return;
+const memo=new Map();   // сетка → {key, order: id→номер}
+const cols=g=>getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length;
+function plan(g){
+  const cards=[...g.querySelectorAll(':scope>.svc[data-id]')];if(!cards.length||!g.offsetParent)return null;
+  const n=cols(g),key=n+':'+Math.round(g.clientWidth/40)+':'+cards.length;const m=memo.get(g);if(m&&m.key===key)return m;
+  // в сетке карточка растянута на высоту ряда — на время замера выравниваем по верху, чтобы взять её собственную высоту
+  const prev=g.style.alignItems;g.style.alignItems='start';
+  const h=new Map(cards.map(c=>[c.dataset.id,c.getBoundingClientRect().height]));g.style.alignItems=prev;
+  let order=cards.map(c=>c.dataset.id);
+  if(n>1){
+    const pinned=order.filter(id=>PIN.includes(id)).sort((a,b)=>PIN.indexOf(a)-PIN.indexOf(b));
+    let rest=order.filter(id=>!PIN.includes(id));const out=[...pinned];
+    // недостроенный ряд после закреплённых — добиваем карточками, ближайшими по высоте к самой высокой в этом ряду
+    const fillN=(n-out.length%n)%n;
+    if(fillN&&out.length){const row=out.slice(out.length-out.length%n),target=Math.max(...row.map(id=>h.get(id)));
+      for(let k=0;k<fillN&&rest.length;k++){rest.sort((a,b)=>Math.abs(h.get(a)-target)-Math.abs(h.get(b)-target));out.push(rest.shift())}}
+    // остальные — от высоких к низким, рядами по n: соседи по ряду близки по высоте
+    rest.sort((a,b)=>h.get(b)-h.get(a));out.push(...rest);order=out;
+  }
+  const r={key,order:new Map(order.map((id,i)=>[id,i]))};memo.set(g,r);return r;
+}
+function apply(g){
+  // сначала — исходный порядок (чтобы мерить настоящие высоты, а не после прошлой раскладки), потом раскладка
+  const r=plan(g);if(!r)return;
+  g.querySelectorAll(':scope>.svc[data-id]').forEach(c=>{const o=String(r.order.get(c.dataset.id)??999);if(c.style.order!==o)c.style.order=o});
+}
+const run=()=>grids.forEach(apply);
+grids.forEach(g=>new MutationObserver(()=>requestAnimationFrame(()=>apply(g))).observe(g,{childList:true}));
+let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(run,200)});
+// раздел услуг может быть скрыт при открытии — раскладываем, когда он появится на экране
+new MutationObserver(()=>requestAnimationFrame(run)).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-view','data-section']});
+document.querySelectorAll('section').forEach(s=>new MutationObserver(()=>requestAnimationFrame(run)).observe(s,{attributes:true,attributeFilter:['hidden']}));
+setTimeout(run,0);setTimeout(run,600);
+})();
 </script>
 </body>
 </html>
