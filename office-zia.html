@@ -5336,7 +5336,7 @@ const TR_REC={ru:'ru-RU',en:'en-US',tg:'tg-TJ',uz:'uz-UZ',ky:'ky-KG',hi:'hi-IN'}
 const TR_LANGS=[['tg','тоҷикӣ'],['uz','oʻzbekcha'],['ky','кыргызча'],['hi','हिन्दी'],['en','English']];
 // что умеет каждый вариант: [распознавание, перевод, голос] — по справке; «?» — не подтверждено
 const TR_CAN={
-  google:{ru:['✓','—','✓ Google'],en:['✓','✓','✓ Google'],tg:['? Chrome','✓','✓ наша модель, без облака'],uz:['? Chrome','✓','✓ наша модель, без облака'],ky:['? Chrome','✓','✗ — текст на экране'],hi:['✓','✓','✓ Google']},
+  google:{ru:['✓','—','✓ Google'],en:['✓','✓','✓ Google'],tg:['? Chrome','✓','✓ наша модель, без облака'],uz:['? Chrome','✓','✓ наша модель, без облака'],ky:['? Chrome','✓','русский голос Google читает текст'],hi:['✓','✓','✓ Google']},
   yandex:{ru:['✓','—','✓'],en:['✓','✓','✓'],tg:['✗','✓','✗'],uz:['✓ латиница','✓','✓'],ky:['✗','✓','✗'],hi:['✗','✓','✗']}};
 const trKey=()=>state.walk?'walk':state.cur||'none';
 function trSt(){if(!state.tr)state.tr={open:false,prov:'google',cloud:true,lang:null,log:[],key:null,rec:null,busy:'',live:''};const t=state.tr;
@@ -5376,12 +5376,15 @@ function trUnlock(){try{mmsCtx=mmsCtx||new (window.AudioContext||window.webkitAu
 function trSpeak(i){const t=trSt(),m=t.log[i];if(!m)return;const c=m.tl,v=voiceFor(c);trStopAudio();
   if(v&&voiceGood(v)){sayText('tr:'+i,m.dst,c);return}
   if(t.cloud&&TR_GTTS.has(c)){trGoogle(m.dst,c);return}
+  // ky: киргизского голоса нет ни у кого; готовые записи — только для фраз шпаргалки и справочника; иначе текст читает русский голос Google
+  if(c==='ky'&&!(typeof recOf==='function'&&recOf('ky',m.dst))){if(t.cloud){trGoogle(m.dst,'ru');return}toast('Киргизского голоса нет — покажите клиенту экран с переводом');return}
   if((c==='tg'||c==='uz')&&!trMmsReady(c)){trWarm(c);if(t.cloud){trGoogle(c==='uz'&&typeof uzCyr==='function'?uzCyr(m.dst):m.dst,'ru');return}}
   if(canSay(c)){sayText('tr:'+i,m.dst,c);return}
   toast('Для языка «'+trName(c)+'» голоса нет — покажите клиенту экран с переводом');
 }
 const trVoiceTxt=c=>{const v=voiceFor(c);if(v&&voiceGood(v))return 'голос браузера: '+v.name;if(trSt().cloud&&TR_GTTS.has(c))return 'голос Google';
   if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока читает русский голос Google':M.st==='err'?'модель не скачалась — читает русский голос Google':'читает русский голос Google; модель начнёт качаться при первом переводе'}
+  if(c==='ky')return trSt().cloud?'киргизского голоса нет ни у кого — читает русский голос Google':'голоса нет — текст на экране';
   return v?'голос Windows':'голоса нет — текст на экране'};
 async function trPhrase(who,text){
   const t=trSt(),cl=trLang(),sl=who==='op'?'ru':cl,tl=who==='op'?cl:'ru';text=String(text||'').trim();if(!text)return;
