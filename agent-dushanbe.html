@@ -2034,7 +2034,7 @@ function hmPaint(){const p=document.getElementById('prPanel');if(!p)return;let r
 document.addEventListener('click',e=>{
   if(e.target.closest('#hmSw')){hmOn=!hmOn;try{localStorage.setItem('hmPrint',hmOn?'1':'0')}catch(x){}hmPaint();return}
   // демо-состояние «готов» (prMode из макета) — тогда и настоящая печать; сбои остаются имитацией
-  if(e.target.closest('#printBtn')&&hmOn&&(typeof prMode==='undefined'||prMode==='ok')&&!(typeof state!=='undefined'&&state.ticket&&state.ticket.printing))setTimeout(hmPrintPaper,30);
+  if(e.target.closest('#printBtn')&&hmOn&&(typeof prMode==='undefined'||prMode==='ok')&&!(typeof state!=='undefined'&&state.ticket&&state.ticket.printing))hmPrintPaper();   // сразу, в том же нажатии: с задержкой Chrome спрашивал «Открыть приложение RawBT?» (планшет, 21.11.2026)
 },true);
 setTimeout(hmPaint,0);
 window.hmPrintPaper=hmPrintPaper;window.hmCanvas=hmCanvas;
