@@ -1993,7 +1993,7 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .side .sideBtn svg{flex:none}
 /* планшет, свёрнуто: узкая полоска только с кнопкой «развернуть» */
 .side-mini.tab .app{grid-template-columns:40px minmax(0,1fr)}
-.side-mini.tab .side>*:not(#sideBtn){display:none!important}
+.side-mini.tab .side>*:not(#sideEdge){display:none!important}
 .side-mini.tab #sideBtn{width:40px;height:52px;margin-top:4px;border-radius:0 10px 10px 0}
 @media (max-width:860px){.side-mini.tab .app{grid-template-columns:40px minmax(0,1fr)}}
 /* масштаб кнопками в шапке (только планшет) */
@@ -2103,6 +2103,36 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .colTgl:hover{color:var(--text-hi);border-color:rgb(var(--cyan-rgb, 34 211 238) / 0.55)}
 .col-drag,.col-drag *{cursor:col-resize!important;user-select:none!important}
 .pcview .colTgl{width:34px;height:56px;border-radius:17px}
+/* 21.11.2026 владелец: складывание — незаметные «три точки» вместо круглой кнопки и пилюли; угол шапки и картинка меню без разъезда */
+/* три точки: серые и бледные, ярче при наведении; под точками — кусочек фона, чтобы линия края не шла сквозь них */
+.dots{display:block;width:4px;height:20px;border-radius:3px;background:radial-gradient(circle,currentColor 1.5px,transparent 1.9px) 0 0/4px 8px repeat-y;box-shadow:0 0 0 4px var(--bg);pointer-events:none}
+/* край меню: вся полоса — щелчок, точки вверху (посередине — точки колонок) */
+.sideEdge{color:var(--muted);opacity:.6;transition:opacity .15s,color .15s}
+.sideEdge .dots{position:absolute;left:50%;top:1px;height:18px;transform:translateX(-50%);background-size:4px 7px}   /* в отступе над пунктами: в свёрнутом меню активный пункт доходит до края и закрывал точки */
+.sideEdge::after{content:'';position:absolute;left:50%;top:-8px;width:32px;height:40px;transform:translateX(-50%)}   /* точки легко попасть пальцем */
+.sideEdge:hover,.sideEdge:focus-visible{opacity:1;color:var(--cyan)}
+.sideEdge:focus-visible{outline:none}
+.sideEdge:focus-visible .dots{box-shadow:0 0 0 4px var(--bg),0 0 0 6px rgb(var(--cyan-rgb, 34 211 238) / .6)}
+/* планшет: ручка у края меню тоже есть; свёрнутое меню — тонкая полоска с точками, вся полоска нажимается */
+.tab .sideEdge{display:block}
+.side-mini.tab .app{grid-template-columns:18px minmax(0,1fr)}
+@media (max-width:860px){.side-mini.tab .app{grid-template-columns:18px minmax(0,1fr)}}
+.side-mini.tab .side{padding:0}
+.side-mini.tab .sideEdge{right:0;width:100%}
+.side-mini.tab .sideEdge .dots{top:50%;transform:translate(-50%,-50%)}
+.side-mini.tab .sideEdge::after{top:0;height:100%;width:100%}
+/* колонки: точки на ручке вместо пилюли со стрелкой */
+.colTgl,.pcview .colTgl{width:28px;height:52px;border:0;border-radius:8px;background:transparent;color:var(--muted);opacity:.6}
+.colGrip:hover .colTgl,.colTgl:focus-visible{opacity:1}
+.colGrip.off .colTgl{opacity:.75}
+.colTgl:hover{color:var(--cyan);border:0}
+.colTgl:focus-visible{outline:none}.colTgl:focus-visible .dots{box-shadow:0 0 0 4px var(--bg),0 0 0 6px rgb(var(--cyan-rgb, 34 211 238) / .6)}
+/* колонка выезжает и уезжает плавно (переводчик и «Ответы» сами открывают спрятанную правую колонку) */
+:root:not(.tab) .main.oz{transition:grid-template-columns .28s cubic-bezier(.2,0,0,1)}
+.col-drag .main.oz{transition:none!important}
+@media (prefers-reduced-motion:reduce){.main.oz{transition:none!important}}
+/* «как на компьютере» на планшете: у шапки зазор 6 — линия под знаком уезжала на 6 правее края меню (угол над «Вызовом») */
+.pcview .top>.title{margin-left:-6px}
 
 </style>
 <script>
@@ -5699,9 +5729,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tzoom]');i
 const sideKey=()=>document.documentElement.classList.contains('tab')?'sideMini:tab':'sideMini:wide';
 function sideGet(){try{return localStorage.getItem(sideKey())==='1'}catch(e){return false}}
 function sideApply(){const r=document.documentElement,on=sideGet();if(r.classList.contains('side-mini')!==on)r.classList.toggle('side-mini',on);
-  const b=document.getElementById('sideBtn');if(b){b.setAttribute('aria-expanded',String(!on));b.title=on?'Развернуть меню':'Свернуть меню';b.setAttribute('aria-label',b.title);}}
-(()=>{const nav=document.querySelector('.side .nav[data-nav="desk"]');if(nav&&!document.getElementById('sideBtn'))nav.insertAdjacentHTML('beforebegin','<button class="sideBtn" id="sideBtn" aria-expanded="true" title="Свернуть меню" aria-label="Свернуть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>')})();
-document.addEventListener('click',e=>{const b=e.target.closest('#sideBtn');if(!b)return;const on=!sideGet();try{localStorage.setItem(sideKey(),on?'1':'0')}catch(x){}sideApply()});
+  const b=document.getElementById('sideEdge');if(b){b.setAttribute('aria-expanded',String(!on));b.setAttribute('aria-label',on?'Развернуть меню':'Свернуть меню');b.title=b.getAttribute('aria-label')+(r.classList.contains('tab')?'':' · клавиша [');}}
+// 21.11.2026 владелец: круглую кнопку вверху меню убрать («верни как было»); складывание — незаметные «три точки» на краю меню (#sideEdge ниже)
 new MutationObserver(sideApply).observe(document.documentElement,{attributes:true,attributeFilter:['class']});setTimeout(sideApply,0);
 // ----- Масштаб кнопками в шапке (только на планшете): «−  75%  +», шаг 5%; у вида «вкладки» и «как на компьютере» — свой масштаб
 const zoomReal=()=>innerWidth<=1300&&!document.documentElement.classList.contains('preview');
@@ -5718,9 +5747,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-zstep]');i
   applyZoom();render()});
 setTimeout(zoomPaint,0);
 
-// край меню — ручка (как в Linear): щелчок по правой границе меню сворачивает и разворачивает; клавиша «[» — то же (на компьютере, не при вводе текста)
+// край меню — ручка (как в Linear): щелчок по правой границе меню или по «трём точкам» на ней сворачивает и разворачивает; клавиша «[» — то же (на компьютере, не при вводе текста).
+// Точки — вверху края, а не посередине: посередине стоят точки колонок (oz32.js), и при спрятанной очереди они оказались бы рядом.
 function sideToggle(){const on=!sideGet();try{localStorage.setItem(sideKey(),on?'1':'0')}catch(x){}sideApply()}
-(()=>{const side=document.querySelector('.side');if(side&&!document.getElementById('sideEdge'))side.insertAdjacentHTML('beforeend','<button class="sideEdge" id="sideEdge" tabindex="-1" aria-hidden="true" title="Свернуть или развернуть меню · клавиша ["></button>')})();
+(()=>{const side=document.querySelector('.side');if(side&&!document.getElementById('sideEdge'))side.insertAdjacentHTML('beforeend','<button class="sideEdge" id="sideEdge" aria-expanded="true" aria-label="Свернуть меню" title="Свернуть меню"><i class="dots" aria-hidden="true"></i></button>')})();
 document.addEventListener('click',e=>{if(e.target.closest('#sideEdge'))sideToggle()});
 document.addEventListener('keydown',e=>{if(e.key==='['&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&!document.documentElement.classList.contains('tab')){sideToggle();e.preventDefault()}});
 // подсказки у пунктов меню — видны в свёрнутом виде
@@ -5730,10 +5760,15 @@ document.querySelectorAll('.side .nav[data-nav]').forEach(b=>{if(!b.title)b.titl
 // На обеих картинках (ночь и день, 752×1344) центр башни — около 94 px от левого края = 7% высоты; сдвигаем фон так, чтобы он пришёлся на середину колонки.
 const TOWER_X=94/1344;
 function towerFit(){const r=document.documentElement,pic=document.querySelector('.route .pic'),side=document.querySelector('.side');if(!pic||!side)return;
-  if(!(r.classList.contains('tab')||r.classList.contains('side-mini'))){pic.style.backgroundPosition='';pic.style.backgroundSize='';return}
-  // слева у картинки продолжения нет: если для центра не хватает — картинку чуть крупнее (сверху обрезается небо, его и так гасит маска)
-  const W=side.clientWidth,H=pic.clientHeight;if(!W||!H)return;const S=r.classList.contains('tab')?Math.max(H,Math.min(W/2/TOWER_X,H*1.3)):H;   // на компьютере размер постоянный — картинка не скачет   // не больше 1,3 высоты: иначе на низком блоке верх башни уходит за край
+  const W=side.clientWidth,H=pic.clientHeight;if(!W||!H)return;
+  // компьютер: картинка не уже раскрытого меню (212) — на низком экране (планшет «как на компьютере») справа оставалась синяя полоса, «разъезжалось» (владелец, 21.11.2026);
+  // ширину берём у раскрытого меню, а не у текущего — при сворачивании размер не меняется, картинка не скачет
+  if(!r.classList.contains('tab')){const S=Math.max(H,212/PIC_AR);pic.style.backgroundSize='auto '+S.toFixed(1)+'px';
+    pic.style.backgroundPosition=(r.classList.contains('side-mini')?Math.min(0,W/2-TOWER_X*S):0).toFixed(1)+'px 100%';return}
+  // планшет: слева у картинки продолжения нет: если для центра не хватает — картинку чуть крупнее (сверху обрезается небо, его и так гасит маска)
+  const S=Math.max(H,Math.min(W/2/TOWER_X,H*1.3));   // не больше 1,3 высоты: иначе на низком блоке верх башни уходит за край
   pic.style.backgroundSize='auto '+S.toFixed(1)+'px';pic.style.backgroundPosition=Math.min(0,W/2-TOWER_X*S).toFixed(1)+'px 100%'}   // правее левого края не сдвигаем — слева не будет пустой полосы
+const PIC_AR=752/1344;   // ширина к высоте у обеих картинок меню
 addEventListener('resize',()=>setTimeout(towerFit,60));
 new MutationObserver(()=>{towerFit();setTimeout(towerFit,280)}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 document.addEventListener('transitionend',e=>{if(e.target.classList&&e.target.classList.contains('app'))towerFit()});
@@ -5773,6 +5808,14 @@ function rcpBytes(q,w){
   cmd(0x1B,0x64,4);cmd(0x1D,0x56,0x42,0x00);   // прогнать 4 строки и отрезать (у принтера без ножа команда не мешает)
   return new Uint8Array(B);
 }
+// Как подключён принтер (владелец, 21.11.2026: «пишет: совместимые устройства не найдены, хотя принтер подключён»). Проверка планшета:
+// USB-разъём занят кабелем к компьютеру, а принтер HM-E200 привязан по Bluetooth — классический Bluetooth (SPP), не BLE. Web Bluetooth его не видит,
+// поэтому Bluetooth-путь — Web Serial (порт RFCOMM; в Chrome 157 на планшете navigator.serial есть). USB остаётся для принтера на кабеле.
+// Выбор запоминается (rcpVia); Chrome один раз спрашивает устройство, дальше помнит разрешение.
+const RCP_SPP=['00001101-0000-1000-8000-00805f9b34fb','e5b152ed-6b46-09e9-4678-665e9a972cbc'];   // стандартный SPP и служба, которую объявляет HM-E200
+let rcpVia='bt';try{const v=localStorage.getItem('rcpVia');if(v==='usb'||v==='bt')rcpVia=v;else if(!navigator.serial)rcpVia='usb'}catch(e){}
+let rcpPort=null;
+const rcpCan=v=>v==='bt'?!!navigator.serial:!!navigator.usb;
 async function rcpConnect(ask){
   if(!navigator.usb)throw new Error('этот браузер не умеет USB — нужен Chrome на Android или компьютере');
   if(!rcpDev){const list=await navigator.usb.getDevices();rcpDev=list[0]||null}
@@ -5785,29 +5828,52 @@ async function rcpConnect(ask){
     if(ep){if(!itf.claimed)await rcpDev.claimInterface(itf.interfaceNumber);return ep.endpointNumber}}}
   throw new Error('у устройства нет выхода для печати — это не принтер чеков?');
 }
+// Bluetooth: порт, уже разрешённый раньше, — сразу; иначе Chrome покажет список привязанных принтеров (сначала привязать в настройках Android → Bluetooth)
+async function rcpBtPort(ask){
+  if(!navigator.serial)throw new Error('этот браузер не умеет Bluetooth-принтеры — нужен Chrome на Android или компьютере');
+  if(!rcpPort){const ports=await navigator.serial.getPorts();rcpPort=ports.find(p=>{const i=p.getInfo();return i.bluetoothServiceClassId})||ports[0]||null}
+  if(!rcpPort&&ask)rcpPort=await navigator.serial.requestPort({allowedBluetoothServiceClassIds:RCP_SPP,filters:RCP_SPP.map(id=>({bluetoothServiceClassId:id}))});
+  if(!rcpPort)throw new Error('принтер не выбран');
+  return rcpPort;
+}
+async function rcpSendBt(data){
+  const port=await rcpBtPort(true);
+  if(!port.writable)await port.open({baudRate:9600});   // у Bluetooth скорость не важна, но поле обязательно
+  const wr=port.writable.getWriter();
+  try{for(let i=0;i<data.length;i+=512)await wr.write(data.slice(i,i+512))}   // маленькими кусками: у мобильных принтеров маленький буфер
+  finally{wr.releaseLock()}
+  await new Promise(r=>setTimeout(r,400));await port.close().catch(()=>{});   // дать допечатать и освободить принтер для других
+}
+const rcpErr=e=>e&&e.name==='NotFoundError'?(rcpVia==='bt'?'принтер не выбран — если списка нет, привяжите принтер в настройках Android → Bluetooth':'принтер не выбран — USB-принтер не виден: кабель через переходник OTG, разъём не занят зарядкой или компьютером')
+  :e&&e.name==='SecurityError'?'Chrome не дал доступ — страница должна быть по https'
+  :e&&e.name==='NetworkError'?'принтер не отвечает — включён ли он и рядом ли':e&&e.message||String(e);
 async function rcpPrint(){
   const q=state.cur&&byN(state.cur);if(!q||rcpBusy)return;const w=ws(q);
   rcpBusy=true;render();
-  try{const ep=await rcpConnect(true),data=rcpBytes(q,w);
-    for(let i=0;i<data.length;i+=4096)await rcpDev.transferOut(ep,data.slice(i,i+4096));
-    audit(w,'Квитанция напечатана на принтере чеков у окна (USB)');toast('Чек отправлен на принтер'+(rcpDev.productName?' · '+rcpDev.productName:''))}
-  catch(e){const m=e&&e.name==='NotFoundError'?'принтер не выбран':e&&e.name==='SecurityError'?'Chrome не дал доступ к USB — страница должна быть по https':e&&e.message||String(e);
-    console.warn('печать чека:',m);toast('Чек не напечатался: '+m)}
+  try{const data=rcpBytes(q,w);
+    if(rcpVia==='bt')await rcpSendBt(data);
+    else{const ep=await rcpConnect(true);for(let i=0;i<data.length;i+=4096)await rcpDev.transferOut(ep,data.slice(i,i+4096))}
+    audit(w,'Квитанция напечатана на принтере чеков у окна ('+(rcpVia==='bt'?'Bluetooth':'USB')+')');toast('Чек отправлен на принтер'+(rcpName()?' · '+rcpName():''))}
+  catch(e){const m=rcpErr(e);if(rcpVia==='bt')rcpPort=null;console.warn('печать чека:',e&&e.name);toast('Чек не напечатался: '+m)}
   rcpBusy=false;render();
 }
-const rcpName=()=>rcpDev&&(rcpDev.productName||rcpDev.manufacturerName)||'';
+const rcpName=()=>rcpVia==='bt'?(rcpPort?'Bluetooth':''):(rcpDev&&(rcpDev.productName||rcpDev.manufacturerName)||'');
 // строка в «Итог и выдача»: отдельная кнопка «Напечатать чек» — только чек, без памятки А4
 function rcpRow(q,w){
-  const due=sums(w,true).client,paid=!!w.pay.paid||!due;
-  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${rcpName()?pl('g','принтер: '+esc(rcpName())):pl('d',navigator.usb?'USB · первый раз Chrome спросит принтер':'нужен Chrome с USB')}`+
+  const due=sums(w,true).client,paid=!!w.pay.paid||!due,can=rcpCan(rcpVia);
+  const hint=rcpVia==='bt'?(can?'Bluetooth · первый раз Chrome спросит принтер':'нужен Chrome с Bluetooth-портом'):(can?'USB · первый раз Chrome спросит принтер':'нужен Chrome с USB');
+  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${rcpName()?pl('g','принтер: '+esc(rcpName())):pl('d',hint)}`+
+    `<span class="seg rcp-t">${[['bt','Bluetooth'],['usb','USB']].map(([v,t])=>`<button class="${rcpVia===v?'sel':''}" data-rvia="${v}" aria-pressed="${rcpVia===v}">${t}</button>`).join('')}</span>`+
     `<span class="seg rcp-t">${[58,80].map(t=>`<button class="${rcpTape===t?'sel':''}" data-rtape="${t}" aria-pressed="${rcpTape===t}">${t} мм</button>`).join('')}</span></div>`+
-    `<button class="btn ${paid?'go2':'ghost'} sm" data-rcpprint="1"${rcpBusy||!navigator.usb?' disabled':''}>${ico('printer',18)}${rcpBusy?'Печать…':'Напечатать чек'}</button></div>`+
-    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера].</p>`;
+    `<button class="btn ${paid?'go2':'ghost'} sm" data-rcpprint="1"${rcpBusy||!can?' disabled':''}>${ico('printer',18)}${rcpBusy?'Печать…':'Напечатать чек'}</button></div>`+
+    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера].${rcpVia==='bt'?' Bluetooth-принтер сначала привязать в настройках Android.':''}</p>`;
 }
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.rcpprint){rcpPrint();return}
+  if(b.dataset.rvia){rcpVia=b.dataset.rvia;try{localStorage.setItem('rcpVia',rcpVia)}catch(x){}render();return}
   if(b.dataset.rtape){rcpTape=+b.dataset.rtape;try{localStorage.setItem('rcpTape',String(rcpTape))}catch(x){}render()}});
 if(navigator.usb)navigator.usb.addEventListener('disconnect',e=>{if(rcpDev&&e.device===rcpDev){rcpDev=null;toast('Принтер чеков отключён');render()}});
+if(navigator.serial)navigator.serial.addEventListener('disconnect',e=>{if(rcpPort&&e.target===rcpPort){rcpPort=null;render()}});
 // ----- Памятка А4 в предпросмотре — настоящий лист: вёрстка 794×1123 (А4 при 96 точках на дюйм) и уменьшение под ширину колонки целиком
 // настоящий QR на скачивание «Моего маршрута» (владелец, 20.11.2026: «поставь реальный красивый QR») — тот же адрес и оформление, что у QR в окне оператора
 function a4Qr(){document.querySelectorAll('canvas.a4qrc:not([data-qr])').forEach(c=>{if(typeof drawQr!=='function')return;drawQr(WK_STAND+'/download',c);c.dataset.qr='1'})}
@@ -5817,48 +5883,74 @@ new MutationObserver(()=>requestAnimationFrame(a4Fit)).observe(document.body,{ch
 // ----- Колонки: границы двигаются, левую и правую можно спрятать — центральная расширяется (владелец, 20.11.2026:
 // «сделай, чтобы границы колонок можно было двигать, и колонки слева и справа включать и отключать, чтобы расширялась центральная»).
 // Работает на компьютере и в виде «как на компьютере» на планшете; в виде «вкладки» колонок нет. Ширины и выбор запоминаются в браузере.
-// Ручка — тонкая полоса на границе колонки (тянуть мышью или пальцем; двойной щелчок — ширина по умолчанию); кнопка на ручке — спрятать или показать колонку.
+// Ручка — тонкая полоса на границе колонки (тянуть мышью или пальцем; двойной щелчок — ширина по умолчанию).
+// 21.11.2026 владелец: «кнопки складывания сделай незаметными и аккуратными, три точки например» — вместо кнопки-пилюли со стрелкой
+// на ручке три точки: нажать — спрятать или показать колонку, потянуть — изменить ширину.
+// «Когда нажимаю на переводчика или подсказки, окно само должно отъезжать влево и показывать их» — правая колонка, если спрятана,
+// сама выезжает, пока открыт переводчик или «Ответы», и уезжает обратно, когда их закрыли; выбор «спрятана» при этом не меняется.
 const COLS={q:{def:290,min:220,max:520,el:'colQ',side:'left',t:'очередь'},f:{def:350,min:260,max:640,el:'colF',side:'right',t:'услуги клиента'}};
 const colSt={};for(const k in COLS){let w=COLS[k].def,h=false;try{const v=+localStorage.getItem('colW:'+k);if(v)w=v;h=localStorage.getItem('colH:'+k)==='1'}catch(e){}colSt[k]={w,h}}
 function colSave(k){try{localStorage.setItem('colW:'+k,String(Math.round(colSt[k].w)));localStorage.setItem('colH:'+k,colSt[k].h?'1':'0')}catch(e){}}
 const colOn=()=>{const r=document.documentElement;return !r.classList.contains('tab')&&!r.hasAttribute('data-rkl')};   // при открытом сайте МВД — своя раскладка
+// правая колонка нужна сейчас: открыт переводчик (oz29.js) или «Ответы клиентам» (oz19.js)
+const colNeedF=()=>!!((state.tr&&state.tr.open)||(state.faq&&state.faq.open));
+// правая выехала сама, а для середины не остаётся 380 — на это время уезжает и очередь («окно отъезжает влево»)
+function colSqueeze(){const main=document.querySelector('.main.oz');if(!main||!colSt.f.h||!colNeedF()||colSt.q.h)return false;
+  const cs=getComputedStyle(main),room=main.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-2*(parseFloat(cs.columnGap)||0);
+  return colSt.q.w+colSt.f.w+380>room}
+const colHid=k=>k==='f'?colSt.f.h&&!colNeedF():colSt.q.h||colSqueeze();
+const colTimers={};
 function colApply(){
   const r=document.documentElement,main=document.querySelector('.main.oz');if(!main)return;
   if(!colOn()){main.style.gridTemplateColumns='';['colQ','colF'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=''});colGrips();return}
-  const q=colSt.q,f=colSt.f;
-  main.style.gridTemplateColumns=(q.h?'0px':q.w+'px')+' minmax(0,1fr) '+(f.h?'0px':f.w+'px');
-  document.getElementById('colQ').style.display=q.h?'none':'';document.getElementById('colF').style.display=f.h?'none':'';
-  r.classList.toggle('colq-off',q.h);r.classList.toggle('colf-off',f.h);
+  const hq=colHid('q'),hf=colHid('f');
+  const cols=(hq?'0px':colSt.q.w+'px')+' minmax(0,1fr) '+(hf?'0px':colSt.f.w+'px');
+  if(main.style.gridTemplateColumns!==cols){main.style.gridTemplateColumns=cols;colTrack()}
+  // показать — сразу (колонка выезжает вместе с шириной); спрятать — после того как ширина ушла в ноль
+  for(const [k,h] of [['q',hq],['f',hf]]){const el=document.getElementById(COLS[k].el);clearTimeout(colTimers[k]);
+    if(!h)el.style.display='';else if(el.style.display!=='none')colTimers[k]=setTimeout(()=>{if(colHid(k)&&colOn())el.style.display='none'},colDrag?0:300)}
+  if(r.classList.contains('colq-off')!==hq)r.classList.toggle('colq-off',hq);if(r.classList.contains('colf-off')!==hf)r.classList.toggle('colf-off',hf);   // менять класс только если он другой — наблюдатель за классом корня
   colGrips();
 }
+// пока ширина плавно меняется — ручки идут за краем центральной колонки
+let colRaf=0;function colTrack(){const t0=performance.now();cancelAnimationFrame(colRaf);const f=()=>{colGrips();if(performance.now()-t0<340)colRaf=requestAnimationFrame(f)};colRaf=requestAnimationFrame(f)}
 // ручки — отдельные элементы в .main (колонки перерисовываются, ручки — нет); положение — по краям центральной колонки
-const GRIP_SVG={left:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',right:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'};
 function colGrips(){
   const main=document.querySelector('.main.oz');if(!main)return;
   for(const k in COLS){let g=document.getElementById('grip-'+k);
-    if(!g){main.insertAdjacentHTML('beforeend',`<div class="colGrip" id="grip-${k}" data-grip="${k}" title="Тяните, чтобы изменить ширину · двойной щелчок — как было"><button class="colTgl" data-coltgl="${k}"></button></div>`);g=document.getElementById('grip-'+k)}
+    if(!g){main.insertAdjacentHTML('beforeend',`<div class="colGrip" id="grip-${k}" data-grip="${k}" title="Тяните, чтобы изменить ширину · двойной щелчок — как было"><button class="colTgl" data-coltgl="${k}"><i class="dots" aria-hidden="true"></i></button></div>`);g=document.getElementById('grip-'+k)}
     g.hidden=!colOn();if(g.hidden)continue;
-    const c=COLS[k],s=colSt[k],center=document.getElementById('colC'),mr=main.getBoundingClientRect(),cr=center.getBoundingClientRect(),z=main.offsetWidth?mr.width/main.offsetWidth:1;
+    const c=COLS[k],h=colHid(k),center=document.getElementById('colC'),mr=main.getBoundingClientRect(),cr=center.getBoundingClientRect(),z=main.offsetWidth?mr.width/main.offsetWidth:1;
     const x=((c.side==='left'?cr.left:cr.right)-mr.left)/z;g.style.left=(c.side==='left'?x-12:x+4)+'px';
-    // стрелка показывает, что сделает кнопка: спрятать колонку (к её краю) или вернуть
-    const b=g.querySelector('.colTgl');b.innerHTML=(c.side==='left')===!s.h?GRIP_SVG.left:GRIP_SVG.right;
-    b.title=(s.h?'Показать: ':'Спрятать: ')+c.t;b.setAttribute('aria-label',b.title);g.classList.toggle('off',s.h)}
+    const b=g.querySelector('.colTgl'),t=(h?'Показать ':'Спрятать ')+c.t;if(b.title!==t){b.title=t+(h?'':' · потяните — ширина');b.setAttribute('aria-label',t)}
+    b.setAttribute('aria-expanded',String(!h));g.classList.toggle('off',h)}
 }
-// перетаскивание: сдвиг указателя в единицах вёрстки (учитываем масштаб страницы)
-let colDrag=null;
-document.addEventListener('pointerdown',e=>{const g=e.target.closest('.colGrip');if(!g||e.target.closest('.colTgl'))return;const k=g.dataset.grip;if(colSt[k].h)return;
+// нажатие на точки: колонка, открытая сама (переводчик, «Ответы»), — закрыть их; иначе спрятать или показать
+function colToggle(k){
+  if((k==='f'&&colSt.f.h&&colNeedF())||(k==='q'&&colSqueeze())){if(state.tr&&state.tr.open&&typeof trOpen==='function')trOpen(false);if(state.faq&&state.faq.open&&typeof faqOpen==='function')faqOpen(false);colApply();return}
+  colSt[k].h=!colSt[k].h;colSave(k);colApply();render()}
+// перетаскивание: сдвиг указателя в единицах вёрстки (учитываем масштаб страницы); с точек тоже можно тянуть — короткое нажатие без сдвига прячет колонку
+let colDrag=null,colTapAt=0;
+document.addEventListener('pointerdown',e=>{colTapAt=0;const g=e.target.closest('.colGrip');if(!g)return;const k=g.dataset.grip,tgl=!!e.target.closest('.colTgl');if(colHid(k))return;   // спрятанную — только показать (click)
   const main=document.querySelector('.main.oz'),z=main.offsetWidth?main.getBoundingClientRect().width/main.offsetWidth:1;
   const cw=document.getElementById('colC').offsetWidth;   // центральная — не уже 380: столько можно отдать боковой
-  colDrag={k,x0:e.clientX,w0:colSt[k].w,z,room:Math.max(0,cw-380)};g.setPointerCapture(e.pointerId);g.classList.add('drag');document.documentElement.classList.add('col-drag');e.preventDefault()});
+  colDrag={k,x0:e.clientX,w0:colSt[k].w,z,room:Math.max(0,cw-380),tgl,moved:false};g.setPointerCapture(e.pointerId);if(!tgl)colDragOn(g);e.preventDefault()});
+function colDragOn(g){g.classList.add('drag');document.documentElement.classList.add('col-drag')}
 document.addEventListener('pointermove',e=>{if(!colDrag)return;const c=COLS[colDrag.k],dx=(e.clientX-colDrag.x0)/colDrag.z;
+  if(!colDrag.moved){if(Math.abs(dx)<5)return;colDrag.moved=true;colDragOn(document.getElementById('grip-'+colDrag.k))}
   colSt[colDrag.k].w=Math.round(Math.min(c.max,colDrag.w0+colDrag.room,Math.max(c.min,colDrag.w0+(c.side==='left'?dx:-dx))));colApply()});
-document.addEventListener('pointerup',e=>{if(!colDrag)return;colSave(colDrag.k);document.querySelectorAll('.colGrip.drag').forEach(g=>g.classList.remove('drag'));document.documentElement.classList.remove('col-drag');colDrag=null});
+function colDragEnd(e,cancel){if(!colDrag)return;const d=colDrag;colDrag=null;
+  document.querySelectorAll('.colGrip.drag').forEach(g=>g.classList.remove('drag'));document.documentElement.classList.remove('col-drag');
+  if(d.moved)colSave(d.k);else if(d.tgl&&!cancel){colTapAt=Date.now();colToggle(d.k)}}
+document.addEventListener('pointerup',e=>colDragEnd(e,false));document.addEventListener('pointercancel',e=>colDragEnd(e,true));
 document.addEventListener('dblclick',e=>{const g=e.target.closest('.colGrip');if(!g||e.target.closest('.colTgl'))return;const k=g.dataset.grip;colSt[k].w=COLS[k].def;colSave(k);colApply()});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-coltgl]');if(!b)return;const k=b.dataset.coltgl;colSt[k].h=!colSt[k].h;colSave(k);colApply();render()});
+// click: спрятанная колонка (там нажатие не начинает перетаскивание) и клавиатура (Enter, пробел); нажатие пальцем уже обработано в pointerup
+document.addEventListener('click',e=>{const b=e.target.closest('[data-coltgl]');if(!b)return;if(colTapAt&&Date.now()-colTapAt<400){colTapAt=0;return}colToggle(b.dataset.coltgl)});
 new MutationObserver(()=>requestAnimationFrame(colApply)).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-rkl']});
 addEventListener('resize',()=>requestAnimationFrame(colGrips));
-// после каждой перерисовки и прокрутки — ручки на краях центральной колонки
+// после каждой перерисовки — ручки на краях центральной колонки; правая перерисовалась (открыли или закрыли переводчик, «Ответы») — проверить, нужна ли она
 new MutationObserver(()=>requestAnimationFrame(colGrips)).observe(document.getElementById('colC')||document.body,{childList:true});
+new MutationObserver(()=>requestAnimationFrame(colApply)).observe(document.getElementById('colF')||document.body,{childList:true});
 setTimeout(colApply,0);
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
