@@ -1553,7 +1553,7 @@ const passOk=()=>!!state.pass.mrz&&!cyrProblem($('#cyrS').value,'фамилию'
 function fillCyr(){state.pass.sug={s:'Рахмонов',g:'Фарход'};$('#cyrS').value='Рахмонов';$('#cyrG').value='Фарход'}
 function renderCyr(){
   const p=state.pass,m=p.mrz;
-  $('#cyrNote').innerHTML='<span>'+(m?'В паспорте: <b>RAHMONOV FARKHOD</b>. Статус ФИО здесь только предварительный, эталон подтверждается в Жуковском.':'Поля заполнятся подсказкой после считывания MRZ.')+'</span>';
+  $('#cyrNote').innerHTML='<span>'+(m?'В паспорте: <b>'+(m.sur?m.sur+' '+m.given:'RAHMONOV FARKHOD')+'</b>. Статус ФИО здесь только предварительный, эталон подтверждается в Жуковском.':'Поля заполнятся подсказкой после считывания MRZ.')+'</span>';
   [['#cyrS','s','фамилию'],['#cyrG','g','имя']].forEach(([id,k,what])=>{
     const inp=$(id),st=$(id+'State');inp.disabled=!m;inp.placeholder=m?'':'После MRZ';
     if(!m){inp.classList.remove('err');st.className='ires';st.textContent='';return}
@@ -1573,7 +1573,8 @@ function renderPassport(){
   const ms=$('#mrzState');ms.className='ires '+(m&&!p.scanning?'good':'bad');
   ms.innerHTML=p.scanning?'Считывание…':m?check+' MRZ считан, контрольные цифры сходятся':'Наведите камеру на две строки внизу страницы';
   const mb=$('#mrzBtn');mb.disabled=p.scanning;mb.className='btn '+(m?'ghost':'go2');mb.innerHTML=ico('scan',20)+(m?'Считать заново':'Считать MRZ');
-  const F=[['Фамилия',m&&'RAHMONOV'],['Имя',m&&'FARKHOD'],['Гражданство',m&&'Таджикистан'],['Номер паспорта',m&&m.number],['Дата рождения',m&&'15.04.1990'],['Срок действия',m&&'10.03.2034']];
+  // распознано камерой (common/agent-ocr.js) — настоящие значения с MRZ; демо-кнопка — образец
+  const F=[['Фамилия',m&&(m.sur||'RAHMONOV')],['Имя',m&&(m.given||'FARKHOD')],['Гражданство',m&&(m.nat?ocrNat(m.nat):'Таджикистан')],['Номер паспорта',m&&m.number],['Дата рождения',m&&(m.birth||'15.04.1990')],['Срок действия',m&&(m.exp||'10.03.2034')]];
   $('#fields').innerHTML=F.map(([l,v])=>`<div class="f${v?'':' empty'}"><small>${l}</small><b>${v||'—'}</b></div>`).join('');
   const cs=$('#chipState');cs.className='ires '+(p.chip?'good':'bad');
   cs.innerHTML=p.reading?'Чтение чипа…':p.chip?check+(p.demoTag?' Метка считана (демо, чип не проверялся).':' Чип проверен. Фото лица не считывается.'):m?'Приложите паспорт к планшету':'Сначала считайте MRZ';
@@ -1983,6 +1984,28 @@ if(HASH==='#ticket'){['sim','bank','patent','route'].forEach(id=>state.picked.ad
 .afq-a{display:flex;flex-direction:column;gap:8px;padding:0 12px 12px}
 .afq-a b{font-size:19px;line-height:1.4;overflow-wrap:anywhere}.afq-a small{color:var(--text-2,var(--text));font-size:14px;line-height:1.45}
 .afq-src{color:var(--muted);font-size:12px}
+/* «Распознать камерой» и «Считать MRZ» — в один ряд, одной высоты */
+.ocr-pair{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.ocr-pair>.btn{flex:1 1 auto;justify-content:center}
+/* распознавание паспорта камерой — общий модуль (common/passport-ocr.js) */
+.ocr-back{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .55)}
+.ocr{width:min(720px,100%);max-height:calc(var(--vh,100vh) - 32px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:18px;border:1px solid var(--line2);background:var(--panel-solid,var(--bg));box-shadow:0 30px 60px rgb(0 0 0 / .45);color:var(--text)}
+.ocr-h{display:flex;align-items:center;gap:12px}.ocr-h>div{flex:1;min-width:0;display:flex;flex-direction:column}.ocr-h b{font-size:18px}.ocr-h small{color:var(--muted);font-size:13px}
+.ocr-i{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:rgb(var(--cyan-rgb, 34 211 238) / .12);color:var(--cyan)}
+.ocr-x{width:44px;height:44px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font-size:26px;line-height:1;cursor:pointer}
+.ocr-vp{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line2)}
+.ocr-vp video{width:100%;height:100%;object-fit:cover;display:block}
+.ocr-band{position:absolute;left:5%;right:5%;border:3px solid var(--cyan);border-radius:10px;box-shadow:0 0 0 2000px rgb(0 0 0 / .45);display:flex;align-items:flex-start;justify-content:center}
+.ocr-band span{margin-top:-30px;padding:2px 10px;border-radius:8px;background:rgb(0 0 0 / .6);color:#fff;font-size:13px;font-weight:600}
+.ocr-st{margin:0;color:var(--text-2,var(--text));font-size:14px;line-height:1.45}
+.ocr-b{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.ocr-b label.btn{cursor:pointer}
+.ocr-run{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 0;text-align:center}.ocr-run small{color:var(--muted)}
+.ocr-spin{width:38px;height:38px;border-radius:50%;border:4px solid var(--line2);border-top-color:var(--cyan);animation:ocrspin 1s linear infinite}
+@keyframes ocrspin{to{transform:rotate(360deg)}}
+.ocr-f{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 18px}
+.ocr-f>div{display:flex;flex-direction:column;gap:2px;min-width:0}.ocr-f small{color:var(--muted);font-size:12.5px}.ocr-f b{font-size:16px;overflow-wrap:anywhere}
+.ocr-f em{font-style:normal;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px}.ocr-f em.ok{color:var(--green,#34d399)}.ocr-f em.bad{color:var(--amber,#fbbf24)}
 </style>
 <script>
 // ----- Настоящая печать талона на Mertech HM-E200 (владелец, 21.11.2026: «размести ещё так же Агент Душанбе и Агент Жуковский, добавь туда тоже поддержку принтера»).
@@ -2219,6 +2242,153 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='afqQ'){F.q=e.target.value;F.sel=-1;paint()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&F.open)open(false)});
+})();
+
+// ----- Распознавание паспорта камерой — общий модуль макетов (common/passport-ocr.js): окно оператора (office-zia, oz33.js — связь с формой),
+// агент Душанбе и агент Жуковский (common/agent-ocr.js). Страница задаёт window.OCR_HOOK = {done(R) — вставить в форму, shown() — записать показ в журнал}.
+// Первоначально — office-zia/parts/oz33.js (владелец, 21.11.2026: «повесить на кнопку реальный а-ля OCR распознаватель паспорта»; «в агентов тоже вставить»).
+// распознаватель паспорта, чтобы камеру открывала, считывала реальные данные паспорта и вставляла в формы»). Кнопка «Распознать камерой» — шаг «Документы»
+// при приёме без очереди (oz5.js). Демо-кнопка «Считать MRZ» остаётся — для показа без паспорта.
+// Как устроено: камера планшета (getUserMedia, задняя) или фото из галереи → рамка под две строки MRZ внизу страницы с фото → вырезаем полосу, серый,
+// порог (Оцу), увеличиваем → Tesseract.js 5 прямо в браузере (WebAssembly; модель eng с jsdelivr, буквы A–Z, цифры и «<») → разбор MRZ паспорта
+// (ICAO 9303, TD3: две строки по 44 знака) с исправлением путаницы O/0, I/1, B/8, S/5 по типу поля и сверкой контрольных цифр.
+// ПДн: снимок обрабатывается на устройстве и никуда не отправляется (с CDN качается только программа распознавания); кадр не сохраняется — после
+// распознавания холст очищается. В форму — значения под маской, в журнал — только факт и сошлись ли контрольные цифры. Кириллица ФИО из MRZ не делается:
+// эталон имени подтверждается в карточке (CLAUDE.md, «Комплаенс»). Точность на бликах и голограммах — [проверить на настоящих паспортах].
+// значки и мелочи берём со страницы, если есть (во всех трёх макетах они общие из agent-neon), иначе — простые замены
+const _ico=(k,s)=>typeof ico==='function'?ico(k,s):'',_esc=s=>typeof esc==='function'?esc(s):String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const _ok=()=>typeof check!=='undefined'?check:'',_okSm=()=>typeof checkSm!=='undefined'?checkSm:'',_warn=()=>typeof warn!=='undefined'?warn:'',_toast=m=>{if(typeof toast==='function')toast(m)};
+const OCR_LIB='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+const OCR={st:'',msg:'',res:null,stream:null,worker:null,show:false};
+const OCR_NAT={TJK:'Таджикистан',UZB:'Узбекистан',KGZ:'Кыргызстан',KAZ:'Казахстан',RUS:'Россия',ARM:'Армения',AZE:'Азербайджан',TKM:'Туркменистан',IND:'Индия',AFG:'Афганистан'};
+const ocrNat=c=>OCR_NAT[c]||c;
+const ocrMask=o=>[o.sur,o.given].filter(Boolean).map(s=>s.split(' ').filter(Boolean).map(p=>p[0]+'•'.repeat(Math.max(2,p.length-1))).join(' ')).join(' ');
+// ---- разбор MRZ
+const ocrCd=s=>{const w=[7,3,1];let sum=0;[...s].forEach((ch,i)=>{sum+=(ch==='<'?0:/\d/.test(ch)?+ch:ch.charCodeAt(0)-55)*w[i%3]});return sum%10};
+const TO_D={O:'0',Q:'0',D:'0',U:'0',I:'1',L:'1',T:'1',Z:'2',S:'5',B:'8',G:'6',A:'4'},TO_L={'0':'O','1':'I','2':'Z','5':'S','8':'B','6':'G','4':'A'};
+const digits=s=>[...s].map(c=>TO_D[c]||c).join(''),letters=s=>[...s].map(c=>TO_L[c]||c).join('');
+const fill=s=>s.replace(/[KLC«]{3,}$/,m=>'<'.repeat(m.length));   // хвост «<<<<» Tesseract часто читает как KKK
+function ocrParse(text){
+  const lines=String(text).toUpperCase().split('\n').map(l=>l.replace(/[^A-Z0-9<]/g,'')).filter(l=>l.length>=28);
+  const i=lines.findIndex((l,k)=>/^P[A-Z<]/.test(l)&&k<lines.length-1);   // строка 1 начинается с «P», за ней — строка 2
+  let l1=i>=0?lines[i]:lines[lines.length-2],l2=i>=0?lines[i+1]:lines[lines.length-1];
+  if(!l1||!l2)return null;
+  // в длинном хвосте «<<<<» Tesseract теряет или добавляет знаки — строка 2 съезжает и последние контрольные цифры встают не на место.
+  // Если строка 2 кончается двумя цифрами, а длина не 44, — выравниваем поле доп. данных (позиции 28–41) по «<» в его конце
+  l2=fill(l2);if(l2.length!==44&&/\d\d$/.test(l2)&&l2.length>30){let mid=l2.slice(28,-2);mid=mid.length<14?mid+'<'.repeat(14-mid.length):mid.replace(/<+$/,m=>m.slice(0,Math.max(0,m.length-(mid.length-14))));l2=l2.slice(0,28)+mid.slice(0,14)+l2.slice(-2)}
+  const fit=s=>(s+'<'.repeat(44)).slice(0,44);l1=fit(fill(l1));l2=fit(l2);
+  // разделитель фамилии и имени «<<» Tesseract читает как «KK»: если «<<» в именах нет — первое «KK» и считаем разделителем, одиночные K между частями имени — не трогаем
+  if(!l1.slice(5).replace(/<+$/,'').includes('<<'))l1=l1.slice(0,5)+l1.slice(5).replace('KK','<<');
+  // строка 2: номер(9)+к, гражданство(3), рождение(6)+к, пол, срок(6)+к, доп.(14)+к, общая к
+  const num=l2.slice(0,9).replace(/[KLC]+$/,m=>'<'.repeat(m.length)),c1=digits(l2[9]),nat=letters(l2.slice(10,13)),bd=digits(l2.slice(13,19)),c2=digits(l2[19]);
+  const sex=l2[20]==='M'||l2[20]==='F'?l2[20]:'<',ex=digits(l2.slice(21,27)),c3=digits(l2[27]),opt=fill(l2.slice(28,42)),c4=digits(l2[42]),c5=digits(l2[43]);
+  const ck={num:ocrCd(num)===+c1,birth:ocrCd(bd)===+c2,exp:ocrCd(ex)===+c3};
+  ck.all=ocrCd(num+c1+bd+c2+ex+c3+opt+c4)===+c5;
+  // фамилия — до первого «<<», имя — после него и до следующей пары «<<» (дальше заполнитель; случайная «K» в нём в имя не попадает)
+  const np=letters(l1.slice(5)),cut=np.indexOf('<<'),sur=(cut<0?np:np.slice(0,cut)).replace(/</g,' ').trim(),given=(cut<0?'':np.slice(cut+2).split(/<{2,}/)[0]).replace(/</g,' ').trim();
+  const yy=+bd.slice(0,2),cy=new Date().getFullYear()%100,date=(s,c)=>s.slice(4,6)+'.'+s.slice(2,4)+'.'+c+s.slice(0,2);
+  if(!/^\d{6}$/.test(bd)||!/^\d{6}$/.test(ex)||!sur)return null;
+  return {sur,given,nat,num:num.replace(/</g,''),birth:date(bd,yy>cy?'19':'20'),exp:date(ex,'20'),sex,ck,ok:ck.num&&ck.birth&&ck.exp&&ck.all,l1,l2};
+}
+// ---- картинка → полоса MRZ → чёрно-белая для распознавания
+function ocrPrep(src,sw,sh,band){
+  const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});
+  const by=Math.round(sh*band[0]),bh=Math.round(sh*(band[1]-band[0])),k=Math.max(1,2000/sw);
+  c.width=Math.round(sw*k);c.height=Math.round(bh*k);x.imageSmoothingEnabled=true;x.drawImage(src,0,by,sw,bh,0,0,c.width,c.height);
+  const im=x.getImageData(0,0,c.width,c.height),d=im.data,hist=new Array(256).fill(0),g=new Uint8Array(d.length/4);
+  for(let i=0;i<g.length;i++){g[i]=(d[i*4]*0.3+d[i*4+1]*0.59+d[i*4+2]*0.11)|0;hist[g[i]]++}
+  let sum=0,sumB=0,wB=0,best=0,th=128;for(let t=0;t<256;t++)sum+=t*hist[t];   // порог Оцу
+  for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=g.length-wB;if(!wF)break;sumB+=t*hist[t];const mB=sumB/wB,mF=(sum-sumB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>best){best=v;th=t}}
+  for(let i=0;i<g.length;i++){const v=g[i]>th?255:0;d[i*4]=d[i*4+1]=d[i*4+2]=v}
+  x.putImageData(im,0,0);return c;
+}
+async function ocrLib(){if(window.Tesseract)return;await new Promise((ok,no)=>{const s=document.createElement('script');s.src=OCR_LIB;s.onload=ok;s.onerror=()=>no(new Error('не загрузилась программа распознавания — нет интернета?'));document.head.appendChild(s)})}
+async function ocrRun(canvas){
+  OCR.st='run';OCR.msg='Загружаем распознавание…';ocrPaint();
+  try{await ocrLib();
+    if(!OCR.worker){OCR.worker=await Tesseract.createWorker('eng',1,{logger:m=>{if(m.status==='recognizing text'){OCR.msg='Распознаём… '+Math.round(m.progress*100)+'%';ocrPaint(true)}else if(/loading|initializ/.test(m.status)){OCR.msg='Готовим распознавание: '+Math.round((m.progress||0)*100)+'%';ocrPaint(true)}}});
+      await OCR.worker.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'})}
+    const r=await OCR.worker.recognize(canvas);const p=ocrParse(r.data.text);
+    canvas.width=canvas.height=0;   // кадр больше не нужен
+    if(!p){OCR.st='fail';OCR.msg='Строки MRZ не нашлись. Поднесите паспорт ближе, чтобы две строки внизу страницы с фото заняли рамку, без бликов.';ocrPaint();return}
+    OCR.res=p;OCR.st='done';OCR.msg='';OCR.show=false;ocrPaint();
+  }catch(e){OCR.st='fail';OCR.msg='Распознавание не сработало: '+(e&&e.message||e);ocrPaint()}
+}
+// ---- окно камеры
+const BAND=[0.62,0.86];   // где на кадре рамка MRZ (доли высоты) — совпадает с рамкой на экране
+function ocrOpen(){OCR.st='cam';OCR.res=null;OCR.msg='';ocrPaint();ocrCam()}
+async function ocrCam(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){OCR.st='nocam';OCR.msg=window.isSecureContext?'Камера в этом браузере недоступна — возьмите фото из галереи.':'Камеру браузер даёт только странице по https — возьмите фото из галереи.';ocrPaint();return}
+  try{OCR.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    const v=document.getElementById('ocrV');if(v){v.srcObject=OCR.stream;await v.play().catch(()=>{})}}
+  catch(e){OCR.st='nocam';OCR.msg=e&&e.name==='NotAllowedError'?'Камера запрещена для сайта — разрешите её в настройках браузера или возьмите фото из галереи.':'Камера не открылась — возьмите фото из галереи.';ocrPaint()}
+}
+function ocrStopCam(){if(OCR.stream){OCR.stream.getTracks().forEach(t=>t.stop());OCR.stream=null}}
+function ocrClose(){ocrStopCam();OCR.st='';OCR.res=null;OCR.show=false;const el=document.getElementById('ocrM');if(el)el.remove()}
+function ocrShot(){const v=document.getElementById('ocrV');if(!v||!v.videoWidth){_toast('Камера ещё не готова');return}ocrStopCam();ocrRun(ocrPrep(v,v.videoWidth,v.videoHeight,BAND))}
+function ocrFile(f){if(!f)return;const img=new Image();img.onload=()=>{ocrStopCam();URL.revokeObjectURL(img.src);
+  // фото из галереи: вся нижняя половина страницы — MRZ может быть где угодно ниже середины
+  ocrRun(ocrPrep(img,img.naturalWidth,img.naturalHeight,[0.45,1]))};img.src=URL.createObjectURL(f)}
+function ocrPaint(soft){
+  let el=document.getElementById('ocrM');if(!OCR.st){if(el)el.remove();return}
+  if(!el){document.body.insertAdjacentHTML('beforeend','<div class="ocr-back" id="ocrM"><div class="ocr" role="dialog" aria-label="Распознавание паспорта"></div></div>');el=document.getElementById('ocrM')}
+  if(soft){const m=el.querySelector('.ocr-st');if(m){m.textContent=OCR.msg;return}}
+  const box=el.querySelector('.ocr'),R=OCR.res;
+  let h=`<div class="ocr-h"><span class="ocr-i">${_ico('cam',20)}</span><div><b>Паспорт камерой</b><small>распознавание на этом устройстве — снимок никуда не отправляется</small></div><button class="ocr-x" data-ocrx="1" aria-label="Закрыть">×</button></div>`;
+  if(OCR.st==='cam'||OCR.st==='nocam')h+=`<div class="ocr-vp">${OCR.st==='cam'?'<video id="ocrV" playsinline muted></video>':''}<div class="ocr-band" style="top:${BAND[0]*100}%;height:${(BAND[1]-BAND[0])*100}%"><span>две строки MRZ — сюда</span></div></div>`+
+    `<p class="ocr-st">${OCR.msg||'Откройте страницу с фото и поднесите так, чтобы две строки внизу (P&lt;TJK…) легли в рамку. Без бликов, ровно.'}</p>`+
+    `<div class="ocr-b"><label class="btn ghost">${_ico('passport',20)}Фото из галереи<input type="file" accept="image/*" id="ocrF" hidden></label>${OCR.st==='cam'?`<button class="btn go2" data-ocrshot="1">${_ico('scan',20)}Снять и распознать</button>`:''}</div>`;
+  else if(OCR.st==='run')h+=`<div class="ocr-run"><i class="ocr-spin"></i><p class="ocr-st">${OCR.msg}</p><small>Первый раз программа распознавания скачивается (~10 МБ), дальше быстрее.</small></div>`;
+  else if(OCR.st==='fail')h+=`<div class="ires bad">${_warn()}<span class="ocr-st">${OCR.msg}</span></div><div class="ocr-b"><button class="btn ghost" data-ocrx="1">Отмена</button><button class="btn go2" data-ocragain="1">${_ico('cam',20)}Ещё раз</button></div>`;
+  else if(OCR.st==='done'){const v=(full,masked)=>OCR.show?full:masked,c=k=>R.ck[k]?`<em class="ok">${_okSm()}сходится</em>`:`<em class="bad">не сошлась</em>`;
+    h+=`<div class="ires ${R.ok?'good':'bad'}">${R.ok?_ok()+'Контрольные цифры сходятся — данные прочитаны верно':_warn()+'Контрольные цифры не сошлись — сверьте с паспортом или снимите ещё раз'}</div>`+
+      `<div class="ocr-f"><div><small>Фамилия</small><b>${_esc(v(R.sur,ocrMask({sur:R.sur})))}</b></div><div><small>Имя</small><b>${_esc(v(R.given,ocrMask({sur:R.given})))}</b></div>`+
+      `<div><small>Гражданство</small><b>${_esc(ocrNat(R.nat))}</b></div><div><small>Номер паспорта</small><b class="num">${_esc(v(R.num,R.num.slice(0,3)+'•••'+R.num.slice(-2)))}</b>${c('num')}</div>`+
+      `<div><small>Дата рождения</small><b class="num">${_esc(v(R.birth,'••.••.'+R.birth.slice(-4)))}</b>${c('birth')}</div><div><small>Срок действия</small><b class="num">${_esc(R.exp)}</b>${c('exp')}</div>`+
+      `<div><small>Пол</small><b>${R.sex==='M'?'мужской':R.sex==='F'?'женский':'—'}</b></div><div><small>Общая проверка строки</small>${c('all')}</div></div>`+
+      `<button class="btn ghost sm" data-ocrshow="1">${OCR.show?'Скрыть':'Показать полностью — сверить с паспортом'}</button>`+
+      `<p class="hint">Кириллица ФИО отсюда не берётся: эталон имени подтверждается в карточке.</p>`+
+      `<div class="ocr-b"><button class="btn ghost" data-ocragain="1">${_ico('cam',20)}Снять ещё раз</button><button class="btn go2" data-ocrok="1">${_ok()}Вставить в форму</button></div>`}
+  box.innerHTML=h;
+  if(OCR.st==='cam'&&OCR.stream){const vv=document.getElementById('ocrV');if(vv&&!vv.srcObject){vv.srcObject=OCR.stream;vv.play().catch(()=>{})}}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const d=b.dataset;
+  if(d.ocr){ocrOpen();return}
+  if(d.ocrx){ocrClose();return}
+  if(d.ocrshot){ocrShot();return}
+  if(d.ocragain){ocrOpen();return}
+  if(d.ocrshow){OCR.show=!OCR.show;if(OCR.show&&window.OCR_HOOK&&OCR_HOOK.shown)OCR_HOOK.shown();ocrPaint();return}
+  if(d.ocrok){const R=OCR.res;if(!R||!window.OCR_HOOK)return;ocrClose();OCR_HOOK.done(R)}
+});
+document.addEventListener('change',e=>{if(e.target.id==='ocrF'){ocrFile(e.target.files[0]);e.target.value=''}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&OCR.st)ocrClose()});
+
+// ----- «Распознать камерой» у агентов (владелец, 21.11.2026: «в агентов тоже напоминаю вставить Распознать камерой»).
+// Движок и окно камеры — общий модуль common/passport-ocr.js (тот же, что в окне оператора). Здесь — связь с шагом паспорта агентов:
+// кнопка рядом с демо-кнопкой «Считать MRZ» (#scanBtn), результат — в state.pass.mrz (те же поля, что у демо, плюс фамилия, имя, даты с MRZ).
+// Кириллица ФИО — подсказка по латинице MRZ, агент сверяет с клиентом; эталон подтверждается в Жуковском (CLAUDE.md, «Комплаенс»).
+(()=>{
+const sb=document.getElementById('mrzBtn')||document.getElementById('scanBtn');if(!sb||typeof OCR==='undefined')return;   // Душанбе — #mrzBtn, Жуковский — #scanBtn
+// обе кнопки — в один ряд (владелец: «гармонизируй»): обёртка вокруг демо-кнопки, сама кнопка остаётся тем же элементом
+const pair=document.createElement('span');pair.className='ocr-pair';sb.parentNode.insertBefore(pair,sb);pair.appendChild(sb);
+sb.insertAdjacentHTML('beforebegin',`<button class="btn ghost" data-ocr="1" id="ocrBtn">${typeof ico==='function'?ico('cam',20):''}Распознать камерой</button>`);
+const ob=document.getElementById('ocrBtn');
+// у агента Жуковского одна кнопка снимает и паспорт, и миграционную карту: «Распознать камерой» — только на вкладке паспорта
+const sync=()=>{const mig=typeof state!=='undefined'&&state.docTab==='mig';if(ob.hidden!==mig)ob.hidden=mig;if(ob.disabled!==sb.disabled)ob.disabled=sb.disabled};
+new MutationObserver(sync).observe(sb,{attributes:true,childList:true,subtree:true});sync();
+// латиница паспорта → кириллица (подсказка): сочетания раньше одиночных букв
+const PAIRS=[['SHCH','Щ'],['KH','Х'],['ZH','Ж'],['CH','Ч'],['SH','Ш'],['YA','Я'],['YU','Ю'],['YO','Ё'],['TS','Ц'],['IY','ИЙ']];
+const ONE={A:'А',B:'Б',V:'В',G:'Г',D:'Д',E:'Е',Z:'З',I:'И',Y:'Й',K:'К',L:'Л',M:'М',N:'Н',O:'О',P:'П',R:'Р',S:'С',T:'Т',U:'У',F:'Ф',H:'Х',J:'ДЖ',Q:'К',C:'К',W:'В',X:'КС'};
+function cyr(s){return String(s||'').split(' ').filter(Boolean).map(w=>{let o='',i=0;while(i<w.length){const p=PAIRS.find(([l])=>w.startsWith(l,i));if(p){o+=p[1];i+=p[0].length}else{o+=ONE[w[i]]||'';i++}}
+  return o.charAt(0)+o.slice(1).toLowerCase()}).join(' ')}
+window.OCR_HOOK={
+  done(R){const p=state.pass;p.scanning=false;p.chip=false;
+    p.mrz={line1:R.l1,line2:R.l2,number:R.num,sur:R.sur,given:R.given,nat:R.nat,birth:R.birth,exp:R.exp,sex:R.sex,ok:R.ok,ocr:true};
+    const s=cyr(R.sur),g=cyr(R.given),cs=document.getElementById('cyrS'),cg=document.getElementById('cyrG');if(cs)cs.value=s;if(cg)cg.value=g;p.sug={s,g};
+    if(state.mig&&!state.mig.done&&!state.mig.none)state.docTab='mig';
+    render();if(typeof toast==='function')toast(R.ok?'Паспорт распознан — данные в форме, кириллицу сверьте с клиентом':'Паспорт распознан, контрольные цифры не сошлись — сверьте с паспортом')},
+  shown(){}   // у агентов журнал показа ведёт сервер в продукте; в макете — только факт на экране
+};
 })();
 </script>
 </body>
