@@ -2167,6 +2167,20 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 @keyframes ocrlive{50%{border-color:rgb(var(--cyan-rgb, 34 211 238) / .45)}}
 @media (prefers-reduced-motion:reduce){.ocr-band.live{animation:none}}
 
+/* перевод крупно для клиента и ввод клиентом (common/tr-big.js) */
+.tbig{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .7)}
+.tbig[hidden]{display:none}
+.tbig-in{width:min(980px,100%);max-height:calc(100vh - 32px);overflow:auto;display:flex;flex-direction:column;gap:16px;padding:22px 24px;border-radius:20px;border:1px solid var(--line2);background:var(--panel-solid,var(--bg));color:var(--text);box-shadow:0 30px 70px rgb(0 0 0 / .5)}
+.tbig-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tbig-h small{font-size:14px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.tbig-x{width:48px;height:48px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font-size:28px;line-height:1;cursor:pointer}
+.tbig-t{margin:0;font-size:clamp(28px,4.4vw,46px);line-height:1.3;font-weight:700;overflow-wrap:anywhere}
+.tbig-s{margin:0;min-height:18px;font-size:14px;color:var(--muted)}
+.tbig-a{width:100%;box-sizing:border-box;min-height:160px;padding:16px;border-radius:14px;border:1px solid var(--line2);background:transparent;color:var(--text);font:inherit;font-size:clamp(22px,3vw,30px);line-height:1.35;resize:vertical}
+.tbig-b{display:flex;justify-content:flex-end}
+.tbig-go{display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-height:64px;min-width:220px;padding:10px 22px;border-radius:14px;border:0;background:linear-gradient(135deg,var(--cyan,#22d3ee),var(--blue,#3b82f6));color:#04121c;font:inherit;font-size:20px;font-weight:800;cursor:pointer}
+.tbig-go small{font-size:12px;font-weight:600;opacity:.8}
+
 </style>
 <script>
 // Тема: при открытии всегда тёмная (решение владельца 18.11.2026); выбор агента держится до закрытия вкладки (sessionStorage); #light (или суффикс -light, например #ticket-light) включает светлую без сохранения.
@@ -4195,6 +4209,37 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||
 document.addEventListener('change',e=>{if(e.target.id==='ocrF'){ocrFile(e.target.files[0]);e.target.value=''}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&OCR.st)ocrClose()});
 
+// ----- Перевод крупно для клиента и ввод клиентом (владелец, 21.11.2026: «таджикский, узбекский и киргизский переводчик выдаёт какую-то дичь
+// или говорит по-русски» → убрать русский голос для этих языков, показывать перевод крупно; если распознавание не понимает язык клиента —
+// пусть клиент пишет сам). Общий модуль: окно оператора (office-zia, oz29.js) и агенты (common/agent-tr.js).
+//   trBig.show(text, lang, status) — перевод на весь экран, на языке клиента; status — строка о голосе («голос загружается 34 %») или пусто;
+//   trBig.status(text) — обновить строку о голосе; trBig.input(lang, onText) — клиент печатает на своём языке, «Перевести» отдаёт текст.
+// Подписи на языке клиента переведены без носителя — [проверить].
+(()=>{
+const PH={tg:'Инҷо нависед…',uz:'Shu yerga yozing…',ky:'Бул жерге жазыңыз…',hi:'यहाँ लिखें…',en:'Type here…',ru:'Напишите здесь…'};
+const GO={tg:'Тарҷума кардан',uz:'Tarjima qilish',ky:'Которуу',hi:'अनुवाद करें',en:'Translate',ru:'Перевести'};
+const NM={tg:'тоҷикӣ',uz:'oʻzbekcha',ky:'кыргызча',hi:'हिन्दी',en:'English',ru:'русский'};
+const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let onText=null;
+function el(){let m=document.getElementById('trbig');if(!m){document.body.insertAdjacentHTML('beforeend','<div class="tbig" id="trbig" role="dialog" aria-modal="true" hidden></div>');m=document.getElementById('trbig')}return m}
+function show(text,lang,status){const m=el();onText=null;
+  m.innerHTML=`<div class="tbig-in"><div class="tbig-h"><small>Перевод для клиента · ${E(NM[lang]||lang)}</small><button class="tbig-x" data-trb="close" aria-label="Закрыть">×</button></div>`+
+    `<p class="tbig-t" lang="${E(lang)}">${E(text)}</p><p class="tbig-s" id="trbS">${E(status||'')}</p></div>`;m.hidden=false}
+function status(t){const s=document.getElementById('trbS');if(s)s.textContent=t||''}
+function input(lang,cb){const m=el();onText=cb;
+  m.innerHTML=`<div class="tbig-in"><div class="tbig-h"><small>Клиент пишет сам · ${E(NM[lang]||lang)}</small><button class="tbig-x" data-trb="close" aria-label="Закрыть">×</button></div>`+
+    `<textarea class="tbig-a" id="trbA" lang="${E(lang)}" placeholder="${E(PH[lang]||PH.ru)}" rows="4"></textarea>`+
+    `<div class="tbig-b"><button class="tbig-go" data-trb="go"><span lang="${E(lang)}">${E(GO[lang]||GO.ru)}</span><small>перевести</small></button></div></div>`;
+  m.hidden=false;setTimeout(()=>{const a=document.getElementById('trbA');if(a)a.focus()},50)}
+function close(){const m=document.getElementById('trbig');if(m){m.hidden=true;m.innerHTML=''}onText=null;if(window.trBig&&trBig.onclose)trBig.onclose()}
+document.addEventListener('click',e=>{const b=e.target.closest('#trbig [data-trb]');if(!b)return;
+  if(b.dataset.trb==='close'){close();return}
+  if(b.dataset.trb==='go'){const a=document.getElementById('trbA'),v=a&&a.value.trim();if(!v){a&&a.focus();return}const cb=onText;close();cb&&cb(v)}});
+document.addEventListener('keydown',e=>{const m=document.getElementById('trbig');if(!m||m.hidden)return;if(e.key==='Escape'){close();e.stopPropagation()}
+  if(e.key==='Enter'&&!e.shiftKey&&e.target.id==='trbA'){e.preventDefault();document.querySelector('#trbig [data-trb="go"]').click()}},true);
+window.trBig={show,status,input,close,onclose:null,open:()=>{const m=document.getElementById('trbig');return !!(m&&!m.hidden)}};
+})();
+
 // ----- Шпаргалка опроса на языке клиента (владелец, 19.11.2026): «не хватает английского; при нажатии вопросы переводятся; кнопка голосового озвучивания».
 // Оператор говорит по-русски, поэтому русский текст остаётся под переводом, кнопки ответа — по-русски. Языки — коды языка, не страны.
 // Переводы tg, uz, ky сделаны без носителя — [проверить] (CLAUDE.md папки, «Открытые пункты»).
@@ -5186,6 +5231,9 @@ function mccaSim(v){
 }
 mccaSim('mf');mccaSim('yota');
 
+// ----- Общий модуль макетов (common/mms-tts.js): голос tg и uz моделью Meta MMS прямо в браузере — окно оператора (office-zia, готовые записи — oz22.js)
+// и агенты (common/agent-tr.js). Вынесено из office-zia/parts/oz22.js 21.11.2026 (владелец: «таджикский и узбекский — та же модель, что в офисе, и для агентов;
+// пусть долгое первое скачивание на планшете»).
 // ----- Озвучка tg и uz моделями Meta MMS-TTS прямо в браузере (владелец, 20.11.2026: «Модели MMS прямо в браузере tg и uz, давай их делать»).
 // Справка и выбор — notes/tts-research-2026-11-19.md, раздел 2. Ключей и своего сервера нет: модель (~114 МБ на язык) браузер скачивает
 // с huggingface.co при первом показе языка и хранит в IndexedDB — со второго раза голос готов сразу. Синтез идёт в фоновом потоке (Worker из Blob),
@@ -5360,8 +5408,10 @@ function mmsPaint(){document.querySelectorAll('.say[data-saylang]').forEach(b=>{
   const t=mmsLabel(c,b.classList.contains('on'));if(sp&&sp.textContent!==t)sp.textContent=t;b.classList.toggle('err',MMS[c].st==='err');
   b.title=MMS[c].st==='err'?'Голос не загрузился ('+MMS[c].err+') — нажмите, чтобы попробовать ещё раз':'Прочитать вслух · Meta MMS-TTS ('+MMS[c].src+', CC BY-NC 4.0) · в браузере'})}
 // подготовить заранее: вызывают шпаргалка (вопросы) и справочник (раскрытый ответ)
-function mmsWarm(code,texts,pri){if(!MMS[code])return;if(MMS[code].st==='err')return;texts.forEach(t=>{if(!recOf(code,t))mmsJob(code,String(t),pri||1)})}   // записанное не готовим и модель ради него не качаем
+function mmsWarm(code,texts,pri){if(!MMS[code])return;if(MMS[code].st==='err')return;texts.forEach(t=>{if(!(typeof recOf==='function'&&recOf(code,t)))mmsJob(code,String(t),pri||1)})}   // записанное не готовим и модель ради него не качаем
 
+
+// ----- Голос tg и uz: движок модели MMS — общий модуль common/mms-tts.js (его вставляет assemble.mjs перед этой частью); здесь — только готовые записи офиса.
 // --- готовые записи (владелец, 20.11.2026: «MP3 32 кбит/с, встроенным в HTML, таджикский и узбекский — посмотрим, как будет работать»).
 // Те же модели MMS, озвучено заранее: node tools/tts-bake.cjs → audio/tts-rec.json → build.mjs вставляет вместо плейсхолдера ниже.
 // Ключ — хеш нормализованного текста: поменяли текст — записи нет, фраза озвучивается синтезом в браузере, как раньше. Откат — удалить audio/tts-rec.json и пересобрать.
@@ -5793,15 +5843,20 @@ function trUnlock(){try{mmsCtx=mmsCtx||new (window.AudioContext||window.webkitAu
 function trSpeak(i){const t=trSt(),m=t.log[i];if(!m)return;const c=m.tl,v=voiceFor(c);trStopAudio();
   if(v&&voiceGood(v)){sayText('tr:'+i,m.dst,c);return}
   if(t.cloud&&TR_GTTS.has(c)){trGoogle(m.dst,c);return}
-  // ky: киргизского голоса нет ни у кого; готовые записи — только для фраз шпаргалки и справочника; иначе текст читает русский голос Google
-  if(c==='ky'&&!(typeof recOf==='function'&&recOf('ky',m.dst))){if(t.cloud){trGoogle(m.dst,'ru');return}toast('Киргизского голоса нет — покажите клиенту экран с переводом');return}
-  if((c==='tg'||c==='uz')&&!trMmsReady(c)){trWarm(c);if(t.cloud){trGoogle(c==='uz'&&typeof uzCyr==='function'?uzCyr(m.dst):m.dst,'ru');return}}
-  if(canSay(c)){sayText('tr:'+i,m.dst,c);return}
-  toast('Для языка «'+trName(c)+'» голоса нет — покажите клиенту экран с переводом');
+  // 21.11.2026 владелец: «таджикский, узбекский, киргизский — дичь или говорит по-русски» → русский голос Google для этих языков убран.
+  // ky: голоса нет ни у кого (готовые записи — только фразы шпаргалки и справочника) — перевод крупно на экране (common/tr-big.js)
+  if(c==='ky'&&!(typeof recOf==='function'&&recOf('ky',m.dst))){trBig.show(m.dst,'ky','Киргизского голоса нет ни у кого из сервисов — покажите клиенту экран');return}
+  // tg и uz: модель ещё не готова — перевод крупно, ход загрузки в том же окне; готова — читает модель, если окно ещё открыто
+  if((c==='tg'||c==='uz')&&!trMmsReady(c)){trWarm(c);const pct=()=>MMS[c].st==='err'?'голос не скачался — покажите клиенту экран':'голос скачивается — '+(MMS[c].pct||0)+' % (первый раз долго, дальше сразу)';
+    trBig.show(m.dst,c,pct());clearInterval(trBigT);trBigT=setInterval(()=>{if(!trBig.open()){clearInterval(trBigT);return}
+      if(trMmsReady(c)){clearInterval(trBigT);trBig.status('звучит голос модели');sayText('tr:'+i,m.dst,c)}else trBig.status(pct())},700);return}
+  if(canSay(c)){if(['tg','uz'].includes(c))trBig.show(m.dst,c,'звучит голос модели');sayText('tr:'+i,m.dst,c);return}
+  trBig.show(m.dst,c,'Для языка «'+trName(c)+'» голоса нет — покажите клиенту экран');
 }
+let trBigT=null;
 const trVoiceTxt=c=>{const v=voiceFor(c);if(v&&voiceGood(v))return 'голос браузера: '+v.name;if(trSt().cloud&&TR_GTTS.has(c))return 'голос Google';
-  if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока читает русский голос Google':M.st==='err'?'модель не скачалась — читает русский голос Google':'читает русский голос Google; модель начнёт качаться при первом переводе'}
-  if(c==='ky')return trSt().cloud?'киргизского голоса нет ни у кого — читает русский голос Google':'голоса нет — текст на экране';
+  if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока перевод крупно на экране':M.st==='err'?'модель не скачалась — перевод крупно на экране':'модель начнёт качаться при выборе языка; пока — перевод крупно на экране'}
+  if(c==='ky')return 'киргизского голоса нет ни у кого — перевод крупно на экране';
   return v?'голос Windows':'голоса нет — текст на экране'};
 async function trPhrase(who,text){
   const t=trSt(),cl=trLang(),sl=who==='op'?'ru':cl,tl=who==='op'?cl:'ru';text=String(text||'').trim();if(!text)return;
@@ -5818,7 +5873,9 @@ function trListen(who){
   const lang=who==='op'?'ru':trLang(),r=new SR();r.lang=TR_REC[lang];r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
   let fin='';t.rec=r;t.busy='rec:'+who;t.live='';sayStop();render();
   r.onresult=e=>{let s='';for(const x of e.results){s+=x[0].transcript;if(x.isFinal)fin=s}t.live=s;const el=document.getElementById('trLive');if(el)el.textContent=s};
-  r.onerror=e=>{const why={'language-not-supported':'Распознавание Google в Chrome не знает язык «'+trName(lang)+'» — пусть клиент напишет фразу','not-allowed':window.isSecureContext?'Нет доступа к микрофону — разрешите его у адресной строки':'Микрофон браузер даёт только странице по https — откройте макет по ссылке https, а не файлом','no-speech':'Ничего не услышали — нажмите и говорите','network':'Нет связи с серверами распознавания Google','audio-capture':'Микрофон не найден'}[e.error]||('Распознавание: '+e.error);toast(why)};
+  r.onerror=e=>{const why={'language-not-supported':'Распознавание Google в Chrome не знает язык «'+trName(lang)+'» — пусть клиент напишет фразу','not-allowed':window.isSecureContext?'Нет доступа к микрофону — разрешите его у адресной строки':'Микрофон браузер даёт только странице по https — откройте макет по ссылке https, а не файлом','no-speech':'Ничего не услышали — нажмите и говорите','network':'Нет связи с серверами распознавания Google','audio-capture':'Микрофон не найден'}[e.error]||('Распознавание: '+e.error);toast(why);
+    // язык клиента распознавание не знает — сразу окно «клиент пишет сам», крупно, на его языке (владелец, 21.11.2026)
+    if(e.error==='language-not-supported'&&who==='cl')trBig.input(lang,txt=>trPhrase('cl',txt))};
   r.onend=()=>{const txt=fin||t.live;t.rec=null;t.busy='';t.live='';render();if(txt)trPhrase(who,txt)};
   try{r.start()}catch(e){t.rec=null;t.busy='';toast('Распознавание не запустилось');render()}
 }
@@ -5835,7 +5892,9 @@ function trPanel(){
   // микрофон и распознавание браузер даёт только «безопасной» странице (https или файл на компьютере); файл, открытый из Telegram на Android (content://), — небезопасный, разрешение в настройках не поможет
   if(!window.isSecureContext)h+=`<div class="tr-pd"><b>${ico('shield',16)}Микрофон здесь не включится.</b> Браузер даёт микрофон только странице по https. Файл, открытый из Telegram или из папки телефона, для него небезопасен — разрешение в настройках Chrome не помогает. Набор текстом ниже работает. Чтобы говорить голосом — откройте макет по ссылке https.</div>`;
   h+=`<div class="tr-btns"><button class="btn ${rec('op')?'go2 on':'ghost'} trb" data-trrec="op"${dis?' disabled':''}>${ico('call',22)}<span><b>${rec('op')?'Слушаю… нажмите, чтобы закончить':'Говорит оператор'}</b><small>по-русски → ${trName(cl)}</small></span></button>`+
-    `<button class="btn ${rec('cl')?'go2 on':'go2'} trb" data-trrec="cl"${dis?' disabled':''}>${ico('call',22)}<span><b>${rec('cl')?'Слушаю… нажмите, чтобы закончить':'Говорит клиент'}</b><small lang="${cl}">${trName(cl)} → по-русски</small></span></button></div>`;
+    `<button class="btn ${rec('cl')?'go2 on':'go2'} trb" data-trrec="cl"${dis?' disabled':''}>${ico('call',22)}<span><b>${rec('cl')?'Слушаю… нажмите, чтобы закончить':'Говорит клиент'}</b><small lang="${cl}">${trName(cl)} → по-русски${['tg','uz','ky'].includes(cl)?' · Chrome может не понять язык':''}</small></span></button></div>`+
+    // tg, uz, ky: распознавание Chrome их может не знать или «слышать» как русский — клиент пишет сам, крупное поле на его языке
+    (['tg','uz','ky'].includes(cl)?`<button class="btn ghost trb tr-write" data-trwrite="1"${dis?' disabled':''}>${ico('pen',22)}<span><b>Клиент пишет сам</b><small>${trName(cl)} → по-русски · крупное поле на весь экран</small></span></button>`:'');
   h+=`<p class="hint">Голос для клиента (${trName(cl)}): <b>${trVoiceTxt(cl)}</b> · для оператора (русский): <b>${trVoiceTxt('ru')}</b>. Живых облачных голосов на таджикском и киргизском нет ни у кого; узбекский есть у Яндекса — нужен наш сервер.</p>`;
   h+=`<div class="tr-live" id="trLive" aria-live="polite">${esc(t.live)}</div>`;
   h+=`<div class="tr-type"><input id="trIn" placeholder="или напишите фразу и нажмите Enter" autocomplete="off"${G?'':' disabled'}><div class="seg"><button data-trtype="op"${G?'':' disabled'}>от оператора</button><button data-trtype="cl"${G?'':' disabled'}>от клиента</button></div></div>`;
@@ -5858,6 +5917,7 @@ document.addEventListener('click',e=>{
   if(d.trprov){t.prov=d.trprov;trStop();render();return}
   if(d.trlang){t.lang=d.trlang;trWarm(d.trlang);render();return}   // модель голоса tg/uz начинает качаться сразу при выборе языка
   if(d.trrec){trUnlock();trListen(d.trrec);return}
+  if(d.trwrite){trUnlock();trBig.input(trLang(),txt=>trPhrase('cl',txt));return}
   if(d.trtype)trUnlock();
   if(d.trtype){const i=document.getElementById('trIn');if(!t.cloud){toast('Облако выключено — включите выше');return}if(i&&i.value.trim()){const v=i.value;i.value='';trPhrase(d.trtype,v)}return}
   if(d.trsay!==undefined){trUnlock();trSpeak(+d.trsay);return}
