@@ -5326,7 +5326,7 @@ function trSt(){if(!state.tr)state.tr={open:false,prov:'google',cloud:true,lang:
 const trLang=()=>{const t=trSt();if(t.lang)return t.lang;const c=typeof faqLang==='function'?faqLang():'tg';return c==='ru'?'tg':c};
 const trName=c=>c==='ru'?'русский':(TR_LANGS.find(l=>l[0]===c)||[])[1]||c;
 function trAudit(what){if(state.walk&&typeof wkAudit==='function')wkAudit(what);else if(state.cur)audit(ws(byN(state.cur)),what)}
-function trOpen(on){const t=trSt();t.open=on===undefined?!t.open:on;if(t.open&&state.faq)state.faq.open=false;if(!t.open)trStop();if(t.open&&isTab())state.tab='f';render()}
+function trOpen(on){const t=trSt();t.open=on===undefined?!t.open:on;if(t.open)trWarm(trLang());if(t.open&&state.faq)state.faq.open=false;if(!t.open)trStop();if(t.open&&isTab())state.tab='f';render()}
 function trStop(){const t=trSt();trStopAudio();if(t.rec){try{t.rec.abort()}catch(e){}t.rec=null}t.busy='';t.live='';sayStop()}
 // перевод: неофициальный адрес Google — только демо
 async function trTranslate(text,sl,tl){
@@ -5348,13 +5348,23 @@ function trGoogle(text,c){
     a.play().catch(()=>{trAudio=null;const v=voiceFor(c);if(v)sayText('trv',text,c);else toast('Голос Google не ответил — покажите клиенту текст')})};
   next();
 }
+// tg и uz на планшете молчали (владелец, 20.11.2026): модель MMS сначала качает ~114 МБ и считает звук медленно. Теперь:
+// модель готова — звучит она; пока не готова — сразу русский голос Google читает текст (узбекский — кириллицей), а модель качается фоном.
+const trMmsReady=c=>typeof MMS!=='undefined'&&MMS[c]&&MMS[c].st==='ready';
+function trWarm(c){if(typeof MMS!=='undefined'&&MMS[c]&&['idle'].includes(MMS[c].st))mmsLoad(c)}
+// звук разрешаем в момент нажатия: на Android звук, запущенный позже (после ответа переводчика), браузер может не пустить
+function trUnlock(){try{mmsCtx=mmsCtx||new (window.AudioContext||window.webkitAudioContext)();if(mmsCtx.state==='suspended')mmsCtx.resume()}catch(e){}
+  try{const a=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');a.volume=0;a.play().catch(()=>{})}catch(e){}}
 function trSpeak(i){const t=trSt(),m=t.log[i];if(!m)return;const c=m.tl,v=voiceFor(c);trStopAudio();
   if(v&&voiceGood(v)){sayText('tr:'+i,m.dst,c);return}
   if(t.cloud&&TR_GTTS.has(c)){trGoogle(m.dst,c);return}
+  if((c==='tg'||c==='uz')&&!trMmsReady(c)){trWarm(c);if(t.cloud){trGoogle(c==='uz'&&typeof uzCyr==='function'?uzCyr(m.dst):m.dst,'ru');return}}
   if(canSay(c)){sayText('tr:'+i,m.dst,c);return}
   toast('Для языка «'+trName(c)+'» голоса нет — покажите клиенту экран с переводом');
 }
-const trVoiceTxt=c=>{const v=voiceFor(c);return v&&voiceGood(v)?'голос браузера: '+v.name:trSt().cloud&&TR_GTTS.has(c)?'голос Google':typeof svcFor==='function'&&svcFor(c)?'наша модель в браузере — без облака':v?'голос Windows':'голоса нет — текст на экране'};
+const trVoiceTxt=c=>{const v=voiceFor(c);if(v&&voiceGood(v))return 'голос браузера: '+v.name;if(trSt().cloud&&TR_GTTS.has(c))return 'голос Google';
+  if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока читает русский голос Google':M.st==='err'?'модель не скачалась — читает русский голос Google':'читает русский голос Google; модель начнёт качаться при первом переводе'}
+  return v?'голос Windows':'голоса нет — текст на экране'};
 async function trPhrase(who,text){
   const t=trSt(),cl=trLang(),sl=who==='op'?'ru':cl,tl=who==='op'?cl:'ru';text=String(text||'').trim();if(!text)return;
   const i=t.log.push({who,src:text,dst:'',sl,tl,t:nowHM(),st:'run'})-1;t.busy='tr';render();
@@ -5408,10 +5418,11 @@ document.addEventListener('click',e=>{
   if(!state.tr||!state.tr.open)return;const t=trSt();
   if(d.trcloud){t.cloud=!t.cloud;if(!t.cloud)trStop();trAudit('Переводчик: облако Google '+(t.cloud?'включено':'выключено'));render();return}
   if(d.trprov){t.prov=d.trprov;trStop();render();return}
-  if(d.trlang){t.lang=d.trlang;render();return}
-  if(d.trrec){trListen(d.trrec);return}
+  if(d.trlang){t.lang=d.trlang;trWarm(d.trlang);render();return}   // модель голоса tg/uz начинает качаться сразу при выборе языка
+  if(d.trrec){trUnlock();trListen(d.trrec);return}
+  if(d.trtype)trUnlock();
   if(d.trtype){const i=document.getElementById('trIn');if(!t.cloud){toast('Облако выключено — включите выше');return}if(i&&i.value.trim()){const v=i.value;i.value='';trPhrase(d.trtype,v)}return}
-  if(d.trsay!==undefined){trSpeak(+d.trsay);return}
+  if(d.trsay!==undefined){trUnlock();trSpeak(+d.trsay);return}
   if(d.trclear){trStop();t.log=[];render();return}
 });
 document.addEventListener('keydown',e=>{
