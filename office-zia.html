@@ -2048,6 +2048,32 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .sideEdge:hover{background:linear-gradient(90deg,transparent 3px,rgb(var(--cyan-rgb, 34 211 238) / 0.55) 3px,rgb(var(--cyan-rgb, 34 211 238) / 0.55) 5px,transparent 5px)}
 .tab .sideEdge{display:none}
 .side{position:sticky}
+/* памятка на целый лист (oz8.js, memoA4Html) */
+.a4.a4-full{gap:6px;font-size:10.5px}
+.a4-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.a4-grid section{min-width:0}
+.a4-sum{margin-top:3px!important;font-size:10px}
+.a4-t{width:100%;border-collapse:collapse;font-size:10px}
+.a4-t td{padding:3px 6px;border-top:1px solid var(--ink-sep);vertical-align:top;color:var(--ink-2)}
+.a4-t td:first-child{white-space:nowrap;font-weight:700;color:var(--ink);width:1%}
+.a4-bot{align-items:start}
+.a4-app{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:start}
+.a4-app h4,.a4-app p{grid-column:1}
+.a4-qr{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:var(--ink-3)}
+.a4-qr i{width:46px;height:46px;border:2px solid var(--ink);border-radius:4px;background:repeating-conic-gradient(var(--ink) 0 25%,transparent 0 50%) 0 0/9px 9px}
+.rcp .rcp-t{margin-left:8px}
+.rcp .rcp-t button{min-height:30px;padding:0 10px;font-size:12px}
+.tab .rcp .rcp-t button{min-height:40px}
+.a4-box{width:100%}
+.a4.a4-full{width:794px;height:1123px;aspect-ratio:auto;box-sizing:border-box;padding:52px 58px;font-size:13px;line-height:1.42;gap:8px;overflow:hidden}
+.a4.a4-full .a4-h b{font-size:16px}.a4.a4-full .a4-h span{font-size:13px}
+.a4.a4-full h4{font-size:14.5px;margin-top:8px}
+.a4.a4-full .a4-t,.a4.a4-full .a4-sum{font-size:12.5px}
+.a4.a4-full .a4-t td{padding:5px 8px}
+.a4.a4-full .a4-f{font-size:11.5px}
+.a4.a4-full .a4-qr{font-size:10px}.a4.a4-full .a4-qr i{width:84px;height:84px;background-size:14px 14px}
+.a4.a4-full .a4-grid{gap:8px 26px}
+.a4.a4-full .num{font-size:1em}
 
 </style>
 <script>
@@ -3530,15 +3556,31 @@ function receiptHtml(q,w){
     `${due.over?`<div class="sp-r"><span>Сверх лимита кредита</span><span class="num">${fmt(due.over)}</span></div>`:''}<div class="sp-r tt"><span>Итого</span><span class="num">${fmt(due.client)}</span></div>${due.loan?`<div class="sp-r"><span>Оплатил банк (кредит)</span><span class="num">${fmt(due.loan)}</span></div>`:''}${due.emp?`<div class="sp-r"><span>Оплатил работодатель</span><span class="num">${fmt(due.emp)}</span></div>`:''}</div>`+
     `<small class="sp-n">Единый чек с агентскими реквизитами — [проверить с бухгалтером и ОФД]</small></div></div>`;
 }
+// Памятка на целый лист (владелец, 20.11.2026: «дополни памятку на А4, чтобы был заполнен лист, напиши там нужную информацию»).
+// Сроки и правила — из справки notes/migrant-needs-one-window-2026-11-20.md (вторичные источники, юристом не проверено) — с пометкой [проверить].
+// Без ФИО и номеров документов. Телефоны — только 112 и демо-номер офиса; телефоны консульств и горячих линий — [проверить] перед печатью.
+const dPlus=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return two(x.getDate())+'.'+two(x.getMonth()+1)+'.'+x.getFullYear()};
 function memoA4Html(q,w){
-  const m=memoLines(q,w),p=w.memo,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
-  return `<div class="a4${p.busy?' printing':''}${!p.printed&&!p.busy?' pre':''}"><div class="a4-h"><b>ДОКУМЕНТ ЭКСПРЕСС</b><span>Памятка клиенту · визит ${q.n} · ${dt}</span></div>`+
-    `<h4>Что оформлено сегодня</h4>${m.ok.length?`<ul>${m.ok.map(id=>`<li><b>${svcName(id)}</b> — ${esc(exOf(w,id).what)}</li>`).join('')}</ul>`:'<p>—</p>'}`+
-    (m.nx.length?`<h4>Что дальше и когда</h4><ul>${m.nx.map(t=>`<li>${t}</li>`).join('')}</ul>`:'')+
-    (m.no.length?`<h4>Не оформлено — можно вернуться в офис</h4><p>${m.no.map(svcName).join(', ')}</p>`:'')+
-    `<h4>Сроки и напоминания</h4><p>${w.c.app?'В «Моём маршруте» — сроки, напоминания и копии всех документов, в том числе этой памятки.':'Поставьте «Мой маршрут»: там сроки, напоминания и копии документов.'}</p>`+
-    `<h4>Если есть вопросы</h4><p>Офис на 2-м этаже аэропорта Жуковский, окна 14–16.</p>`+
-    `<div class="a4-f">Без ФИО и паспортных данных. Язык — язык клиента [демо: русский, переводы проверить].</div></div>`;
+  const m=memoLines(q,w),p=w.memo,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear(),app=!!w.c.app;
+  const due=sums(w,true),later=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).later).map(id=>exOf(w,id).later);
+  const has=id=>w.svc.includes(id)&&!w.off.has(id)&&exOf(w,id).st==='ok';
+  return `<div class="a4-box"><div class="a4 a4-full${p.busy?' printing':''}${!p.printed&&!p.busy?' pre':''}"><div class="a4-h"><b>ДОКУМЕНТ ЭКСПРЕСС</b><span>Памятка клиенту · визит ${q.n} · ${dt}</span></div>`+
+    `<div class="a4-grid"><section><h4>Что оформлено сегодня</h4>${m.ok.length?`<ul>${m.ok.map(id=>`<li><b>${svcName(id)}</b> — ${esc(exOf(w,id).what)}</li>`).join('')}</ul>`:'<p>—</p>'}`+
+      `<p class="a4-sum">Оплачено нам за помощь: <b class="num">${fmt(due.client)}</b>${due.loan?' · оплатил банк: '+fmt(due.loan):''}${due.emp?' · оплатил работодатель: '+fmt(due.emp):''}. Сборы ведомств, налоги и тарифы операторов — отдельно.</p></section>`+
+    `<section><h4>Что дальше и когда</h4><ul>${m.nx.map(t=>`<li>${t}</li>`).join('')}${later.map(l=>`<li>${esc(laterTxt(l))}</li>`).join('')}${!m.nx.length&&!later.length?'<li>Ничего не ждём — всё выдано сегодня.</li>':''}</ul>`+
+      (m.no.length?`<p><b>Не оформлено</b> — можно вернуться в офис: ${m.no.map(svcName).join(', ')}.</p>`:'')+`</section></div>`+
+    `<h4>Ваши сроки — не пропустите</h4><table class="a4-t"><tbody>`+
+      `<tr><td class="num">до ${dPlus(d,7)}</td><td>Уведомление о прибытии (регистрация) подаёт принимающая сторона — хостел или хозяин жилья. Отрывную часть храните с паспортом [проверить срок]</td></tr>`+
+      `<tr><td class="num">до ${dPlus(d,30)}</td><td>Граждане Таджикистана и Узбекистана: заявление на патент, медосвидетельствование, дактилоскопия и фото, полис ДМС, экзамен [проверить]. Граждане Киргизии (ЕАЭС) патент не оформляют</td></tr>`+
+      `<tr><td>каждый месяц</td><td>Платёж за патент (НДФЛ) — до конца оплаченного месяца. Опоздали или заплатили не полностью — патент аннулируется сам, без уведомления [проверить]${has('patpay')?'. Напоминания включены — придут заранее':''}</td></tr>`+
+      `<tr><td>всегда</td><td>Приложение «Амина» в Москве и области: не выключайте геолокацию — без данных 3 рабочих дня снимают с учёта [проверить]</td></tr>`+
+      `<tr><td>сменили адрес</td><td>Новое уведомление о прибытии — на новом месте; сменили работу — сообщите в миграционный центр [проверить порядок]</td></tr>`+
+    `</tbody></table>`+
+    `<div class="a4-grid"><section><h4>Всегда носите с собой</h4><ul><li>Паспорт и миграционную карту</li><li>Отрывную часть уведомления о прибытии</li><li>Патент и чеки об оплате (Таджикистан, Узбекистан)</li><li>Полис ДМС</li><li>Телефон с «Моим маршрутом» — там копии документов</li></ul></section>`+
+      `<section><h4>Будьте осторожны</h4><ul><li>Пароль от Госуслуг и коды из SMS не говорите никому — даже «сотрудникам»</li><li>Не платите за «быструю регистрацию» без договора и чека</li><li>Штрафы для иностранцев выросли с 03.11.2026 — проверяйте долги вовремя [проверить]</li><li>Карту и кредит решает банк — мы не обещаем одобрение</li></ul></section></div>`+
+    `<div class="a4-grid a4-bot"><section><h4>Куда звонить</h4><ul><li><b>112</b> — экстренные службы, бесплатно с любого телефона</li><li><b>Офис «Документ Экспресс»</b>: +7 (000) 000-00-00 · демо</li><li>Аэропорт Жуковский, 2-й этаж, окна 14–16</li><li>Консульство вашей страны — номер в «Моём маршруте» [проверить]</li></ul></section>`+
+      `<section class="a4-app"><h4>«Мой маршрут»</h4><p>${app?'Уже стоит: сроки, напоминания и копии документов, в том числе этой памятки.':'Поставьте приложение: сроки, напоминания и копии документов — бесплатно.'}</p><div class="a4-qr" aria-hidden="true"><i></i><span>QR · «Мой маршрут»</span></div></section></div>`+
+    `<div class="a4-f">Памятка не заменяет документы ведомств и консультацию юриста. Без ФИО и паспортных данных. Язык — язык клиента [демо: русский, переводы проверить].</div></div></div>`;
 }
 function slipHtml(q,w){
   const p=w.memo;
@@ -3579,7 +3621,7 @@ function totalPanel(q,w){
   if(isTab())h+=`<div class="wks">${slipHtml(q,w)}</div>`;
   h+=`<div class="pk"><div><b>Чек, памятка и пакет документов</b>${p.printed?pl('g','напечатано · '+p.printed):pl('d',paid?'не напечатано':'после оплаты')}</div>`+
     (act?`<button class="btn ${p.printed||!paid?'ghost':'go2'} sm" data-memo="print"${p.busy||!paid?' disabled':''}>${ico('printer',18)}${p.busy?'Печать…':p.printed?'Напечатать ещё раз':'Напечатать всё'}</button>`:'')+`</div>`+
-    `<div class="pk"><div><b>Копия в «Мой маршрут»</b>${p.sent?pl('g','отправлено · '+p.sent):app?pl('d','уйдёт вместе с печатью'):pl('d','приложения нет — только печать')}</div></div>`;
+    (act&&typeof rcpRow==='function'?rcpRow(q,w):'')+`<div class="pk"><div><b>Копия в «Мой маршрут»</b>${p.sent?pl('g','отправлено · '+p.sent):app?pl('d','уйдёт вместе с печатью'):pl('d','приложения нет — только печать')}</div></div>`;
   const pk=pickupOf(w),apl=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).later&&exOf(w,id).later.kind==='app');
   if(pk.length)h+=`<p class="hint w">Заберёт в другой день: ${pk.map(x=>esc(x.what)+' — '+esc(x.when)).join('; ')}. После печати визит уйдёт в «Ожидают выдачи» (меню слева): клиент приедет — выдадите комплект и завершите.</p>`;
   if(apl.length)h+=`<p class="hint">Ответ придёт позже${app?' в «Мой маршрут»':' — приложения нет, дата и что ждать — в памятке'}: ${apl.map(id=>esc(exOf(w,id).later.what)).join('; ')}.</p>`;
@@ -5667,6 +5709,79 @@ addEventListener('resize',()=>setTimeout(towerFit,60));
 new MutationObserver(()=>{towerFit();setTimeout(towerFit,280)}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 document.addEventListener('transitionend',e=>{if(e.target.classList&&e.target.classList.contains('app'))towerFit()});
 setTimeout(towerFit,0);setTimeout(towerFit,400);
+
+// ----- Печать чека на принтер чеков Mertech, подключённый к планшету (владелец, 20.11.2026: «смогу с сайта отправить чек при нажатии отдельной кнопки
+// „Напечатать чек“? Только чек, А4 не надо»). Chrome на планшете умеет WebUSB, Web Bluetooth и Web Serial (проверено на Galaxy Tab Active5 20.11.2026).
+// Основной путь — USB: принтер кабелем к планшету через переходник USB-C (OTG); Chrome один раз спросит, какое устройство разрешить, дальше помнит.
+// Команды — ESC/POS (их понимают принтеры чеков Mertech [проверить на модели]); русские буквы — кодовая страница PC866 (ESC t 17 [проверить на модели]).
+// Bluetooth: Web Bluetooth работает только с принтерами BLE; классический Bluetooth (SPP) — через Web Serial, если Chrome увидит порт [проверить на модели].
+// ВАЖНО: это не кассовый чек. Кассовый чек печатает только онлайн-касса (ККТ); Mertech без фискального накопителя печатает копию-квитанцию [проверить у бухгалтера].
+const RCP_W={58:32,80:48};   // символов в строке: лента 58 мм — 32, 80 мм — 48
+let rcpTape=58;try{rcpTape=+localStorage.getItem('rcpTape')===80?80:58}catch(e){}
+let rcpDev=null,rcpBusy=false;
+// кириллица → PC866
+function cp866(str){const out=[];for(const ch of String(str)){const c=ch.codePointAt(0);
+  if(c<128)out.push(c);else if(c>=0x410&&c<=0x42F)out.push(c-0x410+0x80);else if(c>=0x430&&c<=0x43F)out.push(c-0x430+0xA0);else if(c>=0x440&&c<=0x44F)out.push(c-0x440+0xE0);
+  else if(c===0x401)out.push(0xF0);else if(c===0x451)out.push(0xF1);else if(c===0x2116)out.push(0xFC);else if(c===0xA0||c===0x202F)out.push(32);
+  else if(c===0x2014||c===0x2013)out.push(45);else if(c===0xAB||c===0xBB)out.push(34);else if(c===0x2022||c===0xB7)out.push(250);else out.push(63)}return out}
+const rcpLine=(l,r,w)=>{l=String(l);r=String(r);const sp=w-l.length-r.length;return sp>=1?l+' '.repeat(sp)+r:l.slice(0,Math.max(0,w-r.length-1))+' '+r};
+const rcpMoney=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' руб.';
+// текст чека — то же, что на экране «Что получит клиент» (receiptHtml, oz8.js), без ФИО и номеров документов
+function rcpBytes(q,w){
+  const W=RCP_W[rcpTape],due=sums(w,true),paid=w.pay.paid,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
+  const rows=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).price&&payerOf(w,id)==='client'&&!w.off.has(id));
+  const B=[],t=s=>B.push(...cp866(s+'\n')),cmd=(...a)=>B.push(...a),hr=()=>t('-'.repeat(W));
+  cmd(0x1B,0x40);cmd(0x1B,0x74,17);   // сброс; кодовая страница PC866
+  cmd(0x1B,0x61,1);cmd(0x1B,0x45,1);t('ДОКУМЕНТ ЭКСПРЕСС');cmd(0x1B,0x45,0);t('Офис · аэропорт Жуковский');t('2-й этаж · окно '+ME.win);cmd(0x1B,0x61,0);hr();
+  t(rcpLine('Квитанция'+(paid?' № '+paid.no:''),dt+(paid?' '+paid.t:''),W));t('Визит '+q.n);hr();
+  if(rows.length)rows.forEach(id=>t(rcpLine(svcName(id).slice(0,W-13),rcpMoney(exOf(w,id).price),W)));else t('Позиций к оплате нет');
+  if(due.over)t(rcpLine('Сверх лимита кредита',rcpMoney(due.over),W));
+  hr();cmd(0x1B,0x45,1);t(rcpLine('ИТОГО',rcpMoney(due.client),W));cmd(0x1B,0x45,0);
+  if(due.loan)t(rcpLine('Оплатил банк (кредит)',rcpMoney(due.loan),W));if(due.emp)t(rcpLine('Оплатил работодатель',rcpMoney(due.emp),W));
+  if(paid)t('Оплата: '+PAY_T[paid.m]);hr();
+  t('Не является кассовым чеком.');t('Кассовый чек выдаёт онлайн-касса.');t('Копия - в «Моём маршруте».');
+  cmd(0x1B,0x61,1);t('Спасибо!');cmd(0x1B,0x61,0);
+  cmd(0x1B,0x64,4);cmd(0x1D,0x56,0x42,0x00);   // прогнать 4 строки и отрезать (у принтера без ножа команда не мешает)
+  return new Uint8Array(B);
+}
+async function rcpConnect(ask){
+  if(!navigator.usb)throw new Error('этот браузер не умеет USB — нужен Chrome на Android или компьютере');
+  if(!rcpDev){const list=await navigator.usb.getDevices();rcpDev=list[0]||null}
+  if(!rcpDev&&ask)rcpDev=await navigator.usb.requestDevice({filters:[]});
+  if(!rcpDev)throw new Error('принтер не выбран');
+  if(!rcpDev.opened)await rcpDev.open();
+  if(rcpDev.configuration===null)await rcpDev.selectConfiguration(1);
+  // интерфейс с конечной точкой «наружу» (bulk out) — туда уходят команды печати
+  for(const itf of rcpDev.configuration.interfaces){for(const alt of itf.alternates){const ep=alt.endpoints.find(e=>e.direction==='out'&&e.type==='bulk');
+    if(ep){if(!itf.claimed)await rcpDev.claimInterface(itf.interfaceNumber);return ep.endpointNumber}}}
+  throw new Error('у устройства нет выхода для печати — это не принтер чеков?');
+}
+async function rcpPrint(){
+  const q=state.cur&&byN(state.cur);if(!q||rcpBusy)return;const w=ws(q);
+  rcpBusy=true;render();
+  try{const ep=await rcpConnect(true),data=rcpBytes(q,w);
+    for(let i=0;i<data.length;i+=4096)await rcpDev.transferOut(ep,data.slice(i,i+4096));
+    audit(w,'Квитанция напечатана на принтере чеков у окна (USB)');toast('Чек отправлен на принтер'+(rcpDev.productName?' · '+rcpDev.productName:''))}
+  catch(e){const m=e&&e.name==='NotFoundError'?'принтер не выбран':e&&e.name==='SecurityError'?'Chrome не дал доступ к USB — страница должна быть по https':e&&e.message||String(e);
+    console.warn('печать чека:',m);toast('Чек не напечатался: '+m)}
+  rcpBusy=false;render();
+}
+const rcpName=()=>rcpDev&&(rcpDev.productName||rcpDev.manufacturerName)||'';
+// строка в «Итог и выдача»: отдельная кнопка «Напечатать чек» — только чек, без памятки А4
+function rcpRow(q,w){
+  const due=sums(w,true).client,paid=!!w.pay.paid||!due;
+  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${rcpName()?pl('g','принтер: '+esc(rcpName())):pl('d',navigator.usb?'USB · первый раз Chrome спросит принтер':'нужен Chrome с USB')}`+
+    `<span class="seg rcp-t">${[58,80].map(t=>`<button class="${rcpTape===t?'sel':''}" data-rtape="${t}" aria-pressed="${rcpTape===t}">${t} мм</button>`).join('')}</span></div>`+
+    `<button class="btn ${paid?'go2':'ghost'} sm" data-rcpprint="1"${rcpBusy||!navigator.usb?' disabled':''}>${ico('printer',18)}${rcpBusy?'Печать…':'Напечатать чек'}</button></div>`+
+    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера].</p>`;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.rcpprint){rcpPrint();return}
+  if(b.dataset.rtape){rcpTape=+b.dataset.rtape;try{localStorage.setItem('rcpTape',String(rcpTape))}catch(x){}render()}});
+if(navigator.usb)navigator.usb.addEventListener('disconnect',e=>{if(rcpDev&&e.device===rcpDev){rcpDev=null;toast('Принтер чеков отключён');render()}});
+// ----- Памятка А4 в предпросмотре — настоящий лист: вёрстка 794×1123 (А4 при 96 точках на дюйм) и уменьшение под ширину колонки целиком
+function a4Fit(){document.querySelectorAll('.a4-box').forEach(box=>{const a=box.querySelector('.a4-full');if(!a||!box.clientWidth)return;const k=box.clientWidth/794;if(Math.abs((+a.style.zoom||1)-k)>0.002)a.style.zoom=String(k)})}
+new MutationObserver(()=>requestAnimationFrame(a4Fit)).observe(document.body,{childList:true,subtree:true});addEventListener('resize',a4Fit);
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
