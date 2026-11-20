@@ -5774,15 +5774,14 @@ new MutationObserver(()=>{towerFit();setTimeout(towerFit,280)}).observe(document
 document.addEventListener('transitionend',e=>{if(e.target.classList&&e.target.classList.contains('app'))towerFit()});
 setTimeout(towerFit,0);setTimeout(towerFit,400);
 
-// ----- Печать чека на принтер чеков Mertech, подключённый к планшету (владелец, 20.11.2026: «смогу с сайта отправить чек при нажатии отдельной кнопки
-// „Напечатать чек“? Только чек, А4 не надо»). Chrome на планшете умеет WebUSB, Web Bluetooth и Web Serial (проверено на Galaxy Tab Active5 20.11.2026).
-// Основной путь — USB: принтер кабелем к планшету через переходник USB-C (OTG); Chrome один раз спросит, какое устройство разрешить, дальше помнит.
+// ----- Печать чека на принтер чеков у окна (владелец, 20.11.2026: «смогу с сайта отправить чек при нажатии отдельной кнопки „Напечатать чек“? Только чек, А4 не надо»).
+// Принтер — Mertech HM-E200 по Bluetooth, лента только 58 мм (владелец, 21.11.2026: «надо настроить, бумага там только 58 мм, выбирать её не нужно»).
+// Проверка планшета 21.11.2026: HM-E200 привязан как классический Bluetooth (SPP), не BLE — Web Bluetooth его не видит, поэтому печать идёт через Web Serial
+// (порт RFCOMM; в Chrome 157 на Galaxy Tab Active5 navigator.serial есть). Прежний путь по USB убран: «совместимые устройства не найдены» — принтер не на кабеле.
 // Команды — ESC/POS (их понимают принтеры чеков Mertech [проверить на модели]); русские буквы — кодовая страница PC866 (ESC t 17 [проверить на модели]).
-// Bluetooth: Web Bluetooth работает только с принтерами BLE; классический Bluetooth (SPP) — через Web Serial, если Chrome увидит порт [проверить на модели].
 // ВАЖНО: это не кассовый чек. Кассовый чек печатает только онлайн-касса (ККТ); Mertech без фискального накопителя печатает копию-квитанцию [проверить у бухгалтера].
-const RCP_W={58:32,80:48};   // символов в строке: лента 58 мм — 32, 80 мм — 48
-let rcpTape=58;try{rcpTape=+localStorage.getItem('rcpTape')===80?80:58}catch(e){}
-let rcpDev=null,rcpBusy=false;
+const RCP_COLS=32;   // символов в строке на ленте 58 мм
+let rcpBusy=false;
 // кириллица → PC866
 function cp866(str){const out=[];for(const ch of String(str)){const c=ch.codePointAt(0);
   if(c<128)out.push(c);else if(c>=0x410&&c<=0x42F)out.push(c-0x410+0x80);else if(c>=0x430&&c<=0x43F)out.push(c-0x430+0xA0);else if(c>=0x440&&c<=0x44F)out.push(c-0x440+0xE0);
@@ -5792,7 +5791,7 @@ const rcpLine=(l,r,w)=>{l=String(l);r=String(r);const sp=w-l.length-r.length;ret
 const rcpMoney=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' руб.';
 // текст чека — то же, что на экране «Что получит клиент» (receiptHtml, oz8.js), без ФИО и номеров документов
 function rcpBytes(q,w){
-  const W=RCP_W[rcpTape],due=sums(w,true),paid=w.pay.paid,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
+  const W=RCP_COLS,due=sums(w,true),paid=w.pay.paid,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
   const rows=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).price&&payerOf(w,id)==='client'&&!w.off.has(id));
   const B=[],t=s=>B.push(...cp866(s+'\n')),cmd=(...a)=>B.push(...a),hr=()=>t('-'.repeat(W));
   cmd(0x1B,0x40);cmd(0x1B,0x74,17);   // сброс; кодовая страница PC866
@@ -5808,71 +5807,42 @@ function rcpBytes(q,w){
   cmd(0x1B,0x64,4);cmd(0x1D,0x56,0x42,0x00);   // прогнать 4 строки и отрезать (у принтера без ножа команда не мешает)
   return new Uint8Array(B);
 }
-// Как подключён принтер (владелец, 21.11.2026: «пишет: совместимые устройства не найдены, хотя принтер подключён»). Проверка планшета:
-// USB-разъём занят кабелем к компьютеру, а принтер HM-E200 привязан по Bluetooth — классический Bluetooth (SPP), не BLE. Web Bluetooth его не видит,
-// поэтому Bluetooth-путь — Web Serial (порт RFCOMM; в Chrome 157 на планшете navigator.serial есть). USB остаётся для принтера на кабеле.
-// Выбор запоминается (rcpVia); Chrome один раз спрашивает устройство, дальше помнит разрешение.
+// Bluetooth: порт, уже разрешённый раньше, — сразу; иначе Chrome один раз покажет список привязанных принтеров (принтер сначала привязать в настройках Android → Bluetooth)
 const RCP_SPP=['00001101-0000-1000-8000-00805f9b34fb','e5b152ed-6b46-09e9-4678-665e9a972cbc'];   // стандартный SPP и служба, которую объявляет HM-E200
-let rcpVia='bt';try{const v=localStorage.getItem('rcpVia');if(v==='usb'||v==='bt')rcpVia=v;else if(!navigator.serial)rcpVia='usb'}catch(e){}
 let rcpPort=null;
-const rcpCan=v=>v==='bt'?!!navigator.serial:!!navigator.usb;
-async function rcpConnect(ask){
-  if(!navigator.usb)throw new Error('этот браузер не умеет USB — нужен Chrome на Android или компьютере');
-  if(!rcpDev){const list=await navigator.usb.getDevices();rcpDev=list[0]||null}
-  if(!rcpDev&&ask)rcpDev=await navigator.usb.requestDevice({filters:[]});
-  if(!rcpDev)throw new Error('принтер не выбран');
-  if(!rcpDev.opened)await rcpDev.open();
-  if(rcpDev.configuration===null)await rcpDev.selectConfiguration(1);
-  // интерфейс с конечной точкой «наружу» (bulk out) — туда уходят команды печати
-  for(const itf of rcpDev.configuration.interfaces){for(const alt of itf.alternates){const ep=alt.endpoints.find(e=>e.direction==='out'&&e.type==='bulk');
-    if(ep){if(!itf.claimed)await rcpDev.claimInterface(itf.interfaceNumber);return ep.endpointNumber}}}
-  throw new Error('у устройства нет выхода для печати — это не принтер чеков?');
-}
-// Bluetooth: порт, уже разрешённый раньше, — сразу; иначе Chrome покажет список привязанных принтеров (сначала привязать в настройках Android → Bluetooth)
 async function rcpBtPort(ask){
   if(!navigator.serial)throw new Error('этот браузер не умеет Bluetooth-принтеры — нужен Chrome на Android или компьютере');
-  if(!rcpPort){const ports=await navigator.serial.getPorts();rcpPort=ports.find(p=>{const i=p.getInfo();return i.bluetoothServiceClassId})||ports[0]||null}
+  if(!rcpPort){const ports=await navigator.serial.getPorts();rcpPort=ports.find(p=>p.getInfo().bluetoothServiceClassId)||ports[0]||null}
   if(!rcpPort&&ask)rcpPort=await navigator.serial.requestPort({allowedBluetoothServiceClassIds:RCP_SPP,filters:RCP_SPP.map(id=>({bluetoothServiceClassId:id}))});
   if(!rcpPort)throw new Error('принтер не выбран');
   return rcpPort;
 }
-async function rcpSendBt(data){
+async function rcpSend(data){
   const port=await rcpBtPort(true);
   if(!port.writable)await port.open({baudRate:9600});   // у Bluetooth скорость не важна, но поле обязательно
   const wr=port.writable.getWriter();
-  try{for(let i=0;i<data.length;i+=512)await wr.write(data.slice(i,i+512))}   // маленькими кусками: у мобильных принтеров маленький буфер
+  try{for(let i=0;i<data.length;i+=512)await wr.write(data.slice(i,i+512))}   // маленькими кусками: у мобильного принтера маленький буфер
   finally{wr.releaseLock()}
-  await new Promise(r=>setTimeout(r,400));await port.close().catch(()=>{});   // дать допечатать и освободить принтер для других
+  await new Promise(r=>setTimeout(r,400));await port.close().catch(()=>{});   // дать допечатать и освободить принтер
 }
-const rcpErr=e=>e&&e.name==='NotFoundError'?(rcpVia==='bt'?'принтер не выбран — если списка нет, привяжите принтер в настройках Android → Bluetooth':'принтер не выбран — USB-принтер не виден: кабель через переходник OTG, разъём не занят зарядкой или компьютером')
+const rcpErr=e=>e&&e.name==='NotFoundError'?'принтер не выбран — если в списке его нет, привяжите HM-E200 в настройках Android → Bluetooth и включите принтер'
   :e&&e.name==='SecurityError'?'Chrome не дал доступ — страница должна быть по https'
   :e&&e.name==='NetworkError'?'принтер не отвечает — включён ли он и рядом ли':e&&e.message||String(e);
 async function rcpPrint(){
   const q=state.cur&&byN(state.cur);if(!q||rcpBusy)return;const w=ws(q);
   rcpBusy=true;render();
-  try{const data=rcpBytes(q,w);
-    if(rcpVia==='bt')await rcpSendBt(data);
-    else{const ep=await rcpConnect(true);for(let i=0;i<data.length;i+=4096)await rcpDev.transferOut(ep,data.slice(i,i+4096))}
-    audit(w,'Квитанция напечатана на принтере чеков у окна ('+(rcpVia==='bt'?'Bluetooth':'USB')+')');toast('Чек отправлен на принтер'+(rcpName()?' · '+rcpName():''))}
-  catch(e){const m=rcpErr(e);if(rcpVia==='bt')rcpPort=null;console.warn('печать чека:',e&&e.name);toast('Чек не напечатался: '+m)}
+  try{await rcpSend(rcpBytes(q,w));audit(w,'Квитанция напечатана на принтере чеков у окна (Bluetooth)');toast('Чек отправлен на принтер')}
+  catch(e){rcpPort=null;console.warn('печать чека:',e&&e.name);toast('Чек не напечатался: '+rcpErr(e))}
   rcpBusy=false;render();
 }
-const rcpName=()=>rcpVia==='bt'?(rcpPort?'Bluetooth':''):(rcpDev&&(rcpDev.productName||rcpDev.manufacturerName)||'');
-// строка в «Итог и выдача»: отдельная кнопка «Напечатать чек» — только чек, без памятки А4
+// строка в «Итог и выдача»: отдельная кнопка «Напечатать чек» — только чек, без памятки А4; лента одна (58 мм), выбирать нечего
 function rcpRow(q,w){
-  const due=sums(w,true).client,paid=!!w.pay.paid||!due,can=rcpCan(rcpVia);
-  const hint=rcpVia==='bt'?(can?'Bluetooth · первый раз Chrome спросит принтер':'нужен Chrome с Bluetooth-портом'):(can?'USB · первый раз Chrome спросит принтер':'нужен Chrome с USB');
-  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${rcpName()?pl('g','принтер: '+esc(rcpName())):pl('d',hint)}`+
-    `<span class="seg rcp-t">${[['bt','Bluetooth'],['usb','USB']].map(([v,t])=>`<button class="${rcpVia===v?'sel':''}" data-rvia="${v}" aria-pressed="${rcpVia===v}">${t}</button>`).join('')}</span>`+
-    `<span class="seg rcp-t">${[58,80].map(t=>`<button class="${rcpTape===t?'sel':''}" data-rtape="${t}" aria-pressed="${rcpTape===t}">${t} мм</button>`).join('')}</span></div>`+
+  const due=sums(w,true).client,paid=!!w.pay.paid||!due,can=!!navigator.serial;
+  return `<div class="pk rcp"><div><b>Чек на принтере у окна</b>${pl(rcpPort?'g':'d',can?'Mertech HM-E200 · Bluetooth · 58 мм':'нужен Chrome с Bluetooth')}</div>`+
     `<button class="btn ${paid?'go2':'ghost'} sm" data-rcpprint="1"${rcpBusy||!can?' disabled':''}>${ico('printer',18)}${rcpBusy?'Печать…':'Напечатать чек'}</button></div>`+
-    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера].${rcpVia==='bt'?' Bluetooth-принтер сначала привязать в настройках Android.':''}</p>`;
+    `<p class="hint">Только чек, без памятки А4. Это копия-квитанция: кассовый чек выдаёт онлайн-касса [проверить у бухгалтера]. Первый раз Chrome спросит принтер — выберите HM-E200.</p>`;
 }
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  if(b.dataset.rcpprint){rcpPrint();return}
-  if(b.dataset.rvia){rcpVia=b.dataset.rvia;try{localStorage.setItem('rcpVia',rcpVia)}catch(x){}render();return}
-  if(b.dataset.rtape){rcpTape=+b.dataset.rtape;try{localStorage.setItem('rcpTape',String(rcpTape))}catch(x){}render()}});
-if(navigator.usb)navigator.usb.addEventListener('disconnect',e=>{if(rcpDev&&e.device===rcpDev){rcpDev=null;toast('Принтер чеков отключён');render()}});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-rcpprint]');if(b&&!b.disabled)rcpPrint()});
 if(navigator.serial)navigator.serial.addEventListener('disconnect',e=>{if(rcpPort&&e.target===rcpPort){rcpPort=null;render()}});
 // ----- Памятка А4 в предпросмотре — настоящий лист: вёрстка 794×1123 (А4 при 96 точках на дюйм) и уменьшение под ширину колонки целиком
 // настоящий QR на скачивание «Моего маршрута» (владелец, 20.11.2026: «поставь реальный красивый QR») — тот же адрес и оформление, что у QR в окне оператора
