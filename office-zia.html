@@ -2074,6 +2074,35 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .a4.a4-full .a4-qr{font-size:10px}.a4.a4-full .a4-qr i{width:84px;height:84px;background-size:14px 14px}
 .a4.a4-full .a4-grid{gap:8px 26px}
 .a4.a4-full .num{font-size:1em}
+/* настоящий QR в памятке */
+.a4.a4-full .a4-qr canvas{display:block;width:104px;height:104px;border-radius:10px}
+.a4.a4-full .a4-qr span{font-size:11px;font-weight:600;color:var(--ink-2)}
+/* кнопка сворачивания — круглый значок у правого края меню, без подписи (владелец, 20.11.2026: «это некрасиво») */
+.side .sideBtn{align-self:flex-end;display:grid;place-items:center;width:38px;height:38px;margin:0 12px 10px 0;padding:0;border-radius:50%;border:1px solid var(--line2);background:var(--panel);color:var(--muted);cursor:pointer;flex:none;white-space:normal}
+.side .sideBtn:hover{color:var(--text-hi);border-color:rgb(var(--cyan-rgb, 34 211 238) / 0.5)}
+.side .sideBtn svg{width:18px;height:18px;transition:transform .24s cubic-bezier(.2,0,0,1)}
+.side-mini .side .sideBtn svg{transform:rotate(180deg)}
+.side-mini:not(.tab) .side .sideBtn{align-self:center;margin:0 0 10px}
+.tab .side .sideBtn{align-self:center;width:44px;height:44px;margin:0 0 8px}
+.side-mini.tab #sideBtn{width:34px;height:34px;margin:6px 0 0;border-radius:50%}
+/* картинка в меню двигается плавно */
+.route .pic{transition:background-position .24s cubic-bezier(.2,0,0,1)}
+/* планшет, меню свёрнуто в полоску 40: линия под значком в шапке (72) не совпадала с краем полоски — угол «разъезжался» (владелец, 20.11.2026); линию у значка убираем */
+.side-mini.tab .brand .mark{border-right:0!important;border-image:none!important}
+:root[data-theme="light"].side-mini.tab .brand .mark{border-image:none!important}
+/* колонки: ручки на границах и кнопка «спрятать/показать» (oz32.js) */
+:root:not(.tab) .main.oz{position:relative}
+:root:not(.tab) #colQ{grid-column:1}:root:not(.tab) #colC{grid-column:2}:root:not(.tab) #colF{grid-column:3}
+.colGrip{position:absolute;top:14px;bottom:12px;width:8px;z-index:6;cursor:col-resize;touch-action:none}
+.colGrip[hidden]{display:none}
+.colGrip::before{content:'';position:absolute;left:3px;top:0;bottom:0;width:2px;border-radius:2px;background:transparent;transition:background .15s}
+.colGrip:hover::before,.colGrip.drag::before{background:rgb(var(--cyan-rgb, 34 211 238) / 0.6)}
+.colGrip.off{cursor:default}
+.colTgl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:26px;height:44px;padding:0;border-radius:13px;border:1px solid var(--line2);background:var(--panel-solid);color:var(--muted);display:grid;place-items:center;cursor:pointer;opacity:.55;transition:opacity .15s,color .15s,border-color .15s}
+.colGrip:hover .colTgl,.colTgl:focus-visible,.colGrip.off .colTgl{opacity:1}
+.colTgl:hover{color:var(--text-hi);border-color:rgb(var(--cyan-rgb, 34 211 238) / 0.55)}
+.col-drag,.col-drag *{cursor:col-resize!important;user-select:none!important}
+.pcview .colTgl{width:34px;height:56px;border-radius:17px}
 
 </style>
 <script>
@@ -3579,7 +3608,7 @@ function memoA4Html(q,w){
     `<div class="a4-grid"><section><h4>Всегда носите с собой</h4><ul><li>Паспорт и миграционную карту</li><li>Отрывную часть уведомления о прибытии</li><li>Патент и чеки об оплате (Таджикистан, Узбекистан)</li><li>Полис ДМС</li><li>Телефон с «Моим маршрутом» — там копии документов</li></ul></section>`+
       `<section><h4>Будьте осторожны</h4><ul><li>Пароль от Госуслуг и коды из SMS не говорите никому — даже «сотрудникам»</li><li>Не платите за «быструю регистрацию» без договора и чека</li><li>Штрафы для иностранцев выросли с 03.11.2026 — проверяйте долги вовремя [проверить]</li><li>Карту и кредит решает банк — мы не обещаем одобрение</li></ul></section></div>`+
     `<div class="a4-grid a4-bot"><section><h4>Куда звонить</h4><ul><li><b>112</b> — экстренные службы, бесплатно с любого телефона</li><li><b>Офис «Документ Экспресс»</b>: +7 (000) 000-00-00 · демо</li><li>Аэропорт Жуковский, 2-й этаж, окна 14–16</li><li>Консульство вашей страны — номер в «Моём маршруте» [проверить]</li></ul></section>`+
-      `<section class="a4-app"><h4>«Мой маршрут»</h4><p>${app?'Уже стоит: сроки, напоминания и копии документов, в том числе этой памятки.':'Поставьте приложение: сроки, напоминания и копии документов — бесплатно.'}</p><div class="a4-qr" aria-hidden="true"><i></i><span>QR · «Мой маршрут»</span></div></section></div>`+
+      `<section class="a4-app"><h4>«Мой маршрут»</h4><p>${app?'Уже стоит: сроки, напоминания и копии документов, в том числе этой памятки.':'Поставьте приложение: сроки, напоминания и копии документов — бесплатно.'}</p><div class="a4-qr"><canvas class="a4qrc" width="296" height="296" role="img" aria-label="QR-код: скачать «Мой маршрут»"></canvas><span>${app?'Открыть':'Скачать'} «Мой маршрут»</span></div></section></div>`+
     `<div class="a4-f">Памятка не заменяет документы ведомств и консультацию юриста. Без ФИО и паспортных данных. Язык — язык клиента [демо: русский, переводы проверить].</div></div></div>`;
 }
 function slipHtml(q,w){
@@ -5670,8 +5699,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tzoom]');i
 const sideKey=()=>document.documentElement.classList.contains('tab')?'sideMini:tab':'sideMini:wide';
 function sideGet(){try{return localStorage.getItem(sideKey())==='1'}catch(e){return false}}
 function sideApply(){const r=document.documentElement,on=sideGet();if(r.classList.contains('side-mini')!==on)r.classList.toggle('side-mini',on);
-  const b=document.getElementById('sideBtn');if(b){b.setAttribute('aria-expanded',String(!on));b.title=on?'Развернуть меню':'Свернуть меню';b.setAttribute('aria-label',b.title);const t=b.querySelector('span');if(t)t.textContent=b.title}}
-(()=>{const nav=document.querySelector('.side .nav[data-nav="desk"]');if(nav&&!document.getElementById('sideBtn'))nav.insertAdjacentHTML('beforebegin','<button class="nav sideBtn" id="sideBtn" aria-expanded="true" title="Свернуть меню" aria-label="Свернуть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg><span>Свернуть меню</span></button>')})();
+  const b=document.getElementById('sideBtn');if(b){b.setAttribute('aria-expanded',String(!on));b.title=on?'Развернуть меню':'Свернуть меню';b.setAttribute('aria-label',b.title);}}
+(()=>{const nav=document.querySelector('.side .nav[data-nav="desk"]');if(nav&&!document.getElementById('sideBtn'))nav.insertAdjacentHTML('beforebegin','<button class="sideBtn" id="sideBtn" aria-expanded="true" title="Свернуть меню" aria-label="Свернуть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>')})();
 document.addEventListener('click',e=>{const b=e.target.closest('#sideBtn');if(!b)return;const on=!sideGet();try{localStorage.setItem(sideKey(),on?'1':'0')}catch(x){}sideApply()});
 new MutationObserver(sideApply).observe(document.documentElement,{attributes:true,attributeFilter:['class']});setTimeout(sideApply,0);
 // ----- Масштаб кнопками в шапке (только на планшете): «−  75%  +», шаг 5%; у вида «вкладки» и «как на компьютере» — свой масштаб
@@ -5703,7 +5732,7 @@ const TOWER_X=94/1344;
 function towerFit(){const r=document.documentElement,pic=document.querySelector('.route .pic'),side=document.querySelector('.side');if(!pic||!side)return;
   if(!(r.classList.contains('tab')||r.classList.contains('side-mini'))){pic.style.backgroundPosition='';pic.style.backgroundSize='';return}
   // слева у картинки продолжения нет: если для центра не хватает — картинку чуть крупнее (сверху обрезается небо, его и так гасит маска)
-  const W=side.clientWidth,H=pic.clientHeight;if(!W||!H)return;const S=Math.max(H,Math.min(W/2/TOWER_X,H*1.3));   // не больше 1,3 высоты: иначе на низком блоке верх башни уходит за край
+  const W=side.clientWidth,H=pic.clientHeight;if(!W||!H)return;const S=r.classList.contains('tab')?Math.max(H,Math.min(W/2/TOWER_X,H*1.3)):H;   // на компьютере размер постоянный — картинка не скачет   // не больше 1,3 высоты: иначе на низком блоке верх башни уходит за край
   pic.style.backgroundSize='auto '+S.toFixed(1)+'px';pic.style.backgroundPosition=Math.min(0,W/2-TOWER_X*S).toFixed(1)+'px 100%'}   // правее левого края не сдвигаем — слева не будет пустой полосы
 addEventListener('resize',()=>setTimeout(towerFit,60));
 new MutationObserver(()=>{towerFit();setTimeout(towerFit,280)}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -5780,8 +5809,57 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||
   if(b.dataset.rtape){rcpTape=+b.dataset.rtape;try{localStorage.setItem('rcpTape',String(rcpTape))}catch(x){}render()}});
 if(navigator.usb)navigator.usb.addEventListener('disconnect',e=>{if(rcpDev&&e.device===rcpDev){rcpDev=null;toast('Принтер чеков отключён');render()}});
 // ----- Памятка А4 в предпросмотре — настоящий лист: вёрстка 794×1123 (А4 при 96 точках на дюйм) и уменьшение под ширину колонки целиком
-function a4Fit(){document.querySelectorAll('.a4-box').forEach(box=>{const a=box.querySelector('.a4-full');if(!a||!box.clientWidth)return;const k=box.clientWidth/794;if(Math.abs((+a.style.zoom||1)-k)>0.002)a.style.zoom=String(k)})}
+// настоящий QR на скачивание «Моего маршрута» (владелец, 20.11.2026: «поставь реальный красивый QR») — тот же адрес и оформление, что у QR в окне оператора
+function a4Qr(){document.querySelectorAll('canvas.a4qrc:not([data-qr])').forEach(c=>{if(typeof drawQr!=='function')return;drawQr(WK_STAND+'/download',c);c.dataset.qr='1'})}
+function a4Fit(){a4Qr();document.querySelectorAll('.a4-box').forEach(box=>{const a=box.querySelector('.a4-full');if(!a||!box.clientWidth)return;const k=box.clientWidth/794;if(Math.abs((+a.style.zoom||1)-k)>0.002)a.style.zoom=String(k)})}
 new MutationObserver(()=>requestAnimationFrame(a4Fit)).observe(document.body,{childList:true,subtree:true});addEventListener('resize',a4Fit);
+
+// ----- Колонки: границы двигаются, левую и правую можно спрятать — центральная расширяется (владелец, 20.11.2026:
+// «сделай, чтобы границы колонок можно было двигать, и колонки слева и справа включать и отключать, чтобы расширялась центральная»).
+// Работает на компьютере и в виде «как на компьютере» на планшете; в виде «вкладки» колонок нет. Ширины и выбор запоминаются в браузере.
+// Ручка — тонкая полоса на границе колонки (тянуть мышью или пальцем; двойной щелчок — ширина по умолчанию); кнопка на ручке — спрятать или показать колонку.
+const COLS={q:{def:290,min:220,max:520,el:'colQ',side:'left',t:'очередь'},f:{def:350,min:260,max:640,el:'colF',side:'right',t:'услуги клиента'}};
+const colSt={};for(const k in COLS){let w=COLS[k].def,h=false;try{const v=+localStorage.getItem('colW:'+k);if(v)w=v;h=localStorage.getItem('colH:'+k)==='1'}catch(e){}colSt[k]={w,h}}
+function colSave(k){try{localStorage.setItem('colW:'+k,String(Math.round(colSt[k].w)));localStorage.setItem('colH:'+k,colSt[k].h?'1':'0')}catch(e){}}
+const colOn=()=>{const r=document.documentElement;return !r.classList.contains('tab')&&!r.hasAttribute('data-rkl')};   // при открытом сайте МВД — своя раскладка
+function colApply(){
+  const r=document.documentElement,main=document.querySelector('.main.oz');if(!main)return;
+  if(!colOn()){main.style.gridTemplateColumns='';['colQ','colF'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=''});colGrips();return}
+  const q=colSt.q,f=colSt.f;
+  main.style.gridTemplateColumns=(q.h?'0px':q.w+'px')+' minmax(0,1fr) '+(f.h?'0px':f.w+'px');
+  document.getElementById('colQ').style.display=q.h?'none':'';document.getElementById('colF').style.display=f.h?'none':'';
+  r.classList.toggle('colq-off',q.h);r.classList.toggle('colf-off',f.h);
+  colGrips();
+}
+// ручки — отдельные элементы в .main (колонки перерисовываются, ручки — нет); положение — по краям центральной колонки
+const GRIP_SVG={left:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',right:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'};
+function colGrips(){
+  const main=document.querySelector('.main.oz');if(!main)return;
+  for(const k in COLS){let g=document.getElementById('grip-'+k);
+    if(!g){main.insertAdjacentHTML('beforeend',`<div class="colGrip" id="grip-${k}" data-grip="${k}" title="Тяните, чтобы изменить ширину · двойной щелчок — как было"><button class="colTgl" data-coltgl="${k}"></button></div>`);g=document.getElementById('grip-'+k)}
+    g.hidden=!colOn();if(g.hidden)continue;
+    const c=COLS[k],s=colSt[k],center=document.getElementById('colC'),mr=main.getBoundingClientRect(),cr=center.getBoundingClientRect(),z=main.offsetWidth?mr.width/main.offsetWidth:1;
+    const x=((c.side==='left'?cr.left:cr.right)-mr.left)/z;g.style.left=(c.side==='left'?x-12:x+4)+'px';
+    // стрелка показывает, что сделает кнопка: спрятать колонку (к её краю) или вернуть
+    const b=g.querySelector('.colTgl');b.innerHTML=(c.side==='left')===!s.h?GRIP_SVG.left:GRIP_SVG.right;
+    b.title=(s.h?'Показать: ':'Спрятать: ')+c.t;b.setAttribute('aria-label',b.title);g.classList.toggle('off',s.h)}
+}
+// перетаскивание: сдвиг указателя в единицах вёрстки (учитываем масштаб страницы)
+let colDrag=null;
+document.addEventListener('pointerdown',e=>{const g=e.target.closest('.colGrip');if(!g||e.target.closest('.colTgl'))return;const k=g.dataset.grip;if(colSt[k].h)return;
+  const main=document.querySelector('.main.oz'),z=main.offsetWidth?main.getBoundingClientRect().width/main.offsetWidth:1;
+  const cw=document.getElementById('colC').offsetWidth;   // центральная — не уже 380: столько можно отдать боковой
+  colDrag={k,x0:e.clientX,w0:colSt[k].w,z,room:Math.max(0,cw-380)};g.setPointerCapture(e.pointerId);g.classList.add('drag');document.documentElement.classList.add('col-drag');e.preventDefault()});
+document.addEventListener('pointermove',e=>{if(!colDrag)return;const c=COLS[colDrag.k],dx=(e.clientX-colDrag.x0)/colDrag.z;
+  colSt[colDrag.k].w=Math.round(Math.min(c.max,colDrag.w0+colDrag.room,Math.max(c.min,colDrag.w0+(c.side==='left'?dx:-dx))));colApply()});
+document.addEventListener('pointerup',e=>{if(!colDrag)return;colSave(colDrag.k);document.querySelectorAll('.colGrip.drag').forEach(g=>g.classList.remove('drag'));document.documentElement.classList.remove('col-drag');colDrag=null});
+document.addEventListener('dblclick',e=>{const g=e.target.closest('.colGrip');if(!g||e.target.closest('.colTgl'))return;const k=g.dataset.grip;colSt[k].w=COLS[k].def;colSave(k);colApply()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-coltgl]');if(!b)return;const k=b.dataset.coltgl;colSt[k].h=!colSt[k].h;colSave(k);colApply();render()});
+new MutationObserver(()=>requestAnimationFrame(colApply)).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-rkl']});
+addEventListener('resize',()=>requestAnimationFrame(colGrips));
+// после каждой перерисовки и прокрутки — ручки на краях центральной колонки
+new MutationObserver(()=>requestAnimationFrame(colGrips)).observe(document.getElementById('colC')||document.body,{childList:true});
+setTimeout(colApply,0);
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
