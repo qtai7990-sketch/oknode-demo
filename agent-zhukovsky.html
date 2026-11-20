@@ -2412,6 +2412,11 @@ if(HASH==='#history'){state.section='history';render()}
   #viewConsent #mStylus:not([hidden]){flex:1 1 auto;display:flex;flex-direction:column}
   #viewConsent #sig{flex:1 1 auto;aspect-ratio:auto;min-height:150px}
 }
+/* варианты в карточках услуг — ровная сетка, как в окне оператора и у агента Жуковского: название слева, цена справа и не переносится
+   (владелец, 21.11.2026: «у агентов блоки выбора услуг сделать такие же, как у офиса») */
+.svc .vars{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.svc .vars .var{width:100%;justify-content:space-between;text-align:left;line-height:1.25}
+.svc .vars .var small{white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
 /* распознавание паспорта камерой — общий модуль (common/passport-ocr.js) */
 .ocr-back{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .55)}
 .ocr{width:min(720px,100%);max-height:calc(var(--vh,100vh) - 32px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:18px;border:1px solid var(--line2);background:var(--panel-solid,var(--bg));box-shadow:0 30px 60px rgb(0 0 0 / .45);color:var(--text)}
