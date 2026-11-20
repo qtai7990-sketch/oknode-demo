@@ -1938,6 +1938,8 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .pl-n{text-align:center}
 .sim-left{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-top:2px}
 .sim-left.low{color:var(--amber)}
+.diag{position:fixed;left:12px;right:12px;top:12px;z-index:50;display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:14px;background:var(--panel-solid);border:2px solid var(--amber);font-size:14px;color:var(--text);overflow-wrap:anywhere}
+.diag .btn{align-self:flex-start}
 
 </style>
 <script>
@@ -5442,6 +5444,17 @@ const simLeft=v=>SIM_STOCK[v]==null?10:SIM_STOCK[v];
 const simLow=()=>(BY.sim.vars||[]).filter(v=>!v.later&&simLeft(v.id)<SIM_LOW);
 function simTake(w){const v=[...(w.vars.sim||[])].find(x=>x!=='later');if(!v)return;SIM_STOCK[v]=Math.max(0,simLeft(v)-1);if(SIM_STOCK[v]<SIM_LOW)toast(SIM_NAME(v)+': осталось болванок '+SIM_STOCK[v]+' — скажите старшему смены')}
 const simTag=v=>{const n=simLeft(v);return `<small class="sim-left${n<SIM_LOW?' low':''}">${n?'болванок: '+n:'болванок нет'}</small>`};
+// ----- Диагностика на планшете (владелец, 20.11.2026: «проверь дубли иконок наверху в Chrome на планшете»): адрес с #diag —
+// панель поверх страницы: какие кнопки в шапке и сколько раз, браузер, размер экрана, даёт ли браузер микрофон. Снимок этой панели — вместо подключения планшета.
+function diagShow(){
+  const btns=[...document.querySelectorAll('header.top button')].map(b=>b.id||b.className),cnt={};btns.forEach(x=>cnt[x]=(cnt[x]||0)+1);
+  const dup=Object.entries(cnt).filter(([,n])=>n>1),el=document.createElement('div');el.className='diag';
+  el.innerHTML=`<b>Диагностика шапки</b><span>кнопок: ${btns.length} · ${dup.length?'ДУБЛИ: '+dup.map(([k,n])=>k+' ×'+n).join(', '):'дублей нет'}</span><span>${btns.join(' · ')}</span>`+
+    `<span>переводчик: ${document.querySelectorAll('#trBtn').length} шт · https: ${window.isSecureContext?'да':'нет'} · распознавание: ${'webkitSpeechRecognition' in window||'SpeechRecognition' in window?'есть':'нет'}</span>`+
+    `<span>экран ${innerWidth}×${innerHeight} · плотность ${devicePixelRatio} · вид: ${document.documentElement.classList.contains('tab')?'планшет':'широкий'}</span><span>${navigator.userAgent}</span><button class="btn ghost sm" onclick="this.parentNode.remove()">Закрыть</button>`;
+  document.body.appendChild(el);
+}
+if(/diag/.test(location.hash))setTimeout(diagShow,1200);
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
