@@ -5782,7 +5782,7 @@ setTimeout(towerFit,0);setTimeout(towerFit,400);
 // Поэтому на планшете чек уходит в приложение-драйвер RawBT (печать ESC/POS на Bluetooth-принтеры): страница открывает intent со строкой чека в base64,
 // RawBT печатает на выбранный в нём принтер. Нет приложения — Chrome откроет его страницу в Google Play. Формат intent — [проверить на планшете].
 // На компьютере — Web Serial напрямую. В продукте — мост к устройству в оболочке Android (apps/android, интерфейс Hardware), без стороннего приложения.
-// Команды — ESC/POS (их понимают принтеры чеков Mertech [проверить на модели]); русские буквы — кодовая страница PC866 (ESC t 17 [проверить на модели]).
+// Команды — ESC/POS (их понимают принтеры чеков Mertech [проверить на модели]); русские буквы — кодовая страница PC866 (ESC t 17; на HM-E200 проверено 21.11.2026).
 // ВАЖНО: это не кассовый чек. Кассовый чек печатает только онлайн-касса (ККТ); Mertech без фискального накопителя печатает копию-квитанцию [проверить у бухгалтера].
 const RCP_COLS=32;   // символов в строке на ленте 58 мм
 let rcpBusy=false;
@@ -5798,7 +5798,7 @@ function rcpBytes(q,w){
   const W=RCP_COLS,due=sums(w,true),paid=w.pay.paid,d=new Date(),dt=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
   const rows=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).price&&payerOf(w,id)==='client'&&!w.off.has(id));
   const B=[],t=s=>B.push(...cp866(s+'\n')),cmd=(...a)=>B.push(...a),hr=()=>t('-'.repeat(W));
-  cmd(0x1B,0x40);cmd(0x1B,0x74,17);   // сброс; кодовая страница PC866
+  cmd(0x1B,0x40);cmd(0x1C,0x2E);cmd(0x1B,0x74,17);   // сброс; выключить китайский режим (FS .); кодовая страница PC866 — на HM-E200 проверено пробной полоской 21.11.2026 (A17 читается; читаются и 1251 с ESC t 46/22/73)
   cmd(0x1B,0x61,1);cmd(0x1B,0x45,1);t('ДОКУМЕНТ ЭКСПРЕСС');cmd(0x1B,0x45,0);t('Офис · аэропорт Жуковский');t('2-й этаж · окно '+ME.win);cmd(0x1B,0x61,0);hr();
   t(rcpLine('Квитанция'+(paid?' № '+paid.no:''),dt+(paid?' '+paid.t:''),W));t('Визит '+q.n);hr();
   if(rows.length)rows.forEach(id=>t(rcpLine(svcName(id).slice(0,W-13),rcpMoney(exOf(w,id).price),W)));else t('Позиций к оплате нет');
