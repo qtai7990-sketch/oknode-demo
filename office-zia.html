@@ -2140,6 +2140,8 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
    кнопки и фото прижимались к логотипу. Логотип слева, всё остальное — к правому краю */
 @media (max-width:860px){.top>.brand{margin-right:auto}}
 .wkbtns{flex-wrap:wrap}
+/* уголок рамки .cr.bl совпадал по имени с блоком .bl (экран блокировки, padding 28px) и был больше остальных (владелец, 21.11.2026: «нижний левый угол по размеру в соответствии с остальными») */
+.cr.bl{padding:0;max-width:none}
 
 /* распознавание паспорта камерой — общий модуль (common/passport-ocr.js) */
 .ocr-back{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .55)}
