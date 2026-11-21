@@ -5365,6 +5365,20 @@ function mmsPaint(){document.querySelectorAll('.say[data-saylang]').forEach(b=>{
 // подготовить заранее: вызывают шпаргалка (вопросы) и справочник (раскрытый ответ)
 function mmsWarm(code,texts,pri){if(!MMS[code])return;if(MMS[code].st==='err')return;texts.forEach(t=>{if(!(typeof recOf==='function'&&recOf(code,t)))mmsJob(code,String(t),pri||1)})}   // записанное не готовим и модель ради него не качаем
 
+// --- модели качаются сразу при открытии страницы, а не при выборе языка (владелец, 21.11.2026: «начинать качать модель сразу при открытии страницы»).
+// По одной: сначала язык, выбранный в переводчике в прошлый раз, потом второй — так первый готов быстрее, чем если тянуть оба разом.
+// Через 2 с после загрузки страницы, чтобы не мешать её показу. Уже скачанная модель берётся из IndexedDB и только запускается.
+// Не качаем: в режиме экономии трафика (Chrome «Экономия трафика»); в автотестах (navigator.webdriver), чтобы прогоны не тянули ~230 МБ —
+// проверить предзагрузку в тесте: localStorage.mmsPre='1'. Выключить на устройстве: localStorage.mmsPre='0'. Выбор языка, как и раньше, качает свою модель сам.
+function mmsPrefetch(){
+  let flag=null,last=null;try{flag=localStorage.getItem('mmsPre');last=localStorage.getItem('trLang')}catch(e){}
+  if(flag==='0')return;
+  if(flag!=='1'&&(navigator.webdriver||(navigator.connection&&navigator.connection.saveData)))return;
+  const order=last==='uz'?['uz','tg']:['tg','uz'];
+  order.reduce((p,c)=>p.then(()=>MMS[c]&&MMS[c].st==='idle'?mmsLoad(c):null),Promise.resolve());
+}
+if(document.readyState==='complete')setTimeout(mmsPrefetch,2000);else addEventListener('load',()=>setTimeout(mmsPrefetch,2000),{once:true});
+
 
 // ----- Голос tg и uz: движок модели MMS — общий модуль common/mms-tts.js (его вставляет assemble.mjs перед этой частью); здесь — только готовые записи офиса.
 // --- готовые записи (владелец, 20.11.2026: «MP3 32 кбит/с, встроенным в HTML, таджикский и узбекский — посмотрим, как будет работать»).
@@ -5758,7 +5772,7 @@ const TR_REC={ru:'ru-RU',en:'en-US',tg:'tg-TJ',uz:'uz-UZ',ky:'ky-KG',hi:'hi-IN'}
 const TR_LANGS=[['tg','тоҷикӣ'],['uz','oʻzbekcha'],['ky','кыргызча'],['hi','हिन्दी'],['en','English']];
 // что умеет каждый вариант: [распознавание, перевод, голос] — по справке; «?» — не подтверждено
 const TR_CAN={
-  google:{ru:['✓','—','✓ Google'],en:['✓','✓','✓ Google'],tg:['? Chrome','✓','✓ наша модель, без облака'],uz:['? Chrome','✓','✓ наша модель, без облака'],ky:['? Chrome','✓','русский голос Google читает текст'],hi:['✓','✓','✓ Google']},
+  google:{ru:['✓','—','✓ Google'],en:['✓','✓','✓ Google'],tg:['? Chrome','✓','✓ наша модель, без облака'],uz:['? Chrome','✓','✓ наша модель, без облака'],ky:['? Chrome','✓','✗ нет ни у кого — клиенту показываем текст'],hi:['✓','✓','✓ Google']},
   yandex:{ru:['✓','—','✓'],en:['✓','✓','✓'],tg:['✗','✓','✗'],uz:['✓ латиница','✓','✓'],ky:['✗','✓','✗'],hi:['✗','✓','✗']}};
 const trKey=()=>state.walk?'walk':state.cur||'none';
 function trSt(){if(!state.tr)state.tr={open:false,prov:'google',cloud:true,lang:null,log:[],key:null,rec:null,busy:'',live:''};const t=state.tr;
@@ -5789,7 +5803,8 @@ function trGoogle(text,c){
   next();
 }
 // tg и uz на планшете молчали (владелец, 20.11.2026): модель MMS сначала качает ~114 МБ и считает звук медленно. Теперь:
-// модель готова — звучит она; пока не готова — сразу русский голос Google читает текст (узбекский — кириллицей), а модель качается фоном.
+// модель готова — звучит она; пока не готова — ход скачивания, фраза прочитается, когда модель готова. Русским голосом tg/uz/ky не читаем (21.11.2026).
+// С 21.11.2026 модели качаются при открытии страницы (common/mms-tts.js, mmsPrefetch).
 const trMmsReady=c=>typeof MMS!=='undefined'&&MMS[c]&&MMS[c].st==='ready';
 function trWarm(c){if(typeof MMS!=='undefined'&&MMS[c]&&['idle'].includes(MMS[c].st))mmsLoad(c)}
 // звук разрешаем в момент нажатия: на Android звук, запущенный позже (после ответа переводчика), браузер может не пустить
@@ -5814,8 +5829,8 @@ let trVoiceT=null;
 const TR_PH={tg:'Инҷо нависед…',uz:'Shu yerga yozing…',ky:'Бул жерге жазыңыз…',hi:'यहाँ लिखें…',en:'Type here…'};
 function trClientWrite(on){const t=trSt();t.cw=on;render();if(on)setTimeout(()=>{const i=document.getElementById('trIn');if(i)i.focus()},30)}
 const trVoiceTxt=c=>{const v=voiceFor(c);if(v&&voiceGood(v))return 'голос браузера: '+v.name;if(trSt().cloud&&TR_GTTS.has(c))return 'голос Google';
-  if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока перевод крупно на экране':M.st==='err'?'модель не скачалась — перевод крупно на экране':'модель начнёт качаться при выборе языка; пока — перевод крупно на экране'}
-  if(c==='ky')return 'киргизского голоса нет ни у кого — перевод крупно на экране';
+  if(c==='tg'||c==='uz'){const M=MMS[c];return M.st==='ready'?'наша модель в браузере — без облака':M.st==='load'?'модель скачивается '+(M.pct||0)+'% — пока покажите клиенту текст перевода':M.st==='err'?'модель не скачалась — покажите клиенту текст перевода':'модель ещё не скачана — пока покажите клиенту текст перевода'}
+  if(c==='ky')return 'киргизского голоса нет ни у кого — покажите клиенту текст перевода';
   return v?'голос Windows':'голоса нет — текст на экране'};
 async function trPhrase(who,text){
   const t=trSt(),cl=trLang(),sl=who==='op'?'ru':cl,tl=who==='op'?cl:'ru';text=String(text||'').trim();if(!text)return;
