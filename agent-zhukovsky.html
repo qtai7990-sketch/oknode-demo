@@ -2449,6 +2449,21 @@ if(HASH==='#history'){state.section='history';render()}
 /* «Клиент пишет сам»: поле ввода переключено на клиента */
 .atr-w.on{border-color:var(--cyan);box-shadow:0 0 0 3px rgb(var(--cyan-rgb, 34 211 238) / .25)}
 .atr-type button.sel{border-color:var(--cyan);color:var(--cyan);background:rgb(var(--cyan-rgb, 34 211 238) / .1)}
+/* планшет вертикально (Chrome 8" — 600 px по ширине; владелец 21.11.2026: «когда планшет в вертикаль поворачиваешь, разъезжается разметка влево»):
+   правило планшета .tab .app (колонка меню 72 px + экран) перебивало правило узкого экрана — меню спрятано, а экран сидел в колонке 72 px */
+@media (max-width:860px){
+  .tab .app{grid-template-columns:minmax(0,1fr)}
+  .tab .side,.tab .title{display:none}
+  .tab .steps,.tab .main,.tab .foot{grid-column:1}
+  .tab .steps{overflow-x:auto}
+  .tab .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tab .consent{grid-template-columns:minmax(0,1fr)}
+  /* нижняя панель: не влезает в строку — кнопки уходят во вторую строку и растягиваются (на талоне подсказка сжималась в 4 строки и наезжала на кнопку) */
+  .tab .foot{flex-wrap:wrap;row-gap:8px}
+  .tab .fsum{flex:1 1 180px}
+  .tab .foot>.btn{flex:1 1 auto}   /* согласие: текст, под ним подпись — в две колонки кнопки способов не помещались, страница уменьшалась */   /* карточки услуг: три колонки на 600 px тесно (цены вылезали) — две */
+}
+@media (max-width:560px){.tab .grid{grid-template-columns:minmax(0,1fr)}}
 /* распознавание паспорта камерой — общий модуль (common/passport-ocr.js) */
 .ocr-back{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .55)}
 .ocr{width:min(720px,100%);max-height:calc(var(--vh,100vh) - 32px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:18px;border:1px solid var(--line2);background:var(--panel-solid,var(--bg));box-shadow:0 30px 60px rgb(0 0 0 / .45);color:var(--text)}
