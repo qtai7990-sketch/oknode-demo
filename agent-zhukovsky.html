@@ -2580,6 +2580,9 @@ const MMS_DIST='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/';
 const MMS={
   tg:{repo:'https://huggingface.co/Safar-2009-tj/mms-tts-tgk-onnx/resolve/main/',model:'model.onnx',src:'Safar-2009-tj/mms-tts-tgk-onnx',st:'idle',pct:0},
   uz:{repo:'https://huggingface.co/davron112/mms-tts-uzb-cyrl-onnx/resolve/main/',model:'onnx/model.onnx',src:'davron112/mms-tts-uzb-cyrl-onnx',st:'idle',pct:0},
+  // киргизский (владелец 21.11.2026: «давай сделаем для киргизского»): готового ONNX ни у кого нет — переведён нами из facebook/mms-tts-kir
+  // (office-zia/tools/mms-onnx-export.py) и лежит на нашем сайте демо двумя частями (GitHub не берёт файлы больше 100 МБ; tools/publish-demo.cjs режет, браузер склеивает)
+  ky:{repo:'https://qtai7990-sketch.github.io/oknode-demo/models/mms-tts-kir/',parts:['model.onnx.part1','model.onnx.part2'],src:'facebook/mms-tts-kir',st:'idle',pct:0},
 };
 const MMS_RATE=16000,MMS_GAP=0.22;   // частота моделей; пауза между фразами, с
 
@@ -2611,8 +2614,34 @@ function uzCyr(s){   // узбекская латиница → кириллиц
     if(c==='e'){o+=i===0||!/\p{L}/u.test(s[i-1])?'э':'е';continue}o+=UZ_L[c]||c}
   return o;
 }
+// --- киргизский (перенесено из office-zia/parts/oz26.js 21.11.2026 — теперь нужно и агентам): числа, даты, сокращения словами;
+// только буквы словаря модели (нет «щ», «ъ», «ҳ»). Чтение без носителя языка [проверить].
+const KY_U=['','бир','эки','үч','төрт','беш','алты','жети','сегиз','тогуз'],KY_T=['','он','жыйырма','отуз','кырк','элүү','алтымыш','жетимиш','сексен','токсон'];
+const KY_M=['','январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const ky999=n=>{const h=Math.floor(n/100),r=n%100;return [h?(h===1?'жүз':KY_U[h]+' жүз'):'',KY_T[Math.floor(r/10)],KY_U[r%10]].filter(Boolean).join(' ')};
+function kyNum(n){if(!n)return 'нөл';const m=Math.floor(n/1e6),t=Math.floor(n/1000)%1000,r=n%1000;
+  return [m?kyNum(m)+' миллион':'',t?(t===1?'миң':ky999(t)+' миң'):'',ky999(r)].filter(Boolean).join(' ')}
+// порядковое: -ынчы/-инчи/-унчу/-үнчү по последней гласной; после гласной — без первой буквы суффикса («экинчи», «жыйырманчы»)
+function kyOrd(n){const w=kyNum(n),v=(w.match(/[аеиоуыөүэ](?=[^аеиоуыөүэ]*$)/)||['а'])[0],s={а:'ынчы',ы:'ынчы',е:'инчи',и:'инчи',э:'инчи',о:'унчу',у:'унчу',ө:'үнчү',ү:'үнчү'}[v];
+  return /[аеиоуыөүэ]$/.test(w)?w+s.slice(1):w+s}
+function kyWords(t){
+  const num=kyNum,ord=kyOrd;
+  t=String(t).split('[проверить]').join(' ').replace(/ /g,' ')
+    .replace(/\*#06#/g,' жылдызча тор нөл алты тор ')
+    .replace(/24\/7/g,' күнү-түнү ')
+    .replace(/(\d+)\s*[×x]\s*(\d+)/g,(m,a,b)=>` ${num(+a)} га ${num(+b)} `)
+    .replace(/\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b/g,(m,d,mo,y)=>` ${ord(+d)} ${KY_M[+mo]||''} ${ord(+y)} жыл `)
+    .replace(/₽/g,' рубль ').replace(/№/g,' номер ').replace(/%/g,' пайыз ')
+    .replace(/RuID/g,' руайди ')
+    .replace(/(?<!\p{L})(\p{Lu}{2,})(\p{Ll}*)/gu,(m,a,b)=>' '+(MMS_WORD[a]||[...a.toLowerCase()].map(c=>MMS_SPELL[c]||c).join(''))+b.toLowerCase())
+    .replace(/(\d{1,3})(?: (\d{3}))+\b/g,m=>m.replace(/ /g,''))
+    .replace(/(\d+)-(?=\p{L})/gu,(m,n)=>ord(+n)+' ')   // «2026-жыл», «5-бөлүм» — порядковое
+    .replace(/\d+/g,m=>' '+num(+m)+' ');
+  t=uzCyr(t);   // латиница в тексте (Gosuslugi, названия) — по-кириллически
+  return t.toLowerCase().replace(/щ/g,'ш').replace(/ъ/g,'').replace(/ҳ/g,'х').replace(/қ/g,'к').replace(/ғ/g,'г').replace(/ў/g,'у').replace(/ә/g,'э');
+}
 function mmsWords(code,t){
-  if(code==='ky')return kyWords(t);if(code==='hi')return hiWords(t);   // киргизский и хинди — oz26.js
+  if(code==='ky')return kyWords(t);if(code==='hi')return hiWords(t);   // хинди — office-zia/parts/oz26.js (только готовые записи)
   const tg=code==='tg',num=n=>tg?tgNum(n):uzNum(n),ord=n=>tg?tgOrd(n):uzOrd(n);
   t=String(t).split('[проверить]').join(' ').replace(/ /g,' ')
     .replace(/\*#06#/g,tg?' ситорача панҷара сифр шаш панҷара ':' юлдузча панжара нол олти панжара ')
@@ -2662,7 +2691,7 @@ function mmsWorker(){
     const j=mmsBusy;mmsBusy=null;
     if(j){if(m.t==='wav')j.wav[j.next]=m.w;else{j.wav[j.next]=new Float32Array(0);console.warn('mms: фраза не синтезировалась',m.code,m.e)}j.next++;mmsJobStep(j)}
     mmsPump()};
-  mmsW.onerror=e=>{console.warn('mms: фоновый поток не запустился',e.message);['tg','uz'].forEach(c=>{if(MMS[c].st!=='idle')mmsFail(c,'не запустился синтез')})};
+  mmsW.onerror=e=>{console.warn('mms: фоновый поток не запустился',e.message);Object.keys(MMS).forEach(c=>{if(MMS[c].st!=='idle'&&!MMS[c].recOnly)mmsFail(c,'не запустился синтез')})};
   return mmsW;
 }
 function mmsFail(code,why){const M=MMS[code];Object.assign(M,{st:'err',err:why,load:null});
@@ -2681,7 +2710,10 @@ function mmsLoad(code){
   M.load=(async()=>{
     const key=code+':'+M.src;let rec=await mmsGet('model',key);
     if(!rec){const vocab=await (await fetch(M.repo+'vocab.json')).json();let last=-1;
-      const buf=await mmsFetch(M.repo+M.model,p=>{M.pct=p;if(p!==last){last=p;mmsPaint()}});rec={vocab,buf};mmsPut('model',key,rec)}
+      const files=M.parts||[M.model],bufs=[];   // модель частями (ky) — качаем по очереди и склеиваем; ход — общий на все части
+      for(let k=0;k<files.length;k++)bufs.push(await mmsFetch(M.repo+files[k],p=>{const q=Math.min(99,Math.floor((k*100+p)/files.length));M.pct=q;if(q!==last){last=q;mmsPaint()}}));
+      let buf=bufs[0];if(bufs.length>1){const all=new Uint8Array(bufs.reduce((s,b)=>s+b.byteLength,0));let at=0;bufs.forEach(b=>{all.set(new Uint8Array(b),at);at+=b.byteLength});buf=all.buffer}
+      rec={vocab,buf};mmsPut('model',key,rec)}
     M.vocab=rec.vocab;mmsWorker().postMessage({t:'load',code,buf:rec.buf});
   })().catch(e=>{console.warn('mms: модель не скачалась',code,e.message);mmsFail(code,navigator.onLine?'голос не скачался':'нет сети — голос не скачался')});
   return M.load;
@@ -2746,13 +2778,13 @@ function mmsWarm(code,texts,pri){if(!MMS[code])return;if(MMS[code].st==='err')re
 // --- модели качаются сразу при открытии страницы, а не при выборе языка (владелец, 21.11.2026: «начинать качать модель сразу при открытии страницы»).
 // По одной: сначала язык, выбранный в переводчике в прошлый раз, потом второй — так первый готов быстрее, чем если тянуть оба разом.
 // Через 2 с после загрузки страницы, чтобы не мешать её показу. Уже скачанная модель берётся из IndexedDB и только запускается.
-// Не качаем: в режиме экономии трафика (Chrome «Экономия трафика»); в автотестах (navigator.webdriver), чтобы прогоны не тянули ~230 МБ —
+// Не качаем: в режиме экономии трафика (Chrome «Экономия трафика»); в автотестах (navigator.webdriver), чтобы прогоны не тянули ~340 МБ (tg, uz, ky по ~114 МБ) —
 // проверить предзагрузку в тесте: localStorage.mmsPre='1'. Выключить на устройстве: localStorage.mmsPre='0'. Выбор языка, как и раньше, качает свою модель сам.
 function mmsPrefetch(){
   let flag=null,last=null;try{flag=localStorage.getItem('mmsPre');last=localStorage.getItem('trLang')}catch(e){}
   if(flag==='0')return;
   if(flag!=='1'&&(navigator.webdriver||(navigator.connection&&navigator.connection.saveData)))return;
-  const order=last==='uz'?['uz','tg']:['tg','uz'];
+  const order=['tg','uz','ky'].sort((a,b)=>(b===last)-(a===last));   // язык из прошлого раза — первым, дальше tg, uz, ky
   order.reduce((p,c)=>p.then(()=>MMS[c]&&MMS[c].st==='idle'?mmsLoad(c):null),Promise.resolve());
 }
 if(document.readyState==='complete')setTimeout(mmsPrefetch,2000);else addEventListener('load',()=>setTimeout(mmsPrefetch,2000),{once:true});
@@ -2763,7 +2795,7 @@ if(document.readyState==='complete')setTimeout(mmsPrefetch,2000);else addEventLi
 //   распознавание — Chrome Web Speech API (серверы Google; tg, uz, ky — [проверить вживую]);
 //   перевод — переводчик Google по НЕОФИЦИАЛЬНОМУ адресу (client=gtx): только демо, в продукте — Cloud Translation через наш сервер;
 //   голос — голос Google (translate_tts, неофициально) для ru, en, hi; для tg, uz, ky живых облачных голосов нет; русским голосом
-//   их НЕ читаем (владелец 21.11.2026). tg и uz — модель MMS (common/mms-tts.js, качается при открытии страницы), ky — голоса нет, клиенту показываем текст.
+//   их НЕ читаем (владелец 21.11.2026). tg, uz и ky — модель MMS (common/mms-tts.js, качается при открытии страницы; ky — наш ONNX).
 // ПДн: голос и слова клиента — персональные данные. Владелец 20.11.2026: «считай, что передачу голоса юрист разрешил, но уведомление, что надо уточнить, оставь» —
 // пометка на экране, облако можно выключить. Разговор живёт только в памяти страницы, стирается кнопкой «Очистить» и при закрытии окна; в продукте в журнал
 // аудита — только факт перевода, без текста и звука.
@@ -2791,7 +2823,7 @@ function gtts(text,c){stopAudio();const parts=chunks(text);let k=0;
     a.play().catch(()=>{audio=null;say('Голос Google не ответил — покажите клиенту текст')})};next()}
 // Голос перевода (владелец, 21.11.2026: «таджикский, узбекский, киргизский — дичь или по-русски»; потом «крупно на весь экран убирай»): русского голоса
 // для этих языков нет, перевод — в ленте переводчика. ru, en, hi — голос Google; tg и uz — модель Meta MMS прямо в браузере (common/mms-tts.js, как в окне
-// оператора; первый раз ~100 МБ — «пусть долгое первое скачивание»): пока качается — ход в строке о голосе, готова — фраза читается сама; ky — голоса нет.
+// оператора; первый раз ~100 МБ — «пусть долгое первое скачивание»): пока качается — ход в строке о голосе, готова — фраза читается сама; ky — так же, наша модель (21.11.2026).
 const hasMms=c=>typeof MMS!=='undefined'&&!!MMS[c];
 const mmsPct=c=>MMS[c].st==='ready'?'голос готов':MMS[c].st==='err'?'голос не скачался ('+(MMS[c].err||'ошибка')+') — покажите клиенту текст':'голос скачивается — '+(MMS[c].pct||0)+' % (первый раз долго, дальше сразу)';
 let voiceWait=null;
@@ -2805,7 +2837,7 @@ function speakText(text,c){stopAudio();
     clearInterval(voiceWait);voiceWait=setInterval(()=>{const open=T.open||!!document.querySelector('#afq:not([hidden])');if(!open){clearInterval(voiceWait);return}
       if(MMS[c].st==='ready'){clearInterval(voiceWait);mmsSpeak(text,c).catch(()=>{})}else if(MMS[c].st==='err')clearInterval(voiceWait)},700);
     return}
-  say('Киргизского голоса нет ни у кого из сервисов — покажите клиенту текст перевода');}
+  say('Голоса на этом языке нет — покажите клиенту текст перевода');}
 function speak(i){const m=T.log[i];if(!m||m.st!=='ok')return;speakText(m.dst,m.tl)}
 window.atrSay=(text,c)=>{unlock();speakText(text,c)};   // для «Ответов клиентам» (agent-faq.js): та же озвучка
 // звук разрешаем в момент нажатия: на Android звук, запущенный после ответа переводчика, браузер может не пустить
@@ -2875,7 +2907,7 @@ FAQ_TR.hi=[["माइग्रेशन कार्ड का क्या क
 // ----- «Ответы клиентам» для макетов агентов (владелец, 21.11.2026: «Ответы клиентам в агентов добавь тоже»).
 // Тот же справочник, что в окне оператора (office-zia/parts/oz19.js, хинди — oz25.js): данные вставляет сборка (common/inject.mjs), правим их только в офисе.
 // Окно справа поверх экрана, как переводчик (common/agent-tr.js); открыто одно из двух. Язык клиента общий с переводчиком (localStorage trLang).
-// Ответ — крупно на языке клиента, ниже по-русски. «вслух»: голос Google для ru, en, hi; для tg, uz, ky живого голоса нет — показать клиенту экран
+// Ответ — крупно на языке клиента, ниже по-русски. «вслух»: голос Google для ru, en, hi; tg, uz, ky — наша модель MMS в браузере (common/mms-tts.js)
 // (готовые записи офиса сюда не тянем: страница агента и так большая). Черновик: ответы с пометкой «проверить» — к юристу до работы с клиентами;
 // переводы — без носителя [проверить]. Не обещаем, что одобрят кредит, выдадут патент или пустят в страну.
 (()=>{
@@ -2896,7 +2928,7 @@ document.body.insertAdjacentHTML('beforeend','<aside class="atr afq" id="afq" ro
 let audio=null;
 function stopAudio(){if(audio){audio.pause();audio=null}}
 function speak(i){const c=lang(),[,a]=T(i,c);stopAudio();
-  // tg и uz — модель MMS в браузере, ky — крупно на экране (та же озвучка, что у переводчика: window.atrSay из agent-tr.js); русским голосом не читаем
+  // tg, uz, ky — модель MMS в браузере (та же озвучка, что у переводчика: window.atrSay из agent-tr.js); русским голосом не читаем
   if(!['ru','en','hi'].includes(c)){if(window.atrSay)atrSay(clean(a),c);else say('Голоса на этом языке нет — покажите клиенту экран с ответом');return}
   const parts=clean(a).split(/(?<=[.!?;])\s+/).reduce((o,p)=>{const l=o.length-1;if(l>=0&&(o[l]+' '+p).length<180)o[l]+=' '+p;else o.push(p);return o},[]);let k=0;
   const next=()=>{if(k>=parts.length){audio=null;return}const el=new Audio('https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl='+c+'&q='+encodeURIComponent(parts[k++]));audio=el;el.onended=next;el.play().catch(()=>{audio=null;say('Голос Google не ответил — покажите клиенту экран')})};next()}
@@ -2909,7 +2941,7 @@ function paint(){const el=document.getElementById('afq');if(!el||el.hidden)retur
   `<input class="afq-s" id="afqQ" value="${E(F.q)}" placeholder="Поиск: патент, SIM, кредит, учёт…" autocomplete="off" aria-label="Поиск по вопросам и ответам">`+
   `<div class="atr-seg afq-t"><button class="${F.topic?'':'sel'}" data-afqt="">Все</button>${TOPICS.map(t=>`<button class="${F.topic===t?'sel':''}" data-afqt="${E(t)}">${E(t)}</button>`).join('')}</div>`+
   (L.length?`<div class="afq-l">${L.map(([x,i])=>{const on=F.sel===i,[tq,ta]=T(i,c);return `<div class="afq-i${on?' on':''}"><button class="afq-q" data-afqi="${i}" aria-expanded="${on}"><span>${E(x[1])}</span>${x[4]?'<em>проверить</em>':''}</button>`+
-    (on?`<div class="afq-a">${c!=='ru'?`<b lang="${c}">${E(ta)}</b><small>${E(x[2])}</small>`:`<b>${E(x[2])}</b>`}<span class="afq-src">${E(x[3]||'')}</span><button class="atr-say" data-afqsay="${i}">${SPK}${c==='ky'?'голоса нет':'вслух'}</button></div>`:'')+`</div>`}).join('')}</div>`
+    (on?`<div class="afq-a">${c!=='ru'?`<b lang="${c}">${E(ta)}</b><small>${E(x[2])}</small>`:`<b>${E(x[2])}</b>`}<span class="afq-src">${E(x[3]||'')}</span><button class="atr-say" data-afqsay="${i}">${SPK}вслух</button></div>`:'')+`</div>`}).join('')}</div>`
     :`<p class="atr-empty">Ничего не нашлось. <button class="atr-clear" data-afq="reset">Сбросить поиск и тему</button></p>`)+
   `<p class="atr-n">«проверить» — ответ без источника в docs/: до работы с клиентами — к юристу; вслух эта пометка не читается. Переводы — без носителя, проверить. Пароль от Госуслуг клиент вводит сам.</p>`;
   if(keep){const i=document.getElementById('afqQ');i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
