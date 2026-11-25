@@ -924,6 +924,13 @@ svg{flex:none}
 .tsh-agent{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
 .tsh-agent small{display:block;color:var(--muted);font-size:13px;margin-bottom:10px}
 .tsh-btns{display:flex;gap:10px;flex-wrap:wrap}
+#mrDemo .tcap{font-weight:800;font-size:22px}
+#mrDemo canvas{width:260px;height:260px}
+.tab #mrDemo canvas{width:200px;height:200px}
+a.mrdOpen{text-decoration:none;display:inline-flex}
+#mrDemoBtn{flex:none}#mrDemoBtn .s{display:none}
+.mrdInline{display:none;margin-top:12px;justify-content:center;width:100%}
+@media (max-width:760px){#mrDemoBtn{display:none!important}.mrdInline{display:flex}}
 .tsh-x{position:fixed;top:14px;right:14px;width:52px;height:52px;border-radius:var(--r-lg);display:grid;place-items:center;color:var(--muted);border:1px solid var(--line2);background:var(--sheet)}
 .tab .tshow{padding:12px}
 .tab .tsh-in{gap:28px;grid-template-columns:auto minmax(0,430px)}
@@ -2433,6 +2440,16 @@ kbd{font:600 11px/1 ui-monospace,Consolas,"Courier New",monospace;padding:3px 6p
 .wkbtns{flex-wrap:wrap}
 /* уголок рамки .cr.bl совпадал по имени с блоком .bl (экран блокировки, padding 28px) и был больше остальных (владелец, 21.11.2026: «нижний левый угол по размеру в соответствии с остальными») */
 .cr.bl{padding:0;max-width:none}
+/* связь с «Мой маршрут» (oz34.js) */
+a.mrlink{text-decoration:none;flex:none}
+.pk.mrlater{border-top:0;padding-top:0}.pk.mrlater .hint{flex:1;min-width:220px;margin:0}
+.mror{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid rgb(var(--line-rgb) / 0.5)}
+.ph+.mror{border-top:0}
+.mrot{display:grid;gap:4px;min-width:0;flex:1}
+.mrot b{font-size:14px;overflow-wrap:anywhere}
+.mrot span{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mrot small{color:var(--muted);font-size:12px}
+.tab .mror .btn{min-height:48px}
 
 /* распознавание паспорта камерой — общий модуль (common/passport-ocr.js) */
 .ocr-back{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgb(0 0 0 / .55)}
@@ -4038,10 +4055,10 @@ function totalPanel(q,w){
   if(isTab())h+=`<div class="wks">${slipHtml(q,w)}</div>`;
   h+=`<div class="pk"><div><b>Чек, памятка и пакет документов</b>${p.printed?pl('g','напечатано · '+p.printed):pl('d',paid?'не напечатано':'после оплаты')}</div>`+
     (act?`<button class="btn ${p.printed||!paid?'ghost':'go2'} sm" data-memo="print"${p.busy||!paid?' disabled':''}>${ico('printer',18)}${p.busy?'Печать…':p.printed?'Напечатать ещё раз':'Напечатать всё'}</button>`:'')+`</div>`+
-    (act&&typeof rcpRow==='function'?rcpRow(q,w):'')+`<div class="pk"><div><b>Копия в «Мой маршрут»</b>${p.sent?pl('g','отправлено · '+p.sent):app?pl('d','уйдёт вместе с печатью'):pl('d','приложения нет — только печать')}</div></div>`;
+    (act&&typeof rcpRow==='function'?rcpRow(q,w):'')+`<div class="pk"><div><b>Копия в «Мой маршрут»</b>${p.sent?pl('g','отправлено · '+p.sent):app?pl('d','уйдёт вместе с печатью'):pl('d','приложения нет — только печать')}</div>${app?mrLink('done'):''}</div>`;
   const pk=pickupOf(w),apl=w.svc.filter(id=>exOf(w,id).st==='ok'&&exOf(w,id).later&&exOf(w,id).later.kind==='app');
   if(pk.length)h+=`<p class="hint w">Заберёт в другой день: ${pk.map(x=>esc(x.what)+' — '+esc(x.when)).join('; ')}. После печати визит уйдёт в «Ожидают выдачи» (меню слева): клиент приедет — выдадите комплект и завершите.</p>`;
-  if(apl.length)h+=`<p class="hint">Ответ придёт позже${app?' в «Мой маршрут»':' — приложения нет, дата и что ждать — в памятке'}: ${apl.map(id=>esc(exOf(w,id).later.what)).join('; ')}.</p>`;
+  if(apl.length)h+=`<div class="pk mrlater"><p class="hint">Ответ придёт позже${app?' в «Мой маршрут»':' — приложения нет, дата и что ждать — в памятке'}: ${apl.map(id=>esc(exOf(w,id).later.what)).join('; ')}.</p>${app?mrLink('done','Как увидит клиент'):''}</div>`;
   return h+(isTab()?'':`<p class="hint">Чек (лента принтера чеков) и памятка (лист А4) — справа, как их получит клиент.</p>`);
 }
 function memoPrint(q,w){const p=w.memo;if(p.busy)return;p.busy=true;render();
@@ -6638,6 +6655,56 @@ window.OCR_HOOK={
   passNum(){const w=state.walk;return w&&w.pass&&w.pass.ocr?w.pass.ocr.num:''},
   shown(kind){if(state.walk)wkAudit(kind==='mig'?'Показ данных миграционной карты после распознавания':'Показ данных паспорта после распознавания')}
 };
+
+// ----- Связь с приложением клиента «Мой маршрут» (26.11.2026, владелец: «связать с офисом и агентом»)
+// 1) «Копия в „Мой маршрут“» и «Ответ придёт в „Мой маршрут“» — кнопка «Открыть у клиента»: приложение в новой вкладке, ситуация «Визит завершён».
+//    На сайте демо страницы лежат рядом (my-route.html), локально — соседняя папка (../my-route/my-route.html).
+// 2) Карточка клиента — блок «Заказано в приложении». Приложение пишет в localStorage ключ 'oknode-mr-orders':
+//    [{kind:'order'|'hostel'|'loan', t:'текст', at:'ISO-время'}]. На сайте страницы одного адреса делят эту память; локально (file://)
+//    может не совпасть — тогда две демо-записи с пометкой «демо». Передача между устройствами клиента и окна — это сервер, в макете её нет [проверить на стенде].
+const MR_KEY='oknode-mr-orders';
+const mrUrl=st=>(location.protocol==='file:'?'../my-route/my-route.html':'my-route.html')+(st?'?st='+st:'');
+const mrLink=(st,txt)=>`<a class="btn ghost sm mrlink" href="${mrUrl(st)}" target="_blank" rel="noopener">${ico('route',16)}${txt||'Открыть у клиента'}</a>`;
+
+function mrRead(){
+  try{const a=JSON.parse(localStorage.getItem(MR_KEY)||'null');
+    if(Array.isArray(a)){const L=a.filter(x=>x&&typeof x.t==='string'&&x.t.trim()).slice(-8);if(L.length)return {demo:false,L}}}catch(e){}
+  const d=new Date();d.setHours(9,40,0,0);const d2=new Date(d.getTime()+60000);
+  return {demo:true,L:[{kind:'hostel',t:'Хостел с постановкой на учёт · посуточно',at:d.toISOString()},{kind:'order',t:'Полис ДМС для патента',at:d2.toISOString()}]};
+}
+// заказ из приложения → услуга окна (если такая есть в списке услуг)
+const MR_MAP=[[/хостел|засел|жиль/i,'hostel'],[/трансфер/i,'transfer'],[/дмс|полис/i,'dms'],[/медосвид/i,'medical'],[/нотари|перевод док/i,'notary'],
+  [/проверк|урегулир/i,'settle'],[/за[её]м|займ|кредит/i,'loan'],[/sim|сим-карт/i,'sim'],[/патент/i,'patent'],[/банковск|карт[аы] банка/i,'bank']];
+function mrSvc(x){const id=x.kind==='hostel'?'hostel':x.kind==='loan'?'loan':(MR_MAP.find(([re])=>re.test(x.t))||[])[1];return id&&BY[id]?id:null}
+const mrWhen=iso=>{const d=new Date(iso);return isNaN(d)?'':two(d.getDate())+'.'+two(d.getMonth()+1)+' '+two(d.getHours())+':'+two(d.getMinutes())};
+const MR_ADD_STAGES=['client','sign','services'];   // после итога услугу не добавляем: сумма уже показана клиенту
+
+function mrBlock(q,w){
+  const R=mrRead(),act=isCur(q)&&MR_ADD_STAGES.includes(state.stage);
+  let h=`<div class="panel mro"><div class="ph"><div class="ic">${ico('route',18)}</div><div><h2>Заказано в приложении</h2><div class="sub">${R.demo?'демо: заказов из «Мой маршрут» в этом браузере нет':'из «Мой маршрут» клиента · до визита'}</div></div></div>`;
+  h+=R.L.map(x=>{const id=mrSvc(x),key=x.at+'|'+x.t,inS=id&&w.svc.includes(id);
+    const tag=x.kind==='hostel'?pl('c','хостел'):x.kind==='loan'?pl('a','заём · решает банк'):pl('c','услуга');
+    const btn=!id?pl('d','обсудить с клиентом'):inS?pl('g','в услугах · '+esc(svcName(id))):act?`<button class="btn ghost sm" data-mrord="${esc(key)}">${ico('check',16)}Добавить в услуги</button>`:pl('d',isCur(q)?'добавить можно до итога':'добавит окно, когда вызовет');
+    return `<div class="mror"><div class="mrot"><b>${esc(x.t)}</b><span>${tag}${R.demo?pl('d','демо'):''}<small class="num">${mrWhen(x.at)}</small></span></div>${btn}</div>`}).join('');
+  h+=`<p class="hint">Клиент заказал заранее — подтвердите у окна, что услуга ещё нужна. Цена и решение партнёра — при оформлении.${R.L.some(x=>x.kind==='loan')?' Заём: банк может оплатить, решение принимает банк.':''}</p>`;
+  return h+'</div>';
+}
+// блок — в конец карточки клиента (обычный вид, «О клиенте» на шагах оформления и шаг «Клиент у окна»)
+const _ozRenderCard=renderCard;
+renderCard=function(){
+  _ozRenderCard();
+  if(state.walk||state.section!=='desk')return;const q=shownQ();if(!q)return;const w=ws(q);if(!w.c.app)return;
+  $('#colC').insertAdjacentHTML('beforeend',mrBlock(q,w));
+};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-mrord]');if(!b||b.disabled||!state.cur)return;
+  const q=byN(state.cur),w=ws(q),x=mrRead().L.find(x=>x.at+'|'+x.t===b.dataset.mrord),id=x&&mrSvc(x);if(!id)return;
+  if(w.svc.includes(id)){toast('Уже в услугах: «'+svcName(id)+'»');return}
+  addSvc(w,id);audit(w,'Добавлена услуга «'+svcName(id)+'» — заказ из «Мой маршрут»');render();toast('Добавлено в услуги: «'+svcName(id)+'»');
+});
+// приложение в другой вкладке записало заказ — показать сразу
+addEventListener('storage',e=>{if(e.key===MR_KEY&&state.section==='desk')renderCard()});
+addEventListener('focus',()=>{if(state.section==='desk'&&shownQ())renderCard()});
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
