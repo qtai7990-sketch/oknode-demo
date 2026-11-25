@@ -2510,6 +2510,7 @@ a.mrlink{text-decoration:none;flex:none}
   <aside class="side">
     <button class="nav on" data-nav="desk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="3.5"/><path d="M5 21v-1a7 7 0 0 1 14 0v1"/><path d="M4 11h3M17 11h3"/></svg>Окно<span class="cnt" id="navCnt">0</span></button>
     <button class="nav" data-nav="pickup"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Выдача<span class="cnt" id="pkCnt">0</span></button>
+    <button class="nav" data-nav="flights"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 19h19"/><path d="M3.8 8.6l1.6-.9 2.4 2.1 3.5-1-3-5.2 2-.6 5.3 4.4 3.9-1.1a1.6 1.6 0 0 1 .9 3.1L6.3 13.1z"/></svg>Рейсы</button>
     <button class="nav" data-nav="history"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>История</button>
     <button class="nav" data-nav="demo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Демо</button>
     <div class="route">
@@ -2528,6 +2529,7 @@ a.mrlink{text-decoration:none;flex:none}
 
   <main class="main hist" id="pick" hidden></main>
   <main class="main hist" id="hist" hidden></main>
+  <main class="main hist" id="flt" hidden><div class="panel fbpanel" data-fb="op" id="fbOp"></div></main>
   <main class="main hist dmsec" id="demo" hidden></main>
 
   <footer class="foot" id="foot">
@@ -3108,9 +3110,9 @@ function render(){
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.nav===state.section));
   $('#navCnt').textContent=waiting().length+backs().length;$('#pkCnt').textContent=PICKUP.length;$('#pkCnt').hidden=!PICKUP.length;
   const desk=state.section==='desk';
-  $('#desk').hidden=!desk;$('#hist').hidden=state.section!=='history';$('#pick').hidden=state.section!=='pickup';$('#demo').hidden=state.section!=='demo';$('#foot').hidden=!desk;$('#steps').hidden=!desk;
-  $('#ttl').textContent=desk?`окно ${ME.win} · оператор`+(state.stage==='shift'?' · начало смены':state.cur?' · '+state.cur:state.walk?' · без очереди':''):state.section==='demo'?'демо: пути и ситуации':state.section==='pickup'?'ожидают выдачи':'история окна';
-  if(desk){renderSteps();renderQueue();renderCard();renderForm();renderFoot();drawStageQr()}else if(state.section==='demo')renderDemo();else if(state.section==='pickup')renderPickup();else renderHist();
+  $('#desk').hidden=!desk;$('#hist').hidden=state.section!=='history';$('#pick').hidden=state.section!=='pickup';$('#demo').hidden=state.section!=='demo';$('#flt').hidden=state.section!=='flights';$('#foot').hidden=!desk;$('#steps').hidden=!desk;
+  $('#ttl').textContent=desk?`окно ${ME.win} · оператор`+(state.stage==='shift'?' · начало смены':state.cur?' · '+state.cur:state.walk?' · без очереди':''):state.section==='demo'?'демо: пути и ситуации':state.section==='flights'?'рейсы: прилёты в Жуковский':state.section==='pickup'?'ожидают выдачи':'история окна';
+  if(desk){renderSteps();renderQueue();renderCard();renderForm();renderFoot();drawStageQr()}else if(state.section==='demo')renderDemo();else if(state.section==='flights'){if(window.fbPaint)fbPaint()}else if(state.section==='pickup')renderPickup();else renderHist();
   renderKeys();renderNet();renderNotes();sigRestore();
 }
 
@@ -4639,6 +4641,383 @@ function migPrep(src,sw,sh,bin,full){
   c.width=Math.round(r.w*k);c.height=Math.round(r.h*k);x.drawImage(src,r.x,r.y,r.w,r.h,0,0,c.width,c.height);
   return ocrTone(c,x,bin);
 }
+
+/*! flights-demo.js — общий демо-набор рейсов для макетов oknode (окно оператора, агенты, табло, виджет).
+ * Браузер: подключить тегом script с src="../common/flights-demo.js" → window.flightsDemo({...}).
+ * Node:    const flightsDemo = require('…/common/flights-demo.js').
+ * Без зависимостей. Все рейсы и номера вымышлены (в номер вставлена «9»), у каждого demo:true.
+ *
+ * flightsDemo({ airport:'ZIA'|'DYU', dir:'arr'|'dep', now:Date|number, date?:'YYYY-MM-DD' }) → Flight[]
+ *   ZIA — Жуковский, прилёты и вылеты. DYU — Душанбе, только вылеты (в Россию); для dir:'arr' — пустой массив.
+ *
+ * Flight — нормальный вид, тот же, что отдаёт /api/flights. ФОРМАТ ЗАМОРОЖЕН с 26.11.2026:
+ * поля не переименовывать и не удалять, новое — только дописывать.
+ *   id         'SZ9337-2026-11-26' — номер + дата по расписанию (местная дата аэропорта)
+ *   airport    'ZIA' | 'DYU' — чьё это табло
+ *   dir        'arr' | 'dep'
+ *   flight     'SZ9337'
+ *   airline    'SOMON AIR' (как на табло аэропорта, заглавными)
+ *   city       город на другом конце: откуда (arr) или куда (dep), по-русски
+ *   iata       код IATA этого города
+ *   country    страна этого города, ISO 3166-1 alpha-2: 'TJ','UZ','KG','RU','BY',…
+ *   from, to   коды IATA концов маршрута
+ *   tz         часовой пояс табло: 'Europe/Moscow' (ZIA) | 'Asia/Dushanbe' (DYU)
+ *   sched      ISO с местным смещением табло: '2026-11-26T14:10:00+03:00' (ZIA), '…+05:00' (DYU)
+ *   status     'scheduled'|'checkin'|'boarding'|'departed'|'delayed'|'arrived'|'cancelled'|'unknown'
+ *              (у прилёта 'departed' = «в пути», борт в воздухе)
+ *   statusText как на табло аэропорта: 'Задержан до 15:05', 'В ПУТИ', 'РЕГИСТРАЦИЯ'…
+ *   est        ISO нового или фактического времени (задержка, прибыл, вылетел) или null
+ *   gate       выход у вылета ('8') или null
+ *   checkin    стойки регистрации у вылета ('9, 10, 11') или null
+ *   aircraft   'B738'
+ *   belt       лента выдачи багажа у прилёта ('1'…'4') или null — В ДЕМО ВЫДУМАНА, у zia.aero её нет
+ *   beltDemo   true, если лента из демо (подпись — flightsDemo.BELT_NOTE)
+ *   target     true — целевой поток: маршрут между Россией и Таджикистаном, Узбекистаном или Киргизией
+ *              (в обе стороны); внутренние рейсы РФ и прочие зарубежные — false
+ *   demo       true — рейс вымышлен
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.flightsDemo = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var VERSION = '1.0.0';
+  var BELT_NOTE = 'лента — демо, источник — диспетчерская аэропорта [проверить]';
+  var TARGET_NOTE = 'не целевой поток';
+  var TARGET_COUNTRIES = ['TJ', 'UZ', 'KG'];
+
+  // Справочник аэропортов: IATA → [страна, город по-русски]. Для целевого потока и подписи города.
+  var AIRPORTS = {
+    // Таджикистан
+    DYU: ['TJ', 'Душанбе'], LBD: ['TJ', 'Худжанд'], KQT: ['TJ', 'Бохтар'], TJU: ['TJ', 'Куляб'],
+    // Узбекистан
+    TAS: ['UZ', 'Ташкент'], SKD: ['UZ', 'Самарканд'], BHK: ['UZ', 'Бухара'], NMA: ['UZ', 'Наманган'], UGC: ['UZ', 'Ургенч'],
+    FEG: ['UZ', 'Фергана'], AZN: ['UZ', 'Андижан'], NCU: ['UZ', 'Нукус'], KSQ: ['UZ', 'Карши'], TMJ: ['UZ', 'Термез'], NVI: ['UZ', 'Навои'],
+    // Киргизия
+    FRU: ['KG', 'Бишкек'], OSS: ['KG', 'Ош'], IKU: ['KG', 'Тамчы'], JAL: ['KG', 'Джалал-Абад'],
+    // Россия
+    ZIA: ['RU', 'Жуковский'], VKO: ['RU', 'Москва (Внуково)'], DME: ['RU', 'Москва (Домодедово)'], SVO: ['RU', 'Москва (Шереметьево)'],
+    LED: ['RU', 'Санкт-Петербург'], KZN: ['RU', 'Казань'], SVX: ['RU', 'Екатеринбург'], OVB: ['RU', 'Новосибирск'], KJA: ['RU', 'Красноярск'],
+    AER: ['RU', 'Сочи'], KRR: ['RU', 'Краснодар'], ROV: ['RU', 'Ростов-на-Дону'], UFA: ['RU', 'Уфа'], KUF: ['RU', 'Самара'],
+    CEK: ['RU', 'Челябинск'], GOJ: ['RU', 'Нижний Новгород'], VOG: ['RU', 'Волгоград'], IKT: ['RU', 'Иркутск'], TJM: ['RU', 'Тюмень'],
+    PEE: ['RU', 'Пермь'], KGD: ['RU', 'Калининград'], MRV: ['RU', 'Минеральные Воды'], OMS: ['RU', 'Омск'], MCX: ['RU', 'Махачкала'],
+    SGC: ['RU', 'Сургут'], VVO: ['RU', 'Владивосток'], KHV: ['RU', 'Хабаровск'],
+    // прочие
+    MSQ: ['BY', 'Минск'], BXY: ['KZ', 'Байконур'], ALA: ['KZ', 'Алматы'], NQZ: ['KZ', 'Астана'], TLV: ['IL', 'Тель-Авив'],
+    IST: ['TR', 'Стамбул'], DXB: ['AE', 'Дубай'], EVN: ['AM', 'Ереван'], GYD: ['AZ', 'Баку'], TBS: ['GE', 'Тбилиси'],
+  };
+  var HOME = { ZIA: { tz: 'Europe/Moscow', off: '+03:00', offMin: 180 }, DYU: { tz: 'Asia/Dushanbe', off: '+05:00', offMin: 300 } };
+
+  function countryOf(iata) { var a = AIRPORTS[String(iata || '').toUpperCase()]; return a ? a[0] : null; }
+  function cityOf(iata) { var a = AIRPORTS[String(iata || '').toUpperCase()]; return a ? a[1] : null; }
+  /** Целевой поток: один конец в России, другой — в Таджикистане, Узбекистане или Киргизии. */
+  function isTarget(fromIata, toIata) {
+    var a = countryOf(fromIata), b = countryOf(toIata);
+    return (a === 'RU' && TARGET_COUNTRIES.indexOf(b) >= 0) || (b === 'RU' && TARGET_COUNTRIES.indexOf(a) >= 0);
+  }
+  /** Демо-лента 1–4: одна и та же для одного номера рейса. */
+  function beltFor(flight) {
+    var h = 2166136261, s = String(flight || ''); // FNV-1a с перемешиванием — ленты расходятся ровнее
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    h ^= h >>> 15; h = Math.imul(h, 2246822507) >>> 0; h ^= h >>> 13;
+    return String((h >>> 0) % 4 + 1);
+  }
+
+  var MIN = 60000;
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function localParts(ms, offMin) { var d = new Date(ms + offMin * MIN); return { ymd: d.toISOString().slice(0, 10), hm: d.toISOString().slice(11, 16) }; }
+  function iso(ms, home) { var p = localParts(ms, home.offMin); return p.ymd + 'T' + p.hm + ':00' + home.off; }
+  function hmOf(ms, home) { return localParts(ms, home.offMin).hm; }
+  function addDays(ymd, n) { var d = new Date(ymd + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+
+  // Жуковский, прилёты (время московское): [рейс, авиакомпания, откуда, ЧЧ:ММ, ВС, мин в полёте, опции]
+  var ZIA_ARR = [
+    ['SZ9301', 'SOMON AIR', 'DYU', '06:20', 'B738', 270],
+    ['U69402', 'URAL AIRLINES', 'DYU', '09:05', 'A321', 270],
+    ['SZ9275', 'SOMON AIR', 'LBD', '11:40', 'B738', 265],
+    ['SZ9337', 'SOMON AIR', 'DYU', '14:10', 'B739', 270, { delay: 55 }],
+    ['B29953', 'BELAVIA', 'MSQ', '15:30', 'B733', 90],
+    ['WZ9536', 'RED WINGS AIRLINES', 'FRU', '17:20', 'SU95', 270],
+    ['WZ9112', 'RED WINGS AIRLINES', 'MCX', '18:35', 'SU95', 150],
+    ['U69426', 'URAL AIRLINES', 'LBD', '19:45', 'A321', 265],
+    ['U69428', 'URAL AIRLINES', 'DYU', '21:15', 'A321', 270, { delay: 40 }],
+    ['U69430', 'URAL AIRLINES', 'NMA', '22:50', 'A320', 255, { cancelled: true }],
+    ['SZ9231', 'SOMON AIR', 'DYU', '23:40', 'B738', 270],
+  ];
+  // Жуковский, вылеты: [рейс, авиакомпания, куда, ЧЧ:ММ, ВС, мин в полёте, опции]
+  var ZIA_DEP = [
+    ['SZ9338', 'SOMON AIR', 'DYU', '07:30', 'B739', 250, { gate: '8', desks: '9, 10, 11' }],
+    ['U69427', 'URAL AIRLINES', 'DYU', '11:00', 'A321', 250, { gate: '8', desks: '9, 10, 11, 12' }],
+    ['SZ9276', 'SOMON AIR', 'LBD', '12:50', 'B738', 245, { gate: '6', desks: '5, 6, 7' }],
+    ['B29954', 'BELAVIA', 'MSQ', '16:20', 'B733', 90, { gate: '6', desks: '3, 4' }],
+    ['WZ9537', 'RED WINGS AIRLINES', 'FRU', '18:40', 'SU95', 250, { gate: '7', desks: '1, 2' }],
+    ['WZ9113', 'RED WINGS AIRLINES', 'MCX', '20:05', 'SU95', 150, { gate: '7', desks: '1, 2' }],
+    ['U69441', 'URAL AIRLINES', 'DYU', '21:25', 'A321', 250, { gate: '8', desks: '9, 10, 11, 12', delay: 35 }],
+    ['U69425', 'URAL AIRLINES', 'LBD', '22:40', 'A321', 245, { gate: '8', desks: '9, 10, 11, 12' }],
+    ['SZ9232', 'SOMON AIR', 'DYU', '23:55', 'B738', 250, { gate: '8', desks: '9, 10, 11' }],
+  ];
+  // Душанбе, вылеты в другие города России (время душанбинское). Рейсы в Жуковский добавляются
+  // из прилётов ZIA_ARR с тем же номером — табло агентов в Душанбе и в Жуковском сходятся.
+  var DYU_DEP_OTHER = [
+    ['SZ9201', 'SOMON AIR', 'VKO', '05:40', 'B738', 275, { gate: '3', desks: '7, 8, 9' }],
+    ['SU91931', 'AEROFLOT', 'SVO', '07:15', 'A320', 280, { gate: '2', desks: '1, 2, 3' }],
+    ['U69455', 'URAL AIRLINES', 'DME', '08:30', 'A321', 275, { gate: '4', desks: '10, 11' }],
+    ['SZ9211', 'SOMON AIR', 'LED', '10:20', 'B738', 320, { gate: '3', desks: '7, 8' }],
+    ['U69459', 'URAL AIRLINES', 'SVX', '12:05', 'A320', 210, { gate: '5', desks: '12, 13', delay: 70 }],
+    ['SZ9241', 'SOMON AIR', 'KZN', '13:30', 'B737', 250, { gate: '1', desks: '4, 5' }],
+    ['U69471', 'URAL AIRLINES', 'OVB', '15:50', 'A320', 240, { gate: '4', desks: '10, 11' }],
+    ['SU91935', 'AEROFLOT', 'SVO', '17:25', 'A321', 280, { gate: '2', desks: '1, 2, 3' }],
+    ['SZ9251', 'SOMON AIR', 'KRR', '19:10', 'B738', 260, { gate: '3', desks: '7, 8', cancelled: true }],
+    ['U69481', 'URAL AIRLINES', 'KJA', '22:35', 'A320', 250, { gate: '5', desks: '12, 13' }],
+  ];
+  var DYU_GATE_TO_ZIA = { gate: '1', desks: '4, 5, 6' };
+
+  function arrStatus(now, sched, eta, block, home, o) {
+    var r = { status: 'scheduled', statusText: 'ПО РАСПИСАНИЮ', est: eta !== sched ? eta : null };
+    if (o.cancelled) return { status: 'cancelled', statusText: 'ОТМЕНЕН', est: null };
+    if (now >= eta) { var at = eta - 3 * MIN; return { status: 'arrived', statusText: 'Прибыл в ' + hmOf(at, home), est: at }; }
+    if (now >= eta - block * MIN) return eta !== sched ? { status: 'delayed', statusText: 'В ПУТИ · Задержан до ' + hmOf(eta, home), est: eta } : { status: 'departed', statusText: 'В ПУТИ', est: null };
+    if (eta !== sched) return { status: 'delayed', statusText: 'Задержан до ' + hmOf(eta, home), est: eta };
+    return r;
+  }
+  function depStatus(now, sched, etd, home, o) {
+    if (o.cancelled) return { status: 'cancelled', statusText: 'ОТМЕНЕН', est: null, gate: null, checkin: null };
+    var delayed = etd !== sched;
+    if (now >= etd) { var at = etd + 4 * MIN; return { status: 'departed', statusText: 'Вылетел в ' + hmOf(at, home), est: at, gate: o.gate, checkin: null }; }
+    if (now >= etd - 40 * MIN) return { status: 'boarding', statusText: 'ПОСАДКА', est: delayed ? etd : null, gate: o.gate, checkin: null };
+    if (now >= sched - 180 * MIN) return { status: delayed ? 'delayed' : 'checkin', statusText: delayed ? 'РЕГИСТРАЦИЯ · Задержан до ' + hmOf(etd, home) : 'РЕГИСТРАЦИЯ', est: delayed ? etd : null, gate: null, checkin: o.desks };
+    if (delayed) return { status: 'delayed', statusText: 'Задержан до ' + hmOf(etd, home), est: etd, gate: null, checkin: null };
+    return { status: 'scheduled', statusText: 'ПО РАСПИСАНИЮ', est: null, gate: null, checkin: null };
+  }
+
+  function make(airport, dir, row, schedMs, now) {
+    var home = HOME[airport], o = row[6] || {}, other = row[2];
+    var from = dir === 'arr' ? other : airport, to = dir === 'arr' ? airport : other;
+    var eta = schedMs + (o.delay || 0) * MIN;
+    var s = dir === 'arr' ? arrStatus(now, schedMs, eta, row[5], home, o) : depStatus(now, schedMs, eta, home, o);
+    var belt = dir === 'arr' && !o.cancelled ? beltFor(row[0]) : null;
+    return {
+      id: row[0] + '-' + localParts(schedMs, home.offMin).ymd,
+      airport: airport, dir: dir, flight: row[0], airline: row[1],
+      city: cityOf(other), iata: other, country: countryOf(other), from: from, to: to, tz: home.tz,
+      sched: iso(schedMs, home), status: s.status, statusText: s.statusText, est: s.est == null ? null : iso(s.est, home),
+      gate: s.gate || null, checkin: s.checkin || null, aircraft: row[4],
+      belt: belt, beltDemo: belt != null, target: isTarget(from, to), demo: true,
+    };
+  }
+
+  function flightsDemo(opts) {
+    opts = opts || {};
+    var airport = String(opts.airport || 'ZIA').toUpperCase();
+    var dir = opts.dir === 'dep' ? 'dep' : 'arr';
+    var home = HOME[airport];
+    if (!home) throw new Error('flightsDemo: airport — ZIA или DYU');
+    var now = opts.now == null ? Date.now() : +opts.now;
+    var ymd = /^\d{4}-\d{2}-\d{2}$/.test(opts.date || '') ? opts.date : localParts(now, home.offMin).ymd;
+    var at = function (day, hm, off) { return Date.parse(day + 'T' + hm + ':00' + off); };
+    var out = [];
+    if (airport === 'ZIA') {
+      (dir === 'arr' ? ZIA_ARR : ZIA_DEP).forEach(function (r) { out.push(make('ZIA', dir, r, at(ymd, r[3], home.off), now)); });
+    } else if (dir === 'dep') {
+      DYU_DEP_OTHER.forEach(function (r) { out.push(make('DYU', 'dep', r, at(ymd, r[3], home.off), now)); });
+      // рейсы в Жуковский: вылет = прилёт в ZIA минус время в полёте; берём прилёты этого и следующего дня
+      [ymd, addDays(ymd, 1)].forEach(function (day) {
+        ZIA_ARR.forEach(function (r) {
+          if (r[2] !== 'DYU') return;
+          var dep = at(day, r[3], HOME.ZIA.off) - r[5] * MIN;
+          if (localParts(dep, home.offMin).ymd !== ymd) return;
+          var o = r[6] || {};
+          var row = [r[0], r[1], 'ZIA', null, r[4], r[5], { gate: DYU_GATE_TO_ZIA.gate, desks: DYU_GATE_TO_ZIA.desks, delay: o.delay, cancelled: o.cancelled }];
+          out.push(make('DYU', 'dep', row, dep, now));
+        });
+      });
+    }
+    return out.sort(function (a, b) { return a.sched < b.sched ? -1 : a.sched > b.sched ? 1 : 0; });
+  }
+
+  flightsDemo.VERSION = VERSION;
+  flightsDemo.BELT_NOTE = BELT_NOTE;
+  flightsDemo.TARGET_NOTE = TARGET_NOTE;
+  flightsDemo.TARGET_COUNTRIES = TARGET_COUNTRIES.slice();
+  flightsDemo.AIRPORTS = AIRPORTS;
+  flightsDemo.countryOf = countryOf;
+  flightsDemo.cityOf = cityOf;
+  flightsDemo.isTarget = isTarget;
+  flightsDemo.beltFor = beltFor;
+  return flightsDemo;
+});
+
+// ----- Общий модуль макетов (common/flights-board.js): табло рейсов у оператора офиса, агента в Жуковском и агента в Душанбе (26.11.2026).
+// Владелец: «операторы тоже видят все приходящие рейсы; агенты в Душанбе — исходящие рейсы в РФ; рейсы прилёта из РФ помечены для агентов
+// в Жуковском и операторов как не целевой поток; демо номера лент выдачи багажа».
+// Данные — common/flights-demo.js: flightsDemo({airport:'ZIA'|'DYU', dir:'arr'|'dep', now}) → [{flight, airline, city, iata, sched, est, status, statusText,
+// gate, checkin, belt, beltDemo, target, …}]. Данные демо; в продукте — табло аэропорта через наш сервер. ПДн здесь нет: только рейсы.
+// Где показывается — контейнер с атрибутом data-fb: 'op' (оператор: все прилёты, фильтр «Только целевые»), 'zia' (агент у багажа: акцент на ленты),
+// 'dyu' (агент в Душанбе: вылеты в РФ, Жуковский выделен), 'op-strip' / 'zia-strip' (одна строка о ближайшем целевом прилёте).
+// Обновление раз в минуту и по вызову fbPaint() из макета (когда открыли раздел). Цвета — только переменные common/tokens.css.
+(function(){
+const FB_NOTE='Данные — демо. В продукте — табло аэропорта через наш сервер.';
+const FB_ST={scheduled:['d','по расписанию'],checkin:['c','регистрация'],boarding:['c','посадка'],departed:['d','вылетел'],enroute:['c','в пути'],delayed:['a','задержан'],
+  arrived:['g','прибыл'],cancelled:['r','отменён'],unknown:['d','нет данных']};
+const FB_FIRST_MIN=40;   // от посадки до первых клиентов у офиса — оценка демо (паспортный контроль и багаж)
+const FB_BELT_MIN=20;    // от посадки до первых чемоданов на ленте — оценка демо
+const fbOn={};           // фильтр «Только целевые» по контейнерам; по умолчанию включён
+const two=n=>String(n).padStart(2,'0');
+// время — по часовому поясу табло (Жуковский — Москва, Душанбе — свой), а не по часам компьютера
+const TZ={ZIA:'Europe/Moscow',DYU:'Asia/Dushanbe'};
+const hm=(d,tz)=>{d=d instanceof Date?d:new Date(d);if(isNaN(d))return '—';try{return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:tz||TZ.ZIA})}catch(e){return two(d.getHours())+':'+two(d.getMinutes())}};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mins=(a,b)=>Math.round((new Date(a)-new Date(b))/60000);
+const tm=f=>new Date(f.est||f.sched);
+function fbData(airport,dir,now){
+  if(typeof flightsDemo!=='function')return null;
+  try{return flightsDemo({airport,dir,now}).slice().sort((a,b)=>new Date(a.sched)-new Date(b.sched))}catch(e){console.warn('flights-demo:',e);return null}
+}
+const pill=f=>{const s=FB_ST[f.dir==='arr'&&f.status==='departed'?'enroute':f.status]||FB_ST.unknown;return `<span class="fb-st fb-st-${s[0]}">${esc(f.statusText||s[1])}</span>`};
+const timeCell=f=>{const late=f.est&&mins(f.est,f.sched)>=5;return `<span class="fb-t"><b class="num">${hm(f.sched,f.tz)}</b>${f.est&&hm(f.est,f.tz)!==hm(f.sched,f.tz)?`<small class="num${late?' late':''}">${f.status==='arrived'||(f.dir==='dep'&&f.status==='departed')?'факт':'расч.'} ${hm(f.est,f.tz)}</small>`:''}</span>`};
+const beltCell=(f,big)=>f.belt?`<span class="fb-belt${big?' fb-big':''}" title="${esc(typeof flightsDemo==='function'&&flightsDemo.BELT_NOTE||'лента — демо')}"><b class="num">${esc(f.belt)}</b><small>лента${f.beltDemo!==false?' · демо':''}</small></span>`:`<span class="fb-belt none"><small>лента позже</small></span>`;
+// ближайший целевой прилёт: уже приземлился (не позже 60 мин назад) или следующий по времени
+function nextTarget(L,now){
+  const T=L.filter(f=>f.target&&f.status!=='cancelled');
+  return T.find(f=>f.status==='arrived'&&mins(now,tm(f))<=60)||T.find(f=>tm(f)>=now&&f.status!=='arrived')||null;
+}
+function stripText(L,now,who){
+  const f=nextTarget(L,now);if(!f)return 'Целевых прилётов на сегодня больше нет';
+  const land=tm(f),ago=mins(now,land),lead=who==='zia'?FB_BELT_MIN:FB_FIRST_MIN,left=lead-ago;
+  const what=f.status==='arrived'?'приземлился '+hm(land,f.tz):f.status==='delayed'?'задержан, ожидается '+hm(land,f.tz):'ожидается '+hm(land,f.tz);
+  const tail=who==='zia'?(left>0?'~'+dur(left)+' до багажа':'багаж на ленте'):(left>0?'~'+dur(left)+' до первых клиентов':'клиенты уже идут');
+  return [f.iata,f.flight,what,f.belt?'лента '+f.belt:'',tail+' (оценка демо)'].filter(Boolean).join(' · ');
+}
+const dur=m=>m<60?m+' мин':Math.floor(m/60)+' ч'+(m%60?' '+m%60+' мин':'');
+// строка над очередью оператора — коротко, в две строки: колонка узкая
+function stripHtml(who,now){
+  const L=fbData('ZIA','arr',now);if(!L)return '';
+  const f=nextTarget(L,now);
+  if(!f)return `<button class="fb-strip" data-fbgo="${who}"><span class="fb-sic">${FB_PLANE}</span><span class="fb-stx"><small>Целевые прилёты</small><b>на сегодня больше нет</b></span></button>`;
+  const land=tm(f),left=FB_FIRST_MIN-mins(now,land);
+  return `<button class="fb-strip" data-fbgo="${who}" title="${esc(stripText(L,now,who))}"><span class="fb-sic">${FB_PLANE}</span><span class="fb-stx"><small>Ближайший целевой прилёт</small>`+
+    `<b><span class="num">${esc(f.flight)}</span> · ${esc(f.city)} · ${f.status==='arrived'?'сел ':''}<span class="num">${hm(land,f.tz)}</span>${f.belt?' · лента '+esc(f.belt):''}</b>`+
+    `<i>${left>0?'~'+dur(left)+' до первых клиентов':'клиенты уже идут'} · оценка демо</i>${pill(f)}</span></button>`;
+}
+const FB_PLANE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 19h19"/><path d="M3.8 8.6l1.6-.9 2.4 2.1 3.5-1-3-5.2 2-.6 5.3 4.4 3.9-1.1a1.6 1.6 0 0 1 .9 3.1L6.3 13.1z"/></svg>';
+const FB_DEP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 19h19"/><path d="M2 16l20-7-3-3-6 2-6-4-2 1 4 5-4 1.5-2-1.5-2 1z"/></svg>';
+function arrHtml(key,who,now){
+  const L=fbData('ZIA','arr',now);if(!L)return `<div class="fb-empty">Табло не загрузилось · ${FB_NOTE}</div>`;
+  const only=fbOn[key]!==false,nT=L.filter(f=>f.target).length;
+  let R=only?L.filter(f=>f.target):L.slice();
+  if(who==='zia'&&!only)R=R.filter(f=>f.target).concat(R.filter(f=>!f.target));   // у багажа целевые — сверху
+  let h=`<div class="fb-head"><div class="fb-ttl"><span class="fb-ic">${FB_PLANE}</span><div><h2>${who==='zia'?'Прилёты · у какой ленты встречать':'Прилёты в Жуковский сегодня'}</h2><small>обновлено ${hm(now,TZ.ZIA)} мск · ${FB_NOTE}</small></div></div>`+
+    `<button class="fb-sw${only?' on':''}" data-fbonly="${key}" role="switch" aria-checked="${only}"><span class="k"></span>Только целевые · ${nT}</button></div>`;
+  h+=`<div class="fb-sum"><span class="fb-sic">${FB_PLANE}</span><b>${esc(stripText(L,now,who))}</b></div>`;
+  h+=`<div class="fb-legend"><span><i class="fb-dot t"></i>целевые — Таджикистан, Узбекистан, Киргизия</span>${only?'':'<span><i class="fb-dot"></i>из России — не целевой поток</span>'}</div>`;
+  if(!R.length)h+=`<div class="fb-empty">Целевых прилётов на сегодня нет</div>`;
+  h+=`<div class="fb-list ${who==='zia'?'zia':'op'}">`+R.map(f=>{const nt=!f.target,soon=f.target&&f.status==='arrived'&&mins(now,tm(f))<=60;
+    return `<div class="fb-row${nt?' fb-nt':' fb-tg'}${soon?' fb-now':''}">${who==='zia'?beltCell(f,true):''}${timeCell(f)}<span class="fb-fl"><b class="num">${esc(f.flight)}</b><small>${esc(f.airline)}</small></span>`+
+      `<span class="fb-city"><b>${esc(f.city)}</b><small class="num">${esc(f.iata)}${nt?' · <em>не целевой поток</em>':''}</small></span>${pill(f)}${who==='zia'?'':beltCell(f,false)}</div>`}).join('')+`</div>`;
+  return h;
+}
+function depHtml(key,now){
+  const L=fbData('DYU','dep',now);if(!L)return `<div class="fb-empty">Табло не загрузилось · ${FB_NOTE}</div>`;
+  const z=L.find(f=>f.iata==='ZIA'&&!['departed','cancelled'].includes(f.status)&&tm(f)>=new Date(now.getTime()-5*60000));
+  let h=`<div class="fb-head"><div class="fb-ttl"><span class="fb-ic">${FB_DEP}</span><div><h2>Вылеты из Душанбе в Россию</h2><small>обновлено ${hm(now,TZ.DYU)} по Душанбе · ${FB_NOTE}</small></div></div></div>`;
+  if(z){const left=mins(tm(z),now);h+=`<div class="fb-sum zia"><span class="fb-sic">${FB_DEP}</span><b>${esc(z.flight)} в Жуковский — до вылета ${left>0?left+' мин':'считанные минуты'} · ${hm(tm(z),z.tz)}${z.checkin?' · стойки '+esc(z.checkin):''}${z.gate?' · выход '+esc(z.gate):''}</b>${pill(z)}</div>`}
+  else h+=`<div class="fb-sum"><b>Рейсов в Жуковский сегодня больше нет</b></div>`;
+  h+=`<div class="fb-list dep">`+L.map(f=>{const ours=f.iata==='ZIA';
+    return `<div class="fb-row${ours?' fb-ours':''}">${timeCell(f)}<span class="fb-fl"><b class="num">${esc(f.flight)}</b><small>${esc(f.airline)}</small></span>`+
+      `<span class="fb-city"><b>${esc(f.city)}</b><small class="num">${esc(f.iata)}${ours?' · <em>наш маршрут</em>':''}</small></span>`+
+      `<span class="fb-kv"><small>выход</small><b class="num">${esc(f.gate||'—')}</b></span><span class="fb-kv"><small>стойки</small><b class="num">${esc(f.checkin||'—')}</b></span>${pill(f)}</div>`}).join('')+`</div>`;
+  return h;
+}
+function fbPaint(){
+  const now=new Date();
+  document.querySelectorAll('[data-fb]').forEach((el,i)=>{
+    const who=el.dataset.fb,key=el.id||who+i;
+    el.classList.add('fb');
+    el.innerHTML=who==='dyu'?depHtml(key,now):who==='op-strip'||who==='zia-strip'?stripHtml(who.slice(0,-6),now):arrHtml(key,who,now);
+  });
+}
+document.addEventListener('click',e=>{
+  const s=e.target.closest('[data-fbonly]');if(s){const k=s.dataset.fbonly;fbOn[k]=fbOn[k]===false;fbPaint();return}
+  const g=e.target.closest('[data-fbgo]');if(g&&typeof window.fbGo==='function')window.fbGo(g.dataset.fbgo);
+});
+const css=`.fb{container-type:inline-size}
+.fb .num{font-variant-numeric:tabular-nums}
+.fb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.fb-ttl{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.fb-ttl h2{font-size:17px;line-height:1.25;margin:0}
+.fb-ttl small{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;line-height:1.4}
+.fb-ic,.fb-sic{display:grid;place-items:center;flex:none;color:var(--cyan)}
+.fb-ic{width:34px;height:34px;border-radius:var(--r-lg,12px);border:1px solid var(--line2)}
+.fb-sw{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border-radius:var(--r-pill,999px);border:1px solid var(--line2);color:var(--text);font-size:13.5px;font-weight:600;background:none;cursor:pointer}
+.fb-sw .k{width:30px;height:18px;border-radius:999px;background:var(--fill-soft);position:relative;flex:none;border:1px solid var(--line2)}
+.fb-sw .k::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--muted);transition:transform .15s}
+.fb-sw.on{border-color:var(--cyan)}.fb-sw.on .k{background:var(--cyan)}.fb-sw.on .k::after{transform:translateX(12px);background:var(--on-accent)}
+.fb-sum{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:var(--r-lg,12px);border:1px solid var(--zp-c-line);background:var(--zp-c-bg);color:var(--tone-c-ink);font-size:14px;margin-bottom:10px}
+.fb-sum b{flex:1;min-width:200px;font-weight:700;line-height:1.35}
+.fb-legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12.5px;margin:0 0 6px}
+.fb-legend span{display:inline-flex;align-items:center;gap:6px}
+.fb-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);opacity:.6}.fb-dot.t{background:var(--cyan);opacity:1}
+.fb-list{display:grid}
+.fb-row{display:grid;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid var(--line)}
+.fb-list.op .fb-row{grid-template-columns:76px 104px minmax(0,1fr) auto 92px}
+.fb-list.zia .fb-row{grid-template-columns:84px 76px 104px minmax(0,1fr) auto}
+.fb-list.dep .fb-row{grid-template-columns:76px 104px minmax(0,1fr) 58px 70px auto}
+.fb-row b{font-weight:700}
+.fb-row small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.fb-t b{font-size:16px}.fb-t small.late{color:var(--tone-a-ink)}
+.fb-fl b{font-size:15px}
+.fb-city{min-width:0}.fb-city b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-city em{font-style:normal;color:var(--muted)}
+.fb-row.fb-tg .fb-city b{color:var(--text)}
+.fb-row.fb-tg{box-shadow:inset 3px 0 0 var(--cyan)}
+.fb-row.fb-now{background:var(--zp-c-bg)}
+.fb-row.fb-nt{opacity:.62}
+.fb-row.fb-nt .fb-belt b{color:var(--muted)}
+.fb-row.fb-ours{box-shadow:inset 3px 0 0 var(--cyan);background:var(--zp-c-bg)}
+.fb-row.fb-ours .fb-city em{color:var(--tone-c-ink);font-weight:700}
+.fb-st{display:inline-flex;align-items:center;justify-self:start;font-size:12px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap;border:1px solid transparent}
+.fb-st-g{color:var(--tone-g-ink);background:var(--zp-g-bg);border-color:var(--zp-g-line)}
+.fb-st-c{color:var(--tone-c-ink);background:var(--zp-c-bg);border-color:var(--zp-c-line)}
+.fb-st-a{color:var(--tone-a-ink);background:var(--zp-a-bg);border-color:var(--zp-a-line)}
+.fb-st-r{color:var(--tone-r-ink);background:var(--zp-r-bg);border-color:var(--zp-r-line)}
+.fb-st-d{color:var(--muted);background:var(--fill-soft);border-color:var(--line2)}
+.fb-belt{display:grid;justify-items:start}
+.fb-belt b{font-size:18px;color:var(--cyan)}
+.fb-belt.fb-big{justify-items:center;padding:4px 0;border-radius:10px;border:1px solid var(--line2);align-self:start}
+.fb-row.fb-tg .fb-belt.fb-big{border-color:var(--cyan)}
+.fb-belt.fb-big b{font-size:28px;line-height:1}
+.fb-belt.none small{font-style:italic}
+.fb-kv b{font-size:15px}
+.fb-empty{padding:18px 4px;color:var(--muted);font-size:14px}
+.fbq{margin-bottom:10px;grid-column:1/-1}
+.fb-strip{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border-radius:var(--r-lg,12px);border:1px solid var(--zp-c-line);background:var(--zp-c-bg);color:var(--text);cursor:pointer}
+.fb-strip .fb-stx{flex:1;min-width:0;display:grid;gap:2px;justify-items:start}
+.fb-strip .fb-st{margin-top:4px}
+.fb-strip small{display:block;color:var(--tone-c-ink);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fb-strip b{display:block;font-size:13px;font-weight:600;line-height:1.35}
+.fb-strip i{display:block;font-style:normal;color:var(--muted);font-size:12px;line-height:1.35}
+@container (max-width:620px){
+  .fb-list.op .fb-row,.fb-list.dep .fb-row{grid-template-columns:64px minmax(0,1fr) auto;row-gap:4px}
+  .fb-list.zia .fb-row{grid-template-columns:66px 64px minmax(0,1fr);row-gap:4px}
+  .fb-t small{white-space:normal}
+  .fb-list.op .fb-fl,.fb-list.dep .fb-fl{grid-column:2;grid-row:1}
+  .fb-list.op .fb-city,.fb-list.dep .fb-city{grid-column:2;grid-row:2}
+  .fb-list.op .fb-st,.fb-list.dep .fb-st{grid-column:3;grid-row:1}
+  .fb-list.op .fb-belt{grid-column:3;grid-row:2}
+  .fb-list.dep .fb-kv{grid-row:3;grid-column:2 / 4;display:inline-flex;gap:6px;align-items:baseline}
+  .fb-list.dep .fb-kv+.fb-kv{grid-row:4}
+  .fb-list.zia .fb-belt{grid-row:1 / 4;grid-column:1}
+  .fb-list.zia .fb-fl{grid-column:3;grid-row:1}
+  .fb-list.zia .fb-city{grid-column:2 / 4;grid-row:2}
+  .fb-list.zia .fb-st{grid-column:3;grid-row:3}
+  .fb-list.zia .fb-t{grid-column:2;grid-row:1}
+}`;
+const st=document.createElement('style');st.id='fb-css';st.textContent=css;document.head.appendChild(st);
+window.fbPaint=fbPaint;window.fbStrip=who=>stripHtml(who,new Date());window.fbStripText=(who)=>{const n=new Date(),L=fbData('ZIA','arr',n);return L?stripText(L,n,who):''};
+fbPaint();
+setInterval(fbPaint,60000);
+})();
 
 // ----- Шпаргалка опроса на языке клиента (владелец, 19.11.2026): «не хватает английского; при нажатии вопросы переводятся; кнопка голосового озвучивания».
 // Оператор говорит по-русски, поэтому русский текст остаётся под переводом, кнопки ответа — по-русски. Языки — коды языка, не страны.
@@ -6705,6 +7084,18 @@ document.addEventListener('click',e=>{
 // приложение в другой вкладке записало заказ — показать сразу
 addEventListener('storage',e=>{if(e.key===MR_KEY&&state.section==='desk')renderCard()});
 addEventListener('focus',()=>{if(state.section==='desk'&&shownQ())renderCard()});
+
+// ----- Рейсы (26.11.2026, владелец: «операторы тоже видят все приходящие рейсы… рейсы из РФ — не целевой поток… демо номера лент»)
+// Табло — общий модуль common/flights-board.js (данные — common/flights-demo.js, демо; в продукте — табло аэропорта через наш сервер).
+// Раздел «Рейсы» в меню слева: все прилёты в Жуковский, фильтр «Только целевые» включён. Над очередью — одна строка о ближайшем
+// целевом прилёте; нажатие открывает раздел. Три колонки на компьютере и вкладки планшета не меняются.
+const _ozRenderQueue=renderQueue;
+renderQueue=function(){
+  _ozRenderQueue();
+  if(typeof window.fbStrip!=='function')return;
+  $('#colQ').insertAdjacentHTML('afterbegin',`<div data-fb="op-strip" class="fbq">${fbStrip('op')}</div>`);
+};
+window.fbGo=()=>{state.section='flights';render()};
 
 // Планшет 8" (Tab Active5): 1920 px по ширине при плотности x2 = 960 x 510 в единицах вёрстки.
 const TAB_W=960,TAB_H=510,root=document.documentElement,frame=$('#frame'),modeBtn=$('#modeBtn');
