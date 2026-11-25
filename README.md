@@ -6,3 +6,4 @@
 - Агент · Душанбе: agent-dushanbe.html
 - Агент · Жуковский: agent-zhukovsky.html
 - Мой маршрут: my-route.html
+- HR-портал: hr-portal.html
