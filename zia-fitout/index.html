@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Оснащение центра в Жуковском</title>
+<script>
+/* выбранная тема применяется до отрисовки, чтобы страница не мигала */
+try { var t = localStorage.getItem('zia-fitout-theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root { color-scheme: light; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+/* Раскладка: одна колонка-документ до 1120 px. Сверху итог и схема, ниже таблицы по зонам; цифры-параметры стоят перед таблицами и пересчитывают всё на странице. */
+:root {
+  --bg: #f1f4f6; --surface: #ffffff; --surface-2: #f7f9fa;
+  --ink: #0f1a1f; --ink-2: #334155; --muted: #475569;
+  --line: #cbd5e1; --line-strong: #64748b;
+  --brand: #0e7c6b; --brand-strong: #073f37; --brand-soft: #e6f4f1; --on-brand: #ffffff;
+  --warn-bg: #fef3c7; --warn-ink: #78350f; --warn-line: #fcd34d;
+  --info-bg: #dbeafe; --info-ink: #1e40af; --info-line: #93c5fd;
+  --c-own: #0e7c6b; --c-bank: #1c5fa8; --c-partner: #b45309; --c-senior: #475569; --c-free: #cbd5e1; --on-chip: #ffffff;
+  --aisle: #e6f4f1;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --r-s: 10px; --r-m: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a1f; --surface: #17262d; --surface-2: #20333c;
+    --ink: #e8eef1; --ink-2: #b4c2ca; --muted: #94a3b8;
+    --line: #2f454f; --line-strong: #6b7f8c;
+    --brand: #7fd6c4; --brand-strong: #cde9e3; --brand-soft: #12332f; --on-brand: #073f37;
+    --warn-bg: #3a2a0b; --warn-ink: #f2b84b; --warn-line: #6b4e12;
+    --info-bg: #132a4a; --info-ink: #93c5fd; --info-line: #1e40af;
+    --c-own: #2aa893; --c-bank: #5a98dc; --c-partner: #d08a2e; --c-senior: #8a99a8; --c-free: #33474f; --on-chip: #0f1a1f;
+    --aisle: #14302c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a1f; --surface: #17262d; --surface-2: #20333c;
+  --ink: #e8eef1; --ink-2: #b4c2ca; --muted: #94a3b8;
+  --line: #2f454f; --line-strong: #6b7f8c;
+  --brand: #7fd6c4; --brand-strong: #cde9e3; --brand-soft: #12332f; --on-brand: #073f37;
+  --warn-bg: #3a2a0b; --warn-ink: #f2b84b; --warn-line: #6b4e12;
+  --info-bg: #132a4a; --info-ink: #93c5fd; --info-line: #1e40af;
+  --c-own: #2aa893; --c-bank: #5a98dc; --c-partner: #d08a2e; --c-senior: #8a99a8; --c-free: #33474f; --on-chip: #0f1a1f;
+  --aisle: #14302c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--font); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 44px; }
+h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+h1 { font: 700 clamp(26px, 4.2vw, 40px)/1.1 var(--font); letter-spacing: -.022em; text-wrap: balance; max-width: 22ch; }
+h2 { font: 700 22px/1.2 var(--font); letter-spacing: -.012em; text-wrap: balance; }
+h3 { font: 600 16px/1.3 var(--font); }
+.eyebrow { font: 600 12px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.lead { font-size: 17px; color: var(--ink-2); max-width: 68ch; }
+.sec { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sec > p, .note { color: var(--ink-2); max-width: 72ch; }
+.num { font-variant-numeric: tabular-nums; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tile.main { background: var(--brand-soft); border-color: var(--brand); }
+.tile b { font: 700 28px/1.1 var(--font); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tile span { font: 600 12px/1.2 var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tile small { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
+
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px; }
+.fl { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fl + .fl::before { content: "→"; position: absolute; left: -24px; top: 50%; transform: translateY(-50%); font: 600 18px/1 var(--font); color: var(--muted); }
+.fl h3 { font-size: 15px; }
+.fl .who { font: 700 22px/1.1 var(--font); font-variant-numeric: tabular-nums; color: var(--brand); }
+.fl p { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+.fl .kit { font-size: 13px; color: var(--ink); border-top: 1px solid var(--line); padding-top: 8px; margin-top: auto; }
+@media (max-width: 900px) {
+  .flow { grid-template-columns: 1fr; gap: 26px; }
+  .fl + .fl::before { content: "↓"; left: 50%; top: -22px; transform: translateX(-50%); }
+}
+
+.plan-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); padding: 8px; }
+.plan-wrap svg { display: block; width: 100%; min-width: 760px; height: auto; }
+figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; max-width: 80ch; }
+.view.wide { aspect-ratio: 16 / 10; }
+.fig-old { margin-top: 18px; max-width: 560px; }
+.view { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-m); border: 1px solid var(--line); background: var(--surface-2); }
+.pl-room { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.pl-zone { fill: var(--surface-2); }
+.pl-aisle { fill: var(--aisle); }
+.pl-stairs { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 1; }
+.pl-step { stroke: var(--line); stroke-width: 1; }
+.pl-wall { stroke: var(--ink); stroke-width: 3; fill: none; }
+.pl-door { stroke: var(--line-strong); stroke-width: 1.2; fill: none; }
+.pl-res { fill: none; stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 4 3; }
+.pl-col { fill: var(--ink); }
+.pl-furn { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1; }
+.pl-furn.dash { stroke-dasharray: 4 3; }
+.pl-bench { fill: var(--line); stroke: var(--line-strong); stroke-width: 1; }
+.pl-board { fill: var(--brand); }
+.pl-pole { fill: var(--ink); stroke: var(--surface); stroke-width: 1.5; }
+.pl-desk.own, .pl-st.own { fill: var(--c-own); }
+.pl-desk.bank, .pl-st.bank { fill: var(--c-bank); }
+.pl-desk.partner, .pl-st.partner { fill: var(--c-partner); }
+.pl-desk.senior, .pl-st.senior { fill: var(--c-senior); }
+.pl-desk.free, .pl-st.free { fill: var(--c-free); }
+.pl-vis { fill: var(--surface); stroke: var(--ink-2); stroke-width: 1.5; }
+.pl-t { font: 500 11px var(--mono); fill: var(--on-chip); text-anchor: middle; }
+.pl-desk.free + .pl-t { fill: var(--ink); }
+.pl-l { font: 500 11px var(--font); fill: var(--muted); }
+.pl-l.mid { text-anchor: middle; }
+.pl-l.strong { fill: var(--ink-2); font-weight: 600; letter-spacing: .04em; }
+.pl-arrow { stroke: var(--brand); stroke-width: 2; fill: none; }
+.pl-arrowhead { fill: var(--brand); }
+.pl-dim { stroke: var(--line-strong); stroke-width: 1; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 22px; height: 14px; border-radius: 3px; flex: none; }
+.sw.own { background: var(--c-own); } .sw.bank { background: var(--c-bank); } .sw.partner { background: var(--c-partner); } .sw.senior { background: var(--c-senior); } .sw.free { background: var(--c-free); }
+.sw.board { width: 5px; height: 16px; border-radius: 1px; background: var(--brand); }
+.sw.pole { width: 10px; height: 10px; border-radius: 1px; background: var(--ink); transform: rotate(45deg); margin: 0 2px; }
+.sw.col { width: 12px; height: 12px; border-radius: 0; background: var(--ink); }
+.sw.res { border: 1px dashed var(--line-strong); background: none; }
+.sw.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--ink-2); }
+.sw.ring { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--ink-2); background: var(--surface); }
+
+.find { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 0 40px; }
+.find div { padding: 12px 0; border-top: 1px solid var(--line); min-width: 0; }
+.find dt { font-weight: 600; }
+.find dd { color: var(--ink-2); font-size: 14.5px; }
+
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; }
+.seg { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.seg .btn { padding: 8px 10px; font-size: 13px; }
+.pay { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px 28px; }
+.nin { width: 112px; height: 34px; flex: none; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--surface-2); color: var(--ink); font: 600 15px/1 var(--font); font-variant-numeric: tabular-nums; text-align: right; padding: 0 8px; }
+fieldset { border: 1px solid var(--line); border-radius: var(--r-m); background: var(--surface); padding: 12px 16px 14px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+legend { font: 600 13px/1 var(--font); padding: 0 6px; color: var(--ink-2); }
+.st { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.st-l { font-size: 14.5px; min-width: 0; }
+.st-l small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.st-c { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.st-c button { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--ink); font: 600 18px/1 var(--font); cursor: pointer; }
+.st-c button:hover { border-color: var(--brand); color: var(--brand); }
+.st-c output { min-width: 46px; text-align: center; font: 700 17px/1 var(--font); font-variant-numeric: tabular-nums; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.warn { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-line); border-radius: var(--r-s); padding: 10px 14px; font-size: 14px; }
+.btn { align-self: flex-start; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 9px; padding: 9px 14px; font: 600 14px/1 var(--font); cursor: pointer; }
+.btn:hover { border-color: var(--brand); color: var(--brand); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.btn[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); color: var(--ink); }
+.btn.primary:hover { color: var(--on-brand); filter: brightness(1.08); }
+.row-btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.blk { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.blk + .blk { margin-top: 14px; }
+.blk > p { font-size: 14px; color: var(--ink-2); max-width: 80ch; }
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-m); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 14px; }
+th { text-align: left; font: 600 11.5px/1.2 var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); padding: 9px 12px; }
+td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+th.r, td.r { text-align: right; white-space: nowrap; }
+td.r { font-variant-numeric: tabular-nums; }
+.c-chk { width: 38px; }
+.c-chk input { width: 18px; height: 18px; accent-color: var(--brand); margin: 1px 0 0; }
+.nm { font-weight: 600; }
+.ds { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 2px; max-width: 62ch; }
+.hw { font-size: 12px; color: var(--muted); white-space: normal; max-width: 190px; margin-left: auto; line-height: 1.35; }
+.u { color: var(--muted); font-size: 12.5px; }
+.tag { display: inline-block; font: 600 10.5px/1 var(--font); letter-spacing: .02em; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; white-space: nowrap; vertical-align: 1px; }
+.tag.ask { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-line); }
+.tag.opt { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-line); }
+tr.off td { color: var(--muted); }
+tr.off .nm { font-weight: 500; }
+tr.off .c-s { text-decoration: line-through; }
+.c-s { font-weight: 600; }
+tfoot td { background: var(--surface-2); font-weight: 600; }
+.pl3 td small { display: block; font-size: 12.5px; line-height: 1.4; color: var(--muted); margin-top: 2px; max-width: 48ch; white-space: normal; }
+.pl3 th small { display: block; font-size: 11.5px; font-weight: 500; letter-spacing: 0; text-transform: none; margin-top: 3px; white-space: normal; }
+.pl3 td b { font-weight: 600; }
+
+.total { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); padding: 6px 18px; }
+.total div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid var(--line); align-items: baseline; }
+.total div:first-child { border-top: 0; }
+.total div.big { font: 700 20px/1.2 var(--font); }
+.total span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+.total div.big span:last-child { font-weight: 700; }
+#copy-out { width: 100%; min-height: 140px; font: 12px/1.4 var(--mono); border: 1px solid var(--line-strong); border-radius: var(--r-s); background: var(--surface); color: var(--ink); padding: 10px; }
+.plain { display: flex; flex-direction: column; gap: 10px; padding-left: 22px; max-width: 84ch; }
+.plain li { padding-left: 4px; }
+.plain li b { font-weight: 600; }
+.plain li span { color: var(--ink-2); }
+.foot { font-size: 13px; color: var(--muted); max-width: 84ch; }
+@media (prefers-reduced-motion: no-preference) { .st-c button, .btn { transition: border-color .12s, color .12s; } }
+
+/* ---- только для локального файла: кнопка темы и печать ---- */
+.hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+@media print {
+  :root[data-theme], :root:not([data-theme="light"]), :root {
+    --bg: #ffffff; --surface: #ffffff; --surface-2: #f7f9fa;
+    --ink: #0f1a1f; --ink-2: #334155; --muted: #475569;
+    --line: #cbd5e1; --line-strong: #64748b;
+    --brand: #0e7c6b; --brand-strong: #073f37; --brand-soft: #e6f4f1; --on-brand: #ffffff;
+    --warn-bg: #fef3c7; --warn-ink: #78350f; --warn-line: #fcd34d;
+    --info-bg: #dbeafe; --info-ink: #1e40af; --info-line: #93c5fd;
+    --c-own: #0e7c6b; --c-bank: #1c5fa8; --c-partner: #b45309; --c-senior: #475569; --c-free: #cbd5e1; --on-chip: #ffffff;
+    --aisle: #e6f4f1;
+    color-scheme: light;
+  }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .row-btns, .st-c button, #copy-out, #theme, .c-chk { display: none !important; }
+  .wrap { max-width: none; gap: 28px; padding-block: 0; }
+  .plan-wrap, .tw { overflow: visible; }
+  .plan-wrap svg, table { min-width: 0; }
+  .tile, .fl, figure, fieldset, tr, .find div, .plain li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-top"><p class="eyebrow">Предварительный расчёт · 26 ноября 2026</p><button type="button" class="btn" id="theme">Тёмная тема</button></div>
+  <h1>Оснащение офиса на втором этаже и постов агентов в Жуковском</h1>
+  <p class="lead">Посчитано по расстановке «вариант C» (20 рабочих мест, в помещении не больше 50 человек), фотографиям антресоли и стойки, вашим решениям ноября и вашей модели от 20.11.2026. Цены — ориентир для бюджета: сняты из поисковой выдачи магазинов 26.11.2026, перед закупкой их нужно сверить.</p>
+</header>
+
+<section class="tiles" id="tiles" aria-label="Итог расчёта"></section>
+
+<section class="sec">
+  <h2>Путь клиента и кто где стоит</h2>
+  <div class="flow" id="flow"></div>
+</section>
+
+<section class="sec">
+  <h2>Как офис увидит клиент</h2>
+  <figure>
+    <img class="view wide" src="office-view-3d.jpg" alt="Зал офиса с верхней площадки лестницы в точных размерах: слева у стены столы 1–5, в центре ряд из десяти столов, справа ряд у остекления, на переднем плане скамьи ожидания, в глубине перегородка техзоны с табло">
+    <figcaption>Вид с верхней площадки лестницы, с высоты глаз (около 1,6 м). Это черновик, построенный по размерам расстановки «вариант C»: зал 15,95 × 8,45 м, 20 столов 80 × 60 см, проходы, скамьи ожидания, перегородка техзоны и табло стоят на своих местах и в верном масштабе. Пока условно: фигуры людей, стулья, отделка стен и пола; высота потолка 3 м — моя оценка. Мониторы на столах ещё не поставлены.</figcaption>
+  </figure>
+  <figure class="fig-old">
+    <img class="view" src="office-view.jpg" alt="Прежняя картинка нейросети: тот же офис, но зал намного больше настоящего и вид сверху">
+    <figcaption>Прежняя картинка нейросети, оставлена для сравнения. Отделка на ней похожа на вашу, но размеры неверные: зал намного больше настоящего, вид сверху, а не с высоты глаз, один номер повторяется.</figcaption>
+  </figure>
+</section>
+
+<section class="sec">
+  <h2>Офис: кто за каким столом</h2>
+  <p>В расстановке 20 одинаковых столов, но техника на них разная. Ниже моё предложение, как их разделить. Цифры можно поменять в следующем разделе — схема перекрасится.</p>
+  <figure>
+    <div class="plan-wrap" id="plan"></div>
+    <figcaption>Расстановка «вариант C», номера столов как на вашем чертеже. Цвет стола показывает, кто за ним работает. Столы банка — центральный ряд, наши окна — напротив них через проход 2, остальные у дальней стены: между окном и столом банка клиент ходит два-три раза за визит. Старший смены сидит у двери техзоны.</figcaption>
+  </figure>
+  <div class="legend" id="legend"></div>
+</section>
+
+<section class="sec">
+  <h2>Что видно на плане и фотографиях</h2>
+  <dl class="find">
+    <div><dt>Света нет</dt><dd>Светильники сняты, из потолка торчат провода. Для чтения документов и съёмки паспорта камерой планшета свет на столе нужен яркий и ровный: заложил 30 встраиваемых в готовые отверстия и 18 над рядами столов.</dd></div>
+    <div><dt>Центральный ряд без розеток</dt><dd>Десять столов стоят посреди зала, до стен 3–4 метра. Провода по полу пересекут эвакуационные проходы, поэтому питание и сеть спускаются с потолка по двум стойкам и расходятся под столами.</dd></div>
+    <div><dt>Столы маленькие, экран — стена</dt><dd>80 × 60 см на двоих: оператор и клиент напротив. Большой экран на таком столе закрывает клиента: монитор 24 дюйма оставляет просвет 26 см, моноблок 27 дюймов — 19 см. Принтер стоит отдельно, тумба под стол не встаёт — вместо неё подвесной ящик. Зато центральный ряд короче на 2 метра: у техзоны появляется место под общий принтер и кулер. Больше мест не станет: предел — 50 человек.</dd></div>
+    <div><dt>Предел в 50 человек</dt><dd>20 сотрудников, 20 клиентов у столов, 10 на скамьях. Сопровождающим, детям и чемоданам места нет. Отсюда пост у лестницы, табло внизу и место для багажа на первом этаже.</dd></div>
+    <div><dt>Табло далеко от скамей</dt><dd>От скамей до перегородки техзоны 10–13 метров. Телевизор нужен 65 дюймов, и стоит добавить второй экран рядом со скамьями.</dd></div>
+    <div><dt>Перегородка тянет за собой работы</dt><dd>Техзона становится отдельным помещением: нужны дверь, свои датчики пожарной сигнализации и новый план эвакуации.</dd></div>
+    <div><dt>Шкафчиков впритык</dt><dd>28 ячеек — это 20 человек в офисе и 8 агентов. На пересменке, когда одна смена ещё не ушла, а другая уже пришла, не хватит.</dd></div>
+    <div><dt>Стойка в зале прилёта — один модуль</dt><dd>Ширина около 1,3 м: два человека с планшетами, не больше. Фасад из матового стекла можно заклеить плёнкой, как у соседей.</dd></div>
+    <div><dt>Клиентам нужен интернет</dt><dd>У приехавших ещё нет российской SIM, а согласия они читают в своём телефоне. Нужна отдельная гостевая сеть Wi‑Fi. Как в ней опознавать пользователей — вопрос юристу [проверить].</dd></div>
+    <div><dt>У ленты — зона таможенного контроля</dt><dd>По вашим документам агентам нужны письменный допуск и пропуска, а планшету и принтеру — место в перечне технических средств. Это дольше любой закупки, начинать стоит с него.</dd></div>
+  </dl>
+</section>
+
+<section class="sec" id="params-sec">
+  <h2>Цифры, от которых зависит расчёт</h2>
+  <p>Три готовых набора и ручная настройка. Поменяйте — схема, таблицы и итог пересчитаются.</p>
+  <div class="row-btns" id="presets">
+    <button type="button" class="btn" data-preset="full" aria-pressed="true">Весь зал: 20 мест</button>
+    <button type="button" class="btn" data-preset="peak" aria-pressed="false">Пик по вашей модели: 12 столов</button>
+    <button type="button" class="btn" data-preset="open" aria-pressed="false">Открытие: 6 столов</button>
+  </div>
+  <div class="params">
+    <fieldset>
+      <legend>20 мест офиса</legend>
+      <div class="st"><span class="st-l">Наши окна<small>оператор: документы, SIM, оплата, выдача</small></span><span class="st-c"><button type="button" data-k="own" data-d="-1" aria-label="Наши окна: меньше">−</button><output id="v-own">8</output><button type="button" data-k="own" data-d="1" aria-label="Наши окна: больше">+</button></span></div>
+      <div class="st"><span class="st-l">Столы банка<small>биометрия и карта на планшетах банка</small></span><span class="st-c"><button type="button" data-k="bank" data-d="-1" aria-label="Столы банка: меньше">−</button><output id="v-bank">10</output><button type="button" data-k="bank" data-d="1" aria-label="Столы банка: больше">+</button></span></div>
+      <div class="st"><span class="st-l">Столы страховой и нотариуса</span><span class="st-c"><button type="button" data-k="partner" data-d="-1" aria-label="Столы партнёров: меньше">−</button><output id="v-partner">1</output><button type="button" data-k="partner" data-d="1" aria-label="Столы партнёров: больше">+</button></span></div>
+      <div class="st"><span class="st-l">Место старшего смены</span><span class="st-c"><button type="button" data-k="senior" data-d="-1" aria-label="Старший смены: меньше">−</button><output id="v-senior">1</output><button type="button" data-k="senior" data-d="1" aria-label="Старший смены: больше">+</button></span></div>
+    </fieldset>
+    <fieldset>
+      <legend>Агенты в самый загруженный час</legend>
+      <div class="st"><span class="st-l">У выдачи багажа<small>в модели трое на рейс; шесть — два рейса подряд</small></span><span class="st-c"><button type="button" data-k="agBag" data-d="-1" aria-label="Агенты у багажа: меньше">−</button><output id="v-agBag">8</output><button type="button" data-k="agBag" data-d="1" aria-label="Агенты у багажа: больше">+</button></span></div>
+      <div class="st"><span class="st-l">За стойкой в зале прилёта</span><span class="st-c"><button type="button" data-k="counter" data-d="-1" aria-label="Агенты за стойкой: меньше">−</button><output id="v-counter">2</output><button type="button" data-k="counter" data-d="1" aria-label="Агенты за стойкой: больше">+</button></span></div>
+      <div class="st"><span class="st-l">У входа на лестницу</span><span class="st-c"><button type="button" data-k="stairs" data-d="-1" aria-label="Пост у лестницы: меньше">−</button><output id="v-stairs">1</output><button type="button" data-k="stairs" data-d="1" aria-label="Пост у лестницы: больше">+</button></span></div>
+    </fieldset>
+    <fieldset>
+      <legend>Для формы и расходников</legend>
+      <div class="st"><span class="st-l">Человек на одно круглосуточное место<small>в вашей модели от 20.11 — 4,2</small></span><span class="st-c"><button type="button" data-k="crews" data-d="-1" aria-label="Человек на место: меньше">−</button><output id="v-crews">4</output><button type="button" data-k="crews" data-d="1" aria-label="Человек на место: больше">+</button></span></div>
+      <div class="st"><span class="st-l">Клиентов в день<small>январь по вашей модели — около 275, с февраля — около 1 000</small></span><span class="st-c"><button type="button" data-k="perDay" data-d="-1" aria-label="Клиентов в день: меньше">−</button><output id="v-perDay">300</output><button type="button" data-k="perDay" data-d="1" aria-label="Клиентов в день: больше">+</button></span></div>
+    </fieldset>
+    <fieldset>
+      <legend>Столы и техника на окнах</legend>
+      <div class="st"><span class="st-l">Стол<small>по расстановке было 100 × 60</small></span><span class="seg" role="group" aria-label="Стол"><button type="button" class="btn" data-o="desk" data-v="80" aria-pressed="true">80 × 60</button><button type="button" class="btn" data-o="desk" data-v="160" aria-pressed="false">160 × 60 на двоих</button><button type="button" class="btn" data-o="desk" data-v="100" aria-pressed="false">100 × 60</button></span></div>
+      <div class="st"><span class="st-l">Планшет на окне</span><span class="seg" role="group" aria-label="Планшет на окне"><button type="button" class="btn" data-o="tabWin" data-v="active" aria-pressed="true">Tab Active5</button><button type="button" class="btn" data-o="tabWin" data-v="lenovo" aria-pressed="false">Lenovo 12,7″</button></span></div>
+      <div class="st"><span class="st-l">Планшет агентам<small>Lenovo — только за стойкой, с роутером и считывателем чипа</small></span><span class="seg" role="group" aria-label="Планшет агентам"><button type="button" class="btn" data-o="tabAg" data-v="active" aria-pressed="true">Tab Active5</button><button type="button" class="btn" data-o="tabAg" data-v="lenovo" aria-pressed="false">Lenovo 12,7″</button></span></div>
+      <div class="st"><span class="st-l">Компьютер на окне</span><span class="seg" role="group" aria-label="Компьютер на окне"><button type="button" class="btn" data-o="pcSrc" data-v="ru" aria-pressed="true">Мини-ПК и монитор 24″</button><button type="button" class="btn" data-o="pcSrc" data-v="nb" aria-pressed="false">Ноутбук 15,6″</button><button type="button" class="btn" data-o="pcSrc" data-v="cn" aria-pressed="false">Моноблок 27″ из Китая</button></span></div>
+    </fieldset>
+  </div>
+  <p class="warn" id="seats-warn" hidden></p>
+  <div class="row-btns"><button type="button" class="btn" id="reset">Сбросить цифры и галочки</button></div>
+</section>
+
+<section class="sec">
+  <h2>Офис на втором этаже</h2>
+  <p>Галочка слева — учитывать строку в итоге. Строки «по желанию» выключены, включите нужные. Пометка «зависит от аэропорта» стоит там, где сначала надо узнать, кто делает работу и платит за неё, или получить разрешение на место.</p>
+  <div id="t-office"></div>
+</section>
+
+<section class="sec">
+  <h2>Агенты внизу</h2>
+  <div id="t-agents"></div>
+</section>
+
+<section class="sec">
+  <h2>Общее для офиса и постов</h2>
+  <div id="t-common"></div>
+</section>
+
+<section class="sec">
+  <h2>Итог на запуск</h2>
+  <div class="total" id="total"></div>
+  <div class="row-btns"><button type="button" class="btn primary" id="copy">Скопировать таблицу для Excel</button><span class="note" id="copy-msg" role="status"></span></div>
+  <textarea id="copy-out" hidden aria-label="Таблица для вставки в Excel"></textarea>
+  <p class="note">Для сравнения: в вашей финмодели от 12.11.2026 на 12 мест заложено 6,4 млн ₽ без экранов за рубежом — мебель 1,08, оборудование 2,53, экраны 1,42, работы 1,42 млн. Там есть сканеры паспортов по 60 тыс. на место, покупная очередь, LED-табло и планшеты по 35 тыс. Здесь их нет, зато есть компьютеры, кассы и принтеры на окнах, свет и сеть. Планшет Galaxy Tab Active5 у поставщиков со счётом стоит 72–75 тыс.: на 20 планшетах это на 0,75 млн ₽ больше, чем в модели.</p>
+</section>
+
+<section class="sec" id="plan3-sec">
+  <h2>План расходов на три месяца</h2>
+  <p>Сроки взяты из вашей модели от 20.11: декабрь — подготовка и закупка на открытие, январь — работа на 6 столах и докупка до 12, февраль — 12 столов. Расходники покупаются на месяц вперёд. Аренду и вариант оплаты управления можно поменять здесь же. Процент от прибыли, ИТ, коммунальные, привлечение клиентов и доработка программы сюда не входят.</p>
+  <fieldset>
+    <legend>Аренда и управление</legend>
+    <div class="pay">
+      <div class="st"><label class="st-l" for="n-rent">Аренда в месяц, ₽</label><input class="nin" type="number" id="n-rent" data-n="rent" min="0" step="50000" inputmode="numeric"></div>
+      <div class="st"><span class="st-l">Оклады управления</span><span class="seg" role="group" aria-label="Оклады управления"><button type="button" class="btn" data-o="mgmt" data-v="new" aria-pressed="true">Предложение</button><button type="button" class="btn" data-o="mgmt" data-v="model" aria-pressed="false">Как в модели</button></span></div>
+    </div>
+  </fieldset>
+  <div id="plan3"></div>
+  <h3>Кто работает на точке и сколько это стоит</h3>
+  <p class="note">Число ставок и цена ставки взяты из вашей модели от 20.11, базовый сценарий: в январе 8 531 клиент, в феврале 27 978. Ставка 202 тыс. ₽ — это полная стоимость человека в месяц с налогами, развозкой и связью, а не сумма на руки. Одна ставка — один человек на 180 часов в месяц.</p>
+  <div id="fot-staff"></div>
+  <h3>Управление: кто что делает и сколько получает</h3>
+  <p class="note">Предложение: оклад получает должность, а не собственник. Кто не работает в компании каждый день, оклада не получает. Процент от прибыли начисляется только в прибыльный месяц; собственникам он выплачивается после того, как инвестору вернулись вложения.</p>
+  <div id="fot-mgmt"></div>
+  <ol class="plain">
+    <li><b>Начало декабря.</b> <span>Если берёте технику из Китая — сначала купить по одному планшету и компьютеру на пробу. Написать аэропорту: допуск к ленте, место для багажа, кто делает свет и электрику, можно ли свою сеть. Заказать проект.</span></li>
+    <li><b>Декабрь.</b> <span>Работы по помещению — сразу на весь зал. Мебель и техника на 6 столов, комплекты агентам, вывески, форма. Партию из Китая заказывать сразу после пробы: доставка идёт несколько недель.</span></li>
+    <li><b>Январь.</b> <span>Работа на 6 столах. До середины месяца заказать докупку до 12 столов, чтобы она пришла к февралю. В конце месяца — расходники на февраль.</span></li>
+    <li><b>Февраль.</b> <span>12 столов. Из расходов остаются расходники, связь и обслуживание.</span></li>
+  </ol>
+</section>
+
+<section class="sec" id="long-sec">
+  <h2>Что займёт больше всего времени</h2>
+  <p>Закупки — не самое долгое. Дольше всего идут согласования и то, что от них зависит. Сроки — моя оценка по обычной практике, а не регламент аэропорта: точные назовёт он сам.</p>
+  <div class="tw"><table class="pl3"><thead><tr><th>Что</th><th>Сколько</th><th>Что без этого не начнётся</th><th>Когда начинать</th></tr></thead><tbody>
+    <tr><td><b>Договор на помещение второго этажа</b><small>По вашим октябрьским документам он ещё не был оформлен.</small></td><td>3–8 недель</td><td>Работы в зале, завоз мебели, пропуска</td><td>Сейчас</td></tr>
+    <tr><td><b>Утверждение расстановки пожарной службой аэропорта</b><small>На чертеже написано: до утверждения — обмер, пожарные краны, двери, высота потолка.</small></td><td>2–4 недели после обмера</td><td>Заказ мебели: от расстановки зависят размер и число столов</td><td>Сейчас</td></tr>
+    <tr><td><b>Проект, согласование и работы в зале</b><small>Свет, электрика, сеть, перегородка, пожарная сигнализация. Подрядчик нужен с допуском аэропорта.</small></td><td>6–10 недель</td><td>Открытие зала</td><td>Сразу после договора</td></tr>
+    <tr><td><b>Допуск в зал выдачи багажа</b><small>Письменный допуск, пропуска, планшет и принтер в перечне технических средств.</small></td><td>1–2 месяца</td><td>Работа агентов у ленты</td><td>Сейчас. До допуска встречать на выходе из таможенного коридора</td></tr>
+    <tr><td><b>Новое юрлицо, счёт в банке, касса и приём карт</b><small>В вашей модели регистрация — в декабре.</small></td><td>3–5 недель</td><td>Оплата у окна</td><td>Декабрь</td></tr>
+    <tr><td><b>Договоры с банком, операторами связи, страховой, нотариусом</b><small>Без договора с оператором связи на эту точку SIM оформлять нельзя — docs/00, раздел 9.</small></td><td>3–6 недель</td><td>Карты, SIM, полисы</td><td>Вместе с юрлицом</td></tr>
+    <tr><td><b>Техника из Китая</b><small>Проба 2–3 недели, партия ещё 3–5. Около 6 февраля в Китае Новый год — отгрузки встают на две-три недели [проверить дату].</small></td><td>6–9 недель</td><td>Рабочие места на окнах</td><td>Проба — сейчас</td></tr>
+    <tr><td><b>Набор, обучение и пропуска людей</b><small>Обучение новых — две недели по вашей модели; пропуск аэропорта оформляется на каждого.</small></td><td>3–5 недель</td><td>Выход смен</td><td>За месяц до открытия</td></tr>
+    <tr><td><b>Вывески и навигация</b><small>Согласование макетов с аэропортом, потом изготовление и монтаж.</small></td><td>4–7 недель</td><td>Клиент не найдёт лестницу</td><td>После сверки слов с юристом</td></tr>
+    <tr><td><b>Заключения юристов по персональным данным</b><small>В правилах проекта: с настоящими паспортами не работаем, пока заключений нет.</small></td><td>2–6 недель</td><td>Работа с настоящими клиентами</td><td>Сейчас</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="sec">
+  <h2>Каждый месяц</h2>
+  <p>В итог на запуск не входит. Порядок цифр, чтобы понимать текущие расходы на технику.</p>
+  <div id="monthly"></div>
+</section>
+
+<section class="sec">
+  <h2>Что в сумму не вошло</h2>
+  <ul class="plain">
+    <li><b>Техника партнёров.</b> <span>Планшеты банка (в вашей модели банк выдаёт их бесплатно), устройство оператора связи для проверки личности, оборудование страховой и нотариуса. От нас — стол, розетки и место. Стоит спросить банк, нужны ли ему свой интернет, свет для съёмки лица и тишина для записи голоса: в открытом зале шумно.</span></li>
+    <li><b>Аренда, интернет-канал, электричество, уборка.</b> <span>По договору с аэропортом.</span></li>
+    <li><b>Пропуска агентам в зону выдачи багажа.</b> <span>По тарифу аэропорта.</span></li>
+    <li><b>Покупная электронная очередь.</b> <span>В вашей модели 380 тыс. ₽. Не нужна: очередь, талоны и табло уже есть в нашей программе.</span></li>
+    <li><b>LED-табло и экраны 75 дюймов.</b> <span>В вашей модели 1,42 млн ₽. Здесь три обычных телевизора; разница объяснена в вопросах ниже.</span></li>
+    <li><b>Криптозащита для госсистем.</b> <span>В вашей модели 150 тыс. ₽; нужна ли она и сколько стоит — подтвердить.</span></li>
+    <li><b>Доработка программы.</b> <span>Приложение стола банка, связь с кассой, гостевой Wi‑Fi по талону.</span></li>
+    <li><b>Доставка и сборка мебели.</b> <span>Обычно 5–10 % её цены.</span></li>
+    <li><b>Кондиционеры и вентиляция.</b> <span>На фото есть; проверить, что работают.</span></li>
+    <li><b>Стойка в зоне вылета.</b> <span>В вашей модели на ней 2–3 человека. В запросе её не было; комплект агента для неё тот же.</span></li>
+    <li><b>Стойки и экраны в Душанбе.</b> <span>Отдельный расчёт.</span></li>
+  </ul>
+</section>
+
+<section class="sec">
+  <h2>Что решить до закупки</h2>
+  <ol class="plain" id="decide"></ol>
+</section>
+
+<section class="sec">
+  <h2>На чём основан расчёт</h2>
+  <ul class="plain" id="basis"></ul>
+  <p class="foot" id="foot"></p>
+</section>
+
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ---------- Цены: p — за единицу, ₽ с НДС; m — модель или уточнение; s: 'w' — найдено в магазине, 'e' — оценка ---------- */
+const PR = {
+  tab5:        { p: 72000, m: 'Цена модели SM-X306B 6/128 5G у поставщиков со счётом: 72–75 тыс. На маркетплейсах та же модель от 40–44 тыс.', s: 'w' },
+  tabBudget:   { p: 24300, m: 'Например, Samsung Galaxy Tab A11+ 5G.', s: 'w' },
+  glass:       { p: 650, m: '', s: 'w' },
+  spen:        { p: 6000, m: 'В российских магазинах не нашёл, цена по зарубежным.', s: 'e' },
+  strapCase:   { p: 3500, m: 'В российских магазинах не нашёл, цена по зарубежным.', s: 'e' },
+  standSimple: { p: 250, m: '', s: 'w' },
+  standLock:   { p: 11500, m: 'Металлический, антивандальный.', s: 'w' },
+  chargeCab:   { p: 60000, m: 'Готового шкафа под планшеты с ценой в России не нашёл. Шкаф с ячейками для телефонов стоит 13–23 тыс., но влезет ли в ячейку планшет 8″ — надо проверить.', s: 'e' },
+  chargeHub:   { p: 8200, m: 'Например, UGREEN на 200 Вт.', s: 'w' },
+  pbank:       { p: 3000, m: '20 000 мА·ч с быстрой зарядкой.', s: 'w' },
+  e200:        { p: 12570, m: 'MPRINT E200 Bluetooth, цена с сайта производителя.', s: 'w' },
+  e200case:    { p: 1000, m: '', s: 'e' },
+  minipc:      { p: 26000, m: 'Intel N100, 16 ГБ памяти, диск 500 ГБ, Windows 11 Pro: от 18 до 40 тыс. в разных магазинах.', s: 'w' },
+  monitor:     { p: 9500, m: '', s: 'w' },
+  arm:         { p: 3400, m: '', s: 'w' },
+  kbm:         { p: 2050, m: '', s: 'w' },
+  scan2d:      { p: 9620, m: 'Например, Mertech T7821 P2D.', s: 'w' },
+  printerA4:   { p: 33750, m: 'Например, Pantum BP5100DW: 40 страниц в минуту, картридж на 15 000 страниц.', s: 'w' },
+  mfp:         { p: 48700, m: 'Например, Pantum BM5100ADW: картриджи те же, что у принтеров.', s: 'w' },
+  toner:       { p: 12000, m: 'На 15 000 страниц.', s: 'w', y: 15000 },
+  kkt:         { p: 26900, m: 'Например, Эвотор 5i со встроенным приёмом карт.', s: 'w' },
+  fn:          { p: 14000, m: 'На 15 месяцев. На 36 месяцев — 20,4 тыс.; какой нужен, скажет бухгалтер.', s: 'w' },
+  ofd:         { p: 3300, m: '', s: 'w' },
+  antivirus:   { p: 1207, m: '', s: 'w' },
+  upsSmall:    { p: 7190, m: '', s: 'w' },
+  speaker:     { p: 10400, m: '', s: 'w' },
+  detector:    { p: 6000, m: '', s: 'e' },
+  tvSet65:     { p: 81000, m: 'Телевизор 50 тыс., мини-компьютер 26 тыс., кронштейн 5 тыс.', s: 'w' },
+  tvSet55:     { p: 63000, m: 'Телевизор 32 тыс., мини-компьютер 26 тыс., кронштейн 5 тыс.', s: 'w' },
+  router:      { p: 27200, m: 'Например, MikroTik RB5009.', s: 'w' },
+  sw48:        { p: 78000, m: 'Например, TP-Link TL-SG3452P.', s: 'w' },
+  sw24:        { p: 38000, m: 'Например, TP-Link TL-SG3428MP.', s: 'w' },
+  ap:          { p: 12000, m: 'Например, TP-Link EAP650.', s: 'w' },
+  rack:        { p: 19690, m: 'Настенный, 12 единиц.', s: 'w' },
+  patch:       { p: 2100, m: '', s: 'w' },
+  pdu:         { p: 3040, m: '', s: 'w' },
+  cord:        { p: 200, m: '', s: 'w' },
+  ups:         { p: 16700, m: '1500 ВА, напольный. Стоечный с ровным током на выходе — 62 тыс.', s: 'w' },
+  lte:         { p: 7000, m: 'Например, Keenetic Runner 4G.', s: 'w' },
+  scsPort:     { p: 6500, m: 'Материалы и работа. У подрядчиков от 2,5 до 10 тыс. за розетку.', s: 'e' },
+  cam:         { p: 6600, m: 'Например, HiWatch DS-I453M.', s: 'w' },
+  nvr:         { p: 32000, m: 'Регистратор на 8 камер 14,5 тыс. и диск 4 ТБ 17,4 тыс.', s: 'w' },
+  camInstall:  { p: 3500, m: '', s: 'e' },
+  shredder:    { p: 16200, m: '', s: 'w' },
+  safe:        { p: 59260, m: 'Взломостойкий, высота 67 см, например VALBERG Карат-67T.', s: 'w' },
+  safeBox:     { p: 13500, m: 'Например, ПРАКТИК SL-125T.', s: 'w' },
+  archive:     { p: 17000, m: 'Например, ПРАКТИК AM 1891.', s: 'w' },
+  shelving:    { p: 5230, m: '', s: 'w' },
+  cooler:      { p: 15000, m: '', s: 'w' },
+  firstAid:    { p: 740, m: '', s: 'w' },
+  evacPlan:    { p: 3400, m: '', s: 'w' },
+  desk:        { p: 10600, m: 'На металлическом каркасе, без передней стенки: клиент сидит напротив, ему нужно место для ног. Обычный стол из ЛДСП стоит около 3,8 тыс.', s: 'w' },
+  chair:       { p: 8200, m: 'Например, Бюрократ CH-695N, до 150 кг. Кресел, у которых заявлена круглосуточная работа, в продаже не нашёл.', s: 'w' },
+  vchair:      { p: 2730, m: 'Типа «ИЗО», кожзаменитель: легко протирать.', s: 'w' },
+  pedestal:    { p: 7300, m: '', s: 'w' },
+  divider:     { p: 5200, m: '', s: 'w' },
+  bench5:      { p: 23000, m: 'Металлическая перфорированная. Цена пересчитана с секции на 4 места.', s: 'e' },
+  sign:        { p: 2200, m: '', s: 'e' },
+  bin:         { p: 220, m: '', s: 'w' },
+  bin50:       { p: 1100, m: '', s: 'w' },
+  phoneCharge: { p: 12900, m: 'Настенная, 8 кабелей под разные телефоны.', s: 'w' },
+  mat:         { p: 2240, m: '', s: 'w' },
+  locker:      { p: 12000, m: 'ШРМ-24, ширина 60 см.', s: 'w' },
+  rail:        { p: 8300, m: '', s: 'w' },
+  hangers:     { p: 2900, m: '', s: 'w' },
+  cabin:       { p: 6550, m: '', s: 'w' },
+  lbench:      { p: 6900, m: '', s: 'w' },
+  mirror:      { p: 5950, m: '', s: 'w' },
+  kitchen:     { p: 20100, m: '', s: 'w' },
+  partition:   { p: 5500, m: 'Гипсокартон на каркасе с шумоизоляцией и покраской — от 4,8 тыс. за м²; огнестойкие листы дороже.', s: 'e' },
+  door:        { p: 26000, m: 'Противопожарная, с установкой. Если по проекту хватит обычной — около 18 тыс.', s: 'w' },
+  downlight:   { p: 600, m: '', s: 'w' },
+  linear:      { p: 1400, m: 'Панель 60 × 60 см, 36 Вт — 900 ₽, плюс подвес.', s: 'e' },
+  emerg:       { p: 600, m: '', s: 'w' },
+  lightInstall:{ p: 600, m: 'От 350 ₽ за встраиваемый.', s: 'e' },
+  pole:        { p: 54400, m: 'Алюминиевая, без розеток: от 39 до 74 тыс. у разных продавцов.', s: 'w' },
+  trunk:       { p: 1200, m: '', s: 'e' },
+  deskPower:   { p: 3000, m: '', s: 'e' },
+  socketPoint: { p: 4000, m: 'Работа, розетка и кабель от щита.', s: 'e' },
+  panel:       { p: 35000, m: '', s: 'e' },
+  fireAlarm:   { p: 90000, m: '', s: 'e' },
+  project:     { p: 150000, m: '', s: 'e' },
+  lightbox:    { p: 16000, m: 'Сам короб — от 7,4 до 17,6 тыс. за м², монтаж отдельно.', s: 'e' },
+  printPanel:  { p: 8000, m: '', s: 'e' },
+  film:        { p: 2500, m: 'Печать, ламинация и поклейка — от 1,8 тыс. за м².', s: 'e' },
+  floorGfx:    { p: 3500, m: 'С нескользящим покрытием — от 2,5 тыс. за м².', s: 'e' },
+  counterBrand:{ p: 12000, m: '', s: 'e' },
+  plate:       { p: 1400, m: '', s: 'w' },
+  removeLetters:{ p: 10000, m: '', s: 'e' },
+  barStool:    { p: 5980, m: 'Кресло кассира на высокой базе с опорой для ног.', s: 'w' },
+  antiMat:     { p: 9000, m: '', s: 'w' },
+  drawerBox:   { p: 7300, m: '', s: 'w' },
+  powerStrip:  { p: 1000, m: '', s: 'w' },
+  leafletHolder:{ p: 880, m: '', s: 'w' },
+  qrStand:     { p: 600, m: '', s: 'w' },
+  stanchion:   { p: 3900, m: '', s: 'w' },
+  a4frame:     { p: 2200, m: '', s: 'e' },
+  promoCounter:{ p: 14800, m: '', s: 'w' },
+  paddle:      { p: 1500, m: '', s: 'e' },
+  bagCase:     { p: 8000, m: '', s: 'e' },
+  luggageRack: { p: 21250, m: '2 × 1,5 × 0,6 м, три яруса.', s: 'w' },
+  tags:        { p: 5900, m: '', s: 'e' },
+  vest:        { p: 1500, m: '', s: 'e' },
+  polo:        { p: 1500, m: '', s: 'w' },
+  badge:       { p: 110, m: '', s: 'w' },
+  roll:        { p: 35, m: '', s: 'e' },
+  paperBox:    { p: 1900, m: '', s: 'w' },
+  folderPack:  { p: 725, m: '', s: 'w' },
+  leaflets:    { p: 15000, m: '', s: 'e' },
+  smalls:      { p: 9500, m: '', s: 'w' },
+  mdm:         { p: 3000, m: '', s: 'e' },
+  simPlan:     { p: 700, m: '', s: 'e' },
+  privFilm:    { p: 1500, m: '', s: 'e' },
+  fireKit:     { p: 9800, m: '', s: 'w' },
+  passScan:    { p: 60000, m: 'Цена из вашей модели, магазином не подтверждена.', s: 'e' },
+  docScan:     { p: 36450, m: 'Например, Canon DR-C230.', s: 'w' },
+  counter3d:   { p: 370000, m: 'Сумма заявки из вашей сметы.', s: 'e' },
+  tabLenovo:   { p: 27100, m: 'По вашей ссылке на AliExpress: 25 760 ₽ со стилусом и пошлина около 1 400 ₽. С купоном одна штука стоит 16 939 ₽, но на партию купон не действует. В карточке написано: версия для Китая, прошивка китайская, языки — английский и китайский.', s: 'w' },
+  penLenovo:   { p: 5000, m: 'В комплект не входит. В Европе 45–64 €, в России цену не нашёл.', s: 'e' },
+  caseLenovo:  { p: 2500, m: '', s: 'e' },
+  nfcReader:   { p: 9500, m: 'Например, ACS ACR1252U. Готовой программы для чтения паспорта под него нет: производитель чтение паспортов не заявляет, есть одно сообщение разработчика, что получилось.', s: 'w' },
+  minipcCn:    { p: 13800, m: 'По найденным предложениям с доставкой из-за рубежа: Intel N100 или N150, 16 ГБ, диск 512 ГБ — 13–14 тыс. Точную модель жду от вас.', s: 'e' },
+  desk80:      { p: 9700, m: 'На металлическом каркасе, без передней стенки. Ровно 800 × 600 делают под заказ за 10,9 тыс.; со склада есть 780 × 600 и 900 × 600 за 8–9,7 тыс. Из ЛДСП — около 4,2 тыс.', s: 'w' },
+  desk160:     { p: 12200, m: 'На металлическом каркасе. Ровно 1600 × 600 делают под заказ за 17,1 тыс.; со склада есть 1580 × 600 и 1600 × 720 примерно за 12,2 тыс. Из ЛДСП — около 6,1 тыс.', s: 'w' },
+  drawer:      { p: 3200, m: 'Один неглубокий ящик шириной 34 см. Есть ли у него замок, надо уточнить у продавца. Подвесная тумба с замком на два ящика стоит 5,9 тыс., но занимает место для ног.', s: 'w' },
+  simRouter:   { p: 900, m: '', s: 'w' },
+  routerBag:   { p: 8900, m: 'Например, Kroks с двумя SIM-картами: при сбое одного оператора переходит на второго; есть ли у этой версии Wi‑Fi, уточнить у продавца. Карманный с аккумулятором на 32 устройства и 15 часов работы — TP-Link M7450.', s: 'w' },
+  aioCn:       { p: 58000, m: 'В Китае он стоит 4 000–4 700 юаней — примерно 46–54 тыс. ₽ при курсе 11,5 ₽ за юань, плюс доставка и пошлина. Курс и доставку надо проверить.', s: 'e' },
+  winRu:       { p: 4690, m: 'Электронный ключ Windows 11 Pro. Происхождение лицензии и документы для юрлица уточнять у продавца.', s: 'w' },
+  laptop:      { p: 45000, m: 'Рабочий ноутбук: Ryzen 5 или Core i5, 16 ГБ памяти, диск 512 ГБ. Цену в магазинах не проверял.', s: 'e' },
+  nbLock:      { p: 1500, m: '', s: 'e' }
+};
+/*PR-END*/
+
+/* ---------- Параметры ---------- */
+const KEY = 'zia-fitout-v2';
+const DEF = { own: 9, bank: 9, partner: 1, senior: 1, agBag: 6, counter: 2, stairs: 1, crews: 4, perDay: 300, rent: 650000 };
+const PRESETS = {
+  full: {},
+  peak: { own: 5, bank: 5, partner: 1, senior: 1, agBag: 3, counter: 2, stairs: 1 },
+  open: { own: 3, bank: 2, partner: 0, senior: 1, agBag: 2, counter: 1, stairs: 1 }
+};
+const SHAPE = ['own', 'bank', 'partner', 'senior', 'agBag', 'counter', 'stairs'];
+const LIM = { own: [0, 20], bank: [0, 20], partner: [0, 6], senior: [0, 1], agBag: [1, 16], counter: [1, 4], stairs: [0, 2], crews: [1, 6], perDay: [50, 1400] };
+const STEP = { perDay: 50 };
+let P = Object.assign({}, DEF);
+let X = {};
+const ODEF = { tabWin: 'active', tabAg: 'active', pcSrc: 'ru', desk: '80', mgmt: 'new' };
+let O = Object.assign({}, ODEF);
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s && s.P) { for (const k in DEF) if (typeof s.P[k] === 'number') P[k] = s.P[k]; }
+  if (s && s.X && typeof s.X === 'object') X = s.X;
+  if (s && s.O) { for (const k in ODEF) if (typeof s.O[k] === 'string') O[k] = s.O[k]; }
+} catch (e) { /* хранилище недоступно — работаем без него */ }
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ P: P, X: X, O: O })); } catch (e) { /* не страшно */ } }
+
+function derive(p) {
+  const D = {};
+  D.seats = p.own + p.bank + p.partner + p.senior;
+  D.agents = p.agBag + p.counter + p.stairs;
+  D.lenovo = O.tabWin === 'lenovo';
+  D.lenovoAg = O.tabAg === 'lenovo';
+  D.tabOffice = p.own + p.senior;
+  D.a5Users = (D.lenovoAg ? 0 : D.agents) + (D.lenovo ? 0 : D.tabOffice);
+  D.tabSpare = D.a5Users ? Math.max(2, Math.ceil(D.a5Users * 0.12)) : 0;
+  D.tabMain = D.a5Users + D.tabSpare;
+  D.lenQty = D.lenovo ? D.tabOffice + Math.max(1, Math.ceil(D.tabOffice * 0.1)) : 0;
+  D.lenAgQty = D.lenovoAg ? D.agents + Math.max(1, Math.ceil(D.agents * 0.1)) : 0;
+  D.pcCn = O.pcSrc === 'cn';
+  D.pcNb = O.pcSrc === 'nb';
+  D.pcRu = !D.pcCn && !D.pcNb;
+  D.dbl = O.desk === '160';
+  D.dblQty = D.dbl ? (D.seats >= 20 ? 9 : Math.floor(D.seats / 2)) : 0;
+  D.sglQty = D.dbl ? D.seats - D.dblQty * 2 : 0;
+  D.desksP = p.bank + p.partner;
+  D.tabDesk = D.desksP ? D.desksP + 1 : 0;
+  D.pc = p.own + p.senior + 1;
+  D.printers = Math.ceil(p.own / 2);
+  D.e200 = p.agBag + p.counter + 2;
+  D.shift = D.seats + D.agents;
+  D.agentStaff = Math.ceil(D.agents * p.crews * 1.1);
+  D.officeStaff = Math.ceil((p.own + p.senior) * p.crews * 1.1);
+  D.ports = 56;
+  D.lockers = Math.min(7, Math.ceil((D.seats + D.agents) / 4));
+  D.dividers = Math.round(13 * Math.min(D.seats, 20) / 20);
+  D.sheets = p.perDay * 6 * 30;
+  D.rolls = Math.ceil(p.perDay * 30 * 0.27 / 19);
+  return D;
+}
+
+/* ---------- Разделы и строки ---------- */
+const SECS = [
+  { id: 'hall', part: 'office', t: 'Зал: мебель по расстановке', note: '' },
+  { id: 'win', part: 'office', t: 'Наши окна: техника на столе', note: 'Оператор работает за компьютером с большим экраном, планшет лежит рядом: им снимают бумаги и паспорт, на нём клиент расписывается стилусом, в нём же приложение оператора связи. В вашем макете окно не открывается без кассы — поэтому касса в основном списке.' },
+  { id: 'part', part: 'office', t: 'Столы банка и партнёров', note: 'Мебель и розетки для них уже посчитаны выше. Свою технику партнёры приносят сами.' },
+  { id: 'common', part: 'office', t: 'Общее оборудование офиса', note: '' },
+  { id: 'net', part: 'office', t: 'Сеть, интернет, камеры', note: 'Если аэропорт даст место в своём шкафу и порты своего коммутатора, шкаф и коммутаторы не понадобятся. Сеть для работы и сеть для клиентов — раздельные.' },
+  { id: 'tech', part: 'office', t: 'Техзона и гардероб', note: '' },
+  { id: 'light', part: 'office', t: 'Свет и электрика', note: 'Почти всё здесь — работы по помещению. Сначала выяснить у аэропорта, что делает он, а что арендатор.' },
+  { id: 'agent', part: 'agents', t: 'Комплект агента', note: 'То, что у человека в руках и на поясе. Одинаковый у багажа, за стойкой и у лестницы. По вашим документам планшет и принтер должны быть в перечне технических средств, согласованном с аэропортом.' },
+  { id: 'counter', part: 'agents', t: 'Стойка в зале прилёта', note: 'Один модуль рядом с кассой авиакомпании, около 1,3 м шириной.' },
+  { id: 'bag', part: 'agents', t: 'Пост у выдачи багажа', note: 'Агенты ходят вдоль ленты; стойка — точка сбора, запасной планшет и зарядка. Зал выдачи багажа — зона таможенного контроля: работать там можно только с письменного допуска. Запасной вариант из ваших документов — встречать людей на выходе из таможенного коридора.' },
+  { id: 'stairs', part: 'agents', t: 'Вход на лестницу и багаж клиентов', note: 'Наверх пускают по вызову номера, чтобы в офисе не набралось больше 50 человек.' },
+  { id: 'sign', part: 'common', t: 'Вывески и навигация', note: 'Размеры сняты на глаз с вашего рендера — до заказа нужен обмер и согласование с аэропортом. До печати сверить слова: биометрию принимает банк на своём оборудовании (так записано в docs/00, раздел 6), а слово «официальный» и строки «ИНН», «СНИЛС» показать юристу [проверить].' },
+  { id: 'wear', part: 'common', t: 'Форма и бейджи', note: 'Здесь только жилеты, поло и бейджи. В вашей модели на форму заложено 8 200 ₽ на человека — это полный комплект.' },
+  { id: 'spare', part: 'common', t: 'Запас техники и расходники на первый месяц', note: '' }
+];
+
+const ITEMS = [];
+function I(s, id, n, d, q, pk, o) { ITEMS.push(Object.assign({ s: s, id: id, n: n, d: d, q: q, pk: pk, u: 'шт.' }, o || {})); }
+
+/* Зал */
+I('hall', 'desk', 'Стол 1000 × 600 мм', 'Размер из расстановки «вариант C».', D => O.desk === '100' ? D.seats : 0, 'desk', { how: 'по числу мест' });
+I('hall', 'desk80', 'Стол 800 × 600 мм', 'По вашему решению: не шире 80 см на оператора. Два таких стола рядом дают те же 160 см на двоих, а при перестановке снова расходятся.', D => O.desk === '80' ? D.seats : D.sglQty, 'desk80', { how: D => D.dbl ? 'одиночные места в рядах у стен' : 'по числу мест' });
+I('hall', 'desk160', 'Стол 1600 × 600 мм на двоих', 'Один оператор сидит свободно, при наплыве к нему садится второй.', D => D.dblQty, 'desk160', { how: 'один на два места' });
+I('hall', 'chair', 'Кресло сотрудника', 'С сеткой и подлокотниками, под смену в 12 часов.', D => D.seats, 'chair');
+I('hall', 'vchair', 'Стул посетителя', '', D => D.seats, 'vchair');
+I('hall', 'pedestal', 'Тумба под стол с замком', 'Личные вещи, запас бумаги и лент, выручка окна до сдачи старшему.', D => O.desk === '100' ? D.seats : D.dblQty, 'pedestal', { how: D => D.dbl ? 'одна на двоих, посередине стола' : '' });
+I('hall', 'drawer', 'Подвесной ящик с замком под столешницу', 'Под стол шириной 80 см тумба не встанет: ногам оператора останется меньше 40 см.', D => O.desk === '80' ? D.seats : D.sglQty, 'drawer');
+I('hall', 'divider', 'Экран между соседними столами', 'Чтобы сосед не видел чужой паспорт и экран.', D => D.dividers, 'divider', { how: 'на стыках столов; 13 на полный зал' });
+I('hall', 'bench5', 'Скамья ожидания на 5 мест', '', 2, 'bench5', { how: '10 мест по расстановке' });
+I('hall', 'sign', 'Номер окна над столом', 'Табличка на ножке или флажок: видно со скамей.', D => D.seats, 'sign');
+I('hall', 'phoneCharge', 'Зарядка телефонов для клиентов', 'У скамей. Телефон нужен клиенту для согласий и приложения.', 2, 'phoneCharge');
+I('hall', 'coolerV', 'Кулер с водой для посетителей', '', 1, 'cooler');
+I('hall', 'bin', 'Корзина для бумаг', '', D => D.seats, 'bin');
+I('hall', 'bin50', 'Урна 50 л с крышкой', '', 3, 'bin50');
+I('hall', 'mat', 'Коврик у входа с лестницы', '', 1, 'mat', { opt: 1 });
+
+/* Наши окна */
+I('win', 'tabW', 'Планшет Samsung Galaxy Tab Active5 со стилусом', 'Тот же, что у агентов: снимает бумажный бланк и паспорт, читает чип, на нём расписывается клиент.', D => D.lenovo ? 0 : D.tabOffice, 'tab5', { how: (D, p) => p.own + ' на окна + ' + p.senior + ' старшему' });
+I('win', 'tabWL', 'Планшет Lenovo Xiaoxin Pad Pro 12.7', 'Экран 12,7 дюйма лицом к клиенту: подпись, съёмка бумаг камерой со вспышкой. Весит 620 г, работает только по Wi‑Fi, NFC нет — чип паспорта не читает. Прошивка китайская: языки китайский и английский, сервисы Google не гарантированы. Годится только на стол и только после проверки на одном экземпляре.', D => D.lenQty, 'tabLenovo', { how: (D, p) => p.own + ' на окна + ' + p.senior + ' старшему + запас на брак' });
+I('win', 'penL', 'Запасной стилус к планшету Lenovo', 'Один стилус идёт в комплекте с планшетом. Он с аккумулятором: заряжать и привязать шнурком, чтобы не унесли.', D => D.lenovo ? 2 : 0, 'penLenovo');
+I('win', 'caseL', 'Чехол-подставка и защитное стекло к Lenovo', '', D => D.lenQty, 'caseLenovo');
+I('win', 'nfcR', 'Внешний считыватель чипа паспорта', 'У планшета Lenovo нет NFC. Нужен, только если чип паспорта читают и на окнах, а не только агенты. Потребует доработки программы.', (D, p) => D.lenovo ? p.own : 0, 'nfcReader', { opt: 1 });
+I('win', 'standW', 'Подставка под планшет', '', D => D.lenovo ? 0 : D.tabOffice, 'standSimple');
+I('win', 'pc', 'Мини-компьютер', 'Крепится за монитором, стол остаётся свободным.', D => D.pcRu ? D.pc : 0, 'minipc', { how: (D, p) => p.own + ' окон + ' + p.senior + ' старший + 1 запасной' });
+I('win', 'nb', 'Ноутбук 15,6 дюйма', 'Экран низкий и узкий, 36 см: клиент видит оператора поверх него. Свой аккумулятор — скачки света не страшны.', D => D.pcNb ? D.pc : 0, 'laptop', { how: (D, p) => p.own + ' окон + ' + p.senior + ' старший + 1 запасной' });
+I('win', 'nbLock', 'Тросик с замком для ноутбука', '', D => D.pcNb ? D.pc - 1 : 0, 'nbLock');
+I('win', 'pcC', 'Моноблок Lecoo 27 дюймов из Китая', 'Ryzen 7, 16 ГБ, диск 512 ГБ, экран Full HD. Ширина 61,5 см, высота 47 см, подставка не регулируется: на столе 80 см он закрывает клиента. В России не продаётся, гарантия действует только в Китае — поэтому два запасных, а не один.', D => D.pcCn ? D.pc + 1 : 0, 'aioCn', { how: (D, p) => p.own + ' окон + ' + p.senior + ' старший + 2 запасных' });
+I('win', 'winRu', 'Windows с русским языком для моноблока', 'В моноблоке стоит Windows «для Китая»: меню только на китайском, язык в ней не меняется. Нужен ключ обычной Windows 11.', D => D.pcCn ? D.pc + 1 : 0, 'winRu');
+I('win', 'monitor', 'Монитор 24 дюйма', 'Шириной 54 см: на столе 80 см между оператором и клиентом остаётся просвет 26 см.', D => D.pcRu ? D.pc : 0, 'monitor');
+I('win', 'arm', 'Кронштейн монитора на струбцине', 'Стол всего 60 см в глубину. Монитор уходит вбок и ниже: так оператор и клиент лучше видят друг друга.', (D, p) => D.pcRu ? p.own + p.senior : 0, 'arm');
+I('win', 'kbm', 'Клавиатура и мышь', '', D => D.pc, 'kbm');
+I('win', 'scan2d', 'Сканер QR-кодов настольный', 'Талон с бумаги или с экрана телефона, штрихкод IMEI с экрана *#06#.', D => D.pc, 'scan2d');
+I('win', 'printerA4', 'Лазерный принтер A4', 'Памятка и пакет документов клиенту. Стоит на тумбе между двумя соседними окнами.', D => D.printers, 'printerA4', { how: 'один на два окна' });
+I('win', 'kkt', 'Касса с приёмом карт', 'Кассовый чек и оплата картой или по QR прямо у окна. Сколько касс нужно на зал — решить с бухгалтером [проверить].', (D, p) => p.own, 'kkt', { how: 'по одной на окно' });
+I('win', 'fn', 'Фискальный накопитель для кассы', '', (D, p) => p.own, 'fn');
+I('win', 'upsSmall', 'Бесперебойник на окно', 'Чтобы при скачке света компьютер не перезагружался посреди оформления.', (D, p) => D.pcNb ? 0 : p.own + p.senior, 'upsSmall', { opt: 1 });
+I('win', 'speaker', 'Настольный микрофон с динамиком', 'Для голосового переводчика: в зале на 50 человек встроенный микрофон будет ловить соседей.', (D, p) => p.own, 'speaker', { opt: 1 });
+I('win', 'detector', 'Детектор банкнот', 'Если принимаем наличные.', 2, 'detector', { opt: 1 });
+I('win', 'passScan', 'Настольный сканер паспортов', 'В ТЗ от 5 октября паспорт можно было снимать только сканером. По ноябрьским решениям его снимает камера планшета, поэтому строка выключена.', (D, p) => p.own, 'passScan', { opt: 1 });
+I('win', 'docScan', 'Протяжной сканер документов', 'В макете окна он есть в списке проверки рабочего места. Бумагу можно снимать и камерой планшета.', D => D.printers, 'docScan', { opt: 1, how: 'один на два окна' });
+
+/* Столы партнёров */
+I('part', 'tabD', 'Простой планшет 10–11 дюймов', 'На нём сотрудник стола только отмечает в нашей программе результат: биометрия снята, карта выдана, клиент свободен.', D => D.tabDesk, 'tabBudget', { how: D => D.desksP + ' столов + 1 запасной' });
+I('part', 'standD', 'Подставка под планшет', '', D => D.desksP, 'standSimple');
+
+/* Общее оборудование офиса */
+I('common', 'tvOffice', 'Табло очереди: телевизор 65″, мини-компьютер, кронштейн', 'На перегородке техзоны, как на чертеже. Посчитан обычный телевизор; панель, рассчитанная на круглосуточную работу, стоит от 104 тыс. ₽ за 55″.', 1, 'tvSet65');
+I('common', 'tvOffice2', 'Второй экран табло у скамей', 'Со скамей до основного табло 10–13 м — мелкие строки не прочесть.', 1, 'tvSet55', { opt: 1 });
+I('common', 'mfp', 'МФУ A4: копия, скан, печать', 'У старшего смены: копии и скан подписанных бумаг.', 1, 'mfp');
+I('common', 'shredder', 'Уничтожитель бумаг', '', 1, 'shredder');
+I('common', 'safe', 'Сейф для выручки', '', 1, 'safe');
+I('common', 'safeBox', 'Металлический шкаф с замком', 'Запас SIM-карт и карты банка, которые клиент заберёт позже.', 1, 'safeBox');
+I('common', 'archive', 'Металлический шкаф с замком для бумаг', 'Соглашение об ЭДО клиент подписывает ручкой — оригиналы надо где-то хранить.', 2, 'archive');
+I('common', 'chargeCab', 'Шкаф для зарядки планшетов с замком', 'Планшеты агентов между рейсами и ночью.', 1, 'chargeCab');
+I('common', 'shelving', 'Стеллаж для расходников', '', 2, 'shelving');
+I('common', 'firstAid', 'Аптечка', '', 1, 'firstAid');
+I('common', 'evacPlan', 'План эвакуации под новую расстановку', '', 1, 'evacPlan', { ask: 1 });
+I('common', 'fireKit', 'Огнетушители, подставки и знаки', 'Четыре порошковых и один углекислотный к сетевому шкафу. Сколько нужно на самом деле, скажет пожарная служба аэропорта [проверить].', 1, 'fireKit', { u: 'компл.' });
+
+/* Сеть */
+I('net', 'router', 'Маршрутизатор с двумя входами интернета', 'Основной канал и запасной.', 1, 'router');
+I('net', 'sw48', 'Коммутатор на 48 портов', 'Столы и принтеры.', 1, 'sw48');
+I('net', 'sw24', 'Коммутатор на 24 порта с питанием по кабелю', 'Точки Wi‑Fi и камеры питаются от него же.', 1, 'sw24');
+I('net', 'ap', 'Точка доступа Wi‑Fi', 'Две в зале, одна у скамей и лестницы. Отдельная сеть для клиентов.', 3, 'ap');
+I('net', 'rack', 'Шкаф для сетевого оборудования', 'В техзоне, место «IT» на чертеже.', 1, 'rack');
+I('net', 'patch', 'Патч-панель на 24 порта', '', 3, 'patch');
+I('net', 'pdu', 'Блок розеток в шкаф', '', 1, 'pdu');
+I('net', 'cord', 'Патч-корд', '', D => D.ports + 10, 'cord');
+I('net', 'ups', 'Бесперебойник для сетевого шкафа', 'Свет моргнул — сеть, табло и камеры продолжают работать.', 1, 'ups');
+I('net', 'lte', 'Запасной интернет: 4G-роутер', '', 1, 'lte');
+I('net', 'scsPort', 'Компьютерная розетка с прокладкой кабеля', 'Сразу на все 20 столов по две и ещё 16: точки Wi‑Fi, камеры, табло, принтеры, запас. Кабель негорючий, монтаж — подрядчик с допуском аэропорта.', D => D.ports, 'scsPort', { how: '20 × 2 + 16' });
+I('net', 'cam', 'Камера видеонаблюдения', 'Четыре на зал, одна на скамьи и лестницу, одна на сейфы.', 6, 'cam');
+I('net', 'nvr', 'Видеорегистратор с диском', '', 1, 'nvr');
+I('net', 'camInstall', 'Монтаж и настройка камеры', '', 6, 'camInstall');
+
+/* Техзона */
+I('tech', 'partition', 'Перегородка техзоны из негорючих материалов', 'Длина 8,45 м. Высоту до потолка принял 3 м — уточнить обмером.', 25, 'partition', { u: 'м²', ask: 1 });
+I('tech', 'door', 'Дверь 0,9 м с замком', '', 1, 'door', { ask: 1 });
+I('tech', 'locker', 'Шкаф для одежды: 2 яруса, 4 ячейки', 'По расстановке места на 7 шкафов, это 28 ячеек.', D => D.lockers, 'locker', { how: 'по ячейке на человека в смене, не больше 7 шкафов' });
+I('tech', 'rail', 'Вешало напольное 2 м', '', 2, 'rail', { how: '4 м по расстановке' });
+I('tech', 'hangers', 'Плечики для верхней одежды, 50 шт.', '', 1, 'hangers', { u: 'уп.' });
+I('tech', 'cabin', 'Кабина для переодевания', '', 1, 'cabin');
+I('tech', 'lbench', 'Скамья в раздевалку', '', 2, 'lbench');
+I('tech', 'mirror', 'Зеркало', '', 1, 'mirror');
+I('tech', 'coolerS', 'Кулер для персонала', '', 1, 'cooler');
+I('tech', 'kitchen', 'Чайник, микроволновка, небольшой холодильник', 'Смена 12 часов. Проверить, разрешит ли аэропорт.', 1, 'kitchen', { u: 'компл.', opt: 1 });
+
+/* Свет и электрика */
+I('light', 'downlight', 'Светильник в готовое отверстие в потолке', 'Число отверстий оценил по фото — пересчитать на месте.', 30, 'downlight', { ask: 1 });
+I('light', 'linear', 'Светильник над рядом столов', '', 18, 'linear', { ask: 1, how: '5 + 8 + 5 по трём рядам' });
+I('light', 'emerg', 'Аварийный светильник с указателем выхода', '', 4, 'emerg', { ask: 1 });
+I('light', 'lightInstall', 'Монтаж светильника', '', 52, 'lightInstall', { ask: 1 });
+I('light', 'pole', 'Стойка питания от потолка к центральному ряду', 'По ней идут и розетки, и сеть; дальше кабель расходится под столами.', 2, 'pole', { ask: 1 });
+I('light', 'trunk', 'Короб вдоль стен и лоток под столами центрального ряда', '', 32, 'trunk', { u: 'м', ask: 1, how: '22 м вдоль стен + 10 м под столами' });
+I('light', 'deskPower', 'Блок розеток на стол с USB', 'USB — чтобы клиент мог зарядить телефон, пока оформляется.', D => D.seats, 'deskPower');
+I('light', 'socketPoint', 'Подключение розеточной точки', 'Сразу на все 20 столов, чтобы не вскрывать потолок второй раз.', 32, 'socketPoint', { ask: 1, how: '20 столов + 12: шкаф сети, табло, принтеры, кулеры, зарядка' });
+I('light', 'panel', 'Электрощит в сборе', '', 1, 'panel', { ask: 1 });
+I('light', 'fireAlarm', 'Датчики и оповещение в техзоне', 'Перегородка делит помещение на два — пожарную сигнализацию, скорее всего, придётся дополнить.', 1, 'fireAlarm', { ask: 1, u: 'работа' });
+I('light', 'project', 'Проект и согласование: электрика, сеть, пожарная безопасность', '', 1, 'project', { ask: 1, u: 'работа' });
+
+/* Комплект агента */
+I('agent', 'tabA', 'Планшет Samsung Galaxy Tab Active5 со стилусом', 'Защищённый, 8 дюймов, читает чип паспорта, держит смену. Чехол и стилус в комплекте.', D => D.lenovoAg ? 0 : D.agents, 'tab5', { how: (D, p) => p.agBag + ' у багажа + ' + p.counter + ' за стойкой + ' + p.stairs + ' у лестницы' });
+I('agent', 'tabAL', 'Планшет Lenovo Xiaoxin Pad Pro 12.7', 'Только для работы за стойкой: 12,7 дюйма и 620 г в руке не удержать. Интернет — через роутер. Прошивка китайская, нужна проверка на одном экземпляре.', D => D.lenAgQty, 'tabLenovo', { how: D => 'агентов ' + D.agents + ' + запас на брак' });
+I('agent', 'penAL', 'Запасной стилус к планшету Lenovo', '', D => D.lenovoAg ? 1 : 0, 'penLenovo');
+I('agent', 'caseAL', 'Чехол-подставка и защитное стекло к Lenovo', '', D => D.lenAgQty, 'caseLenovo');
+I('agent', 'nfcAL', 'Внешний считыватель чипа паспорта', 'У Lenovo нет NFC. Считыватель лежит на стойке и подключён к планшету кабелем; нашу программу под него надо дорабатывать. Строку можно выключить, если чип паспорта у стойки не читаем.', D => D.lenovoAg ? D.agents : 0, 'nfcReader');
+I('agent', 'strapCase', 'Ремень на руку и через плечо', 'Агент работает стоя, в толпе, одной рукой.', D => D.lenovoAg ? 0 : D.agents + 2, 'strapCase');
+I('agent', 'e200', 'Принтер талонов Mertech (в Bluetooth виден как HM-E200)', 'На поясе у каждого, кто выдаёт номер в офис. В одной из карточек производителя стоит пометка «снят с производства» — до закупки спросить у Mertech, что придёт на замену.', D => D.e200, 'e200', { how: (D, p) => p.agBag + ' + ' + p.counter + ' + 2 запасных' });
+I('agent', 'e200case', 'Чехол на пояс для принтера', '', (D, p) => p.agBag + p.counter, 'e200case');
+I('agent', 'pbank', 'Внешний аккумулятор', 'У багажной ленты розеток нет.', D => D.agents + 2, 'pbank');
+I('agent', 'privFilm', 'Плёнка на экран от подглядывания', 'В толпе у ленты экран с паспортом не должны видеть соседи.', D => D.agents + 2, 'privFilm');
+
+/* Стойка в зале прилёта */
+I('counter', 'barStool', 'Высокий стул со спинкой', 'Стойка высотой около 1,1 м.', (D, p) => p.counter, 'barStool');
+I('counter', 'antiMat', 'Коврик от усталости ног', '', (D, p) => p.counter, 'antiMat');
+I('counter', 'standLock', 'Держатель планшета с замком', 'Планшет стоит на стойке и не уходит вместе с посетителем.', (D, p) => p.counter, 'standLock');
+I('counter', 'chargeHubC', 'Зарядная станция на 6–10 устройств', 'Планшеты, принтеры, аккумуляторы.', 1, 'chargeHub');
+I('counter', 'powerStripC', 'Сетевой фильтр', '', 1, 'powerStrip');
+I('counter', 'drawerBox', 'Тумба с замком под стойку', 'Ленты, листовки, запасной планшет.', 1, 'drawerBox');
+I('counter', 'tvCounter', 'Табло у стойки: телевизор 55″, мини-компьютер, кронштейн', 'На стене за стойкой: люди ждут вызова внизу и видят свой номер. Место согласовать с аэропортом.', 1, 'tvSet55', { ask: 1 });
+I('counter', 'lteC', '4G-роутер для табло', '', 1, 'lte');
+I('counter', 'leafletHolder', 'Буклетница настольная', '', 2, 'leafletHolder');
+I('counter', 'qrStand', 'Подставка с QR-кодом приложения', '', 2, 'qrStand');
+I('counter', 'stanchionC', 'Стойка ограждения с лентой', '', 4, 'stanchion');
+I('counter', 'a4frameC', 'Рамка А4 на стойку ограждения', '', 1, 'a4frame');
+
+/* Пост у выдачи багажа */
+I('bag', 'promoCounter', 'Складная стойка с печатью', 'Если аэропорт не даёт свою стойку в зоне выдачи багажа.', 1, 'promoCounter', { ask: 1 });
+I('bag', 'routerBag', '4G-роутер с Wi‑Fi у ленты', 'По вашему решению планшеты у ленты работают через него. Второй — запасной, с SIM-картой другого оператора: если роутер сел или сеть легла, без связи остаются все агенты разом. Роутер тоже надо внести в перечень технических средств, согласованный с аэропортом.', 2, 'routerBag', { ask: 1, how: 'основной и запасной' });
+I('bag', 'chargeHubB', 'Зарядная станция на 6–10 устройств', 'Если рядом есть розетка.', 1, 'chargeHub');
+I('bag', 'paddle', 'Табличка на ручке', 'Собрать группу в 5–15 человек и провести к лестнице.', 3, 'paddle');
+I('bag', 'bagCase', 'Кейс для переноски планшетов и принтеров', '', 1, 'bagCase', { opt: 1 });
+
+/* Вход на лестницу */
+I('stairs', 'tvStairs', 'Табло у лестницы: телевизор 55″, мини-компьютер, кронштейн', 'Место согласовать с аэропортом.', 1, 'tvSet55', { ask: 1 });
+I('stairs', 'stanchionS', 'Стойка ограждения с лентой', 'Вход и место для багажа.', 8, 'stanchion');
+I('stairs', 'a4frameS', 'Рамка А4 на стойку ограждения', '«Вход по вызову номера» на четырёх языках.', 2, 'a4frame');
+I('stairs', 'luggageRack', 'Стеллаж для багажа', 'Наверху чемоданы ставить некуда: проходы эвакуационные. Место и порядок хранения — только с согласия службы безопасности аэропорта.', 4, 'luggageRack', { ask: 1 });
+I('stairs', 'tags', 'Номерные жетоны на багаж, 100 пар', '', 2, 'tags', { u: 'уп.' });
+I('stairs', 'counter3d', 'Счётчики посетителей: две точки с монтажом', 'По вашей смете пилота от 12.10.2026. Счётчик на входе в офис помогает держать предел в 50 человек.', 1, 'counter3d', { opt: 1, u: 'компл.' });
+
+/* Вывески */
+I('sign', 'lightboxHdr', 'Вывеска над остеклением антресоли, световая', 'Примерно 7 × 0,9 м.', 6.3, 'lightbox', { u: 'м²', ask: 1 });
+I('sign', 'panelStairs', 'Панно над входом на лестницу', 'Примерно 3,5 × 2,5 м: услуги на четырёх языках.', 8.8, 'printPanel', { u: 'м²', ask: 1 });
+I('sign', 'lightbox2', 'Указатель «2 этаж», световой', '', 1.2, 'lightbox', { u: 'м²', ask: 1 });
+I('sign', 'film', 'Плёнка на стёкла антресоли', 'Четыре полотна примерно 1,6 × 2 м.', 12.8, 'film', { u: 'м²', ask: 1 });
+I('sign', 'floorGfx', 'Линия на полу от выхода до лестницы', 'Около 30 м шириной 30 см.', 9, 'floorGfx', { u: 'м²', ask: 1 });
+I('sign', 'counterBrand', 'Оформление стойки в зале прилёта', 'Плёнка на стеклянный фасад и шапка над стойкой.', 1, 'counterBrand', { u: 'компл.', ask: 1 });
+I('sign', 'plate', 'Таблички в офисе', '«Ожидание», «Только для персонала», правила, языки.', 10, 'plate');
+I('sign', 'removeLetters', 'Снять буквы прежнего кафе с ограждения лестницы', '', 1, 'removeLetters', { u: 'работа', ask: 1 });
+
+/* Форма */
+I('wear', 'vest', 'Жилет агента с логотипом', 'Агента должно быть видно в толпе у ленты.', D => D.agentStaff, 'vest', { how: (D, p) => 'агентов ' + D.agents + ' × ' + p.crews + ' на круглосуточное место + 10 %' });
+I('wear', 'polo', 'Поло оператора с логотипом', '', D => D.officeStaff * 2, 'polo', { how: (D, p) => 'операторов ' + (p.own + p.senior) + ' × ' + p.crews + ' + 10 %, по две на человека' });
+I('wear', 'badge', 'Бейдж с лентой', '', D => D.agentStaff + D.officeStaff, 'badge');
+
+/* Запас и расходники */
+I('spare', 'tabS', 'Запасные планшеты Galaxy Tab Active5', 'Замена на время зарядки и ремонта. Один — чтобы обслужить внизу тех, кто не может подняться по лестнице.', D => D.tabSpare, 'tab5', { how: 'каждый восьмой, не меньше двух' });
+I('spare', 'glass', 'Защитное стекло на планшет', '', D => D.tabMain, 'glass');
+I('spare', 'spen', 'Запасной стилус', '', 5, 'spen');
+I('spare', 'rolls', 'Лента 57 мм для талонов и чеков', 'Талон у багажа и чек у окна — около 27 см ленты на клиента. Рулон короткий, 19 м: длинный на 30 м в мобильный принтер может не влезть — сверить по паспорту [проверить].', D => D.rolls, 'roll', { u: 'рул.' });
+I('spare', 'paper', 'Бумага А4, коробка 5 пачек', 'Около 6 листов на клиента.', D => Math.ceil(D.sheets / 2500), 'paperBox', { u: 'кор.' });
+I('spare', 'toner', 'Картридж для принтера', '', D => Math.ceil(D.sheets / PR.toner.y), 'toner');
+I('spare', 'folders', 'Папка для документов клиента, 100 шт.', '', (D, p) => Math.ceil(p.perDay * 30 / 100), 'folderPack', { u: 'уп.' });
+I('spare', 'leaflets', 'Листовки на четырёх языках, 5 000 шт.', '', 1, 'leaflets', { u: 'тираж' });
+I('spare', 'smalls', 'Ручки, антисептик, салфетки для экранов', '', 1, 'smalls', { u: 'компл.' });
+
+/* ---------- Расчёт ---------- */
+const nf = n => (Math.round(n * 10) / 10).toLocaleString('ru-RU');
+const rub = n => Math.round(n).toLocaleString('ru-RU') + ' ₽';
+function val(v, D, p) { return typeof v === 'function' ? v(D, p) : v; }
+
+function calc(p) {
+  const D = derive(p);
+  const rows = ITEMS.map(function (it) {
+    const q = val(it.q, D, p);
+    const pr = PR[it.pk];
+    const on = (it.id in X) ? !!X[it.id] : !it.opt;
+    return { it: it, q: q, price: pr.p, sum: q * pr.p, on: on, est: pr.s === 'e', model: pr.m || '', how: it.how ? val(it.how, D, p) : '' };
+  });
+  let total = 0, ask = 0;
+  const bySec = {}, byPart = { office: 0, agents: 0, common: 0 };
+  rows.forEach(function (r) {
+    if (!r.on || !r.q) return;
+    total += r.sum;
+    if (r.it.ask) ask += r.sum;
+    bySec[r.it.s] = (bySec[r.it.s] || 0) + r.sum;
+  });
+  SECS.forEach(function (s) { byPart[s.part] += bySec[s.id] || 0; });
+  return { D: D, rows: rows, total: total, ask: ask, bySec: bySec, byPart: byPart };
+}
+
+function monthlyRows(p, D) {
+  return [
+    ['SIM-карты для 4G-роутеров: два у ленты, один у стойки в зале прилёта, один запасной в офисе', 4, PR.simRouter.p],
+    ['Управление планшетами: блокировка, обновления, отключение потерянного', D.tabMain + D.tabDesk + D.lenQty + D.lenAgQty, PR.mdm.p / 12],
+    ['Обслуживание касс у оператора фискальных данных', p.own, PR.ofd.p / 12],
+    ['Антивирус на компьютеры', D.pc, PR.antivirus.p / 12],
+    ['Бумага А4, коробок', Math.ceil(D.sheets / 2500), PR.paperBox.p],
+    ['Картриджи', Math.ceil(D.sheets / PR.toner.y), PR.toner.p],
+    ['Лента для талонов и чеков, рулонов', D.rolls, PR.roll.p],
+    ['Папки для документов клиента, упаковок по 100', Math.ceil(p.perDay * 30 / 100), PR.folderPack.p]
+  ];
+}
+
+/* ---------- План на три месяца: открытие на 6 столах, к февралю 12 ---------- */
+const CONS = { rolls: 1, paper: 1, toner: 1, folders: 1 };
+function planPart(p) {
+  const R = calc(p), s = R.bySec;
+  let cons = 0;
+  R.rows.forEach(function (r) { if (r.on && r.q && CONS[r.it.id]) cons += r.sum; });
+  const g = k => s[k] || 0;
+  const serv = monthlyRows(p, R.D).slice(0, 4).reduce((a, r) => a + r[1] * r[2], 0);
+  return { c: [g('light') + g('net') + g('tech'), g('hall') + g('win') + g('part') + g('common'), g('agent') + g('counter') + g('bag') + g('stairs'), g('sign') + g('wear'), g('spare') - cons], cons: cons, serv: serv };
+}
+function planRows() {
+  const A = planPart(Object.assign({}, DEF, PRESETS.open, { crews: P.crews, perDay: 275 }));
+  const B = planPart(Object.assign({}, DEF, PRESETS.peak, { crews: P.crews, perDay: 1000 }));
+  const names = [
+    ['Помещение и сеть', 'Свет, электрика, перегородка и шкафчики техзоны, кабель, сетевое оборудование, камеры. Делается один раз на весь зал.'],
+    ['Офис: мебель и техника', 'Столы, кресла, компьютеры, планшеты, кассы, принтеры, табло.'],
+    ['Агенты и посты внизу', 'Комплекты агентов, стойка в зале прилёта, пост у багажа, вход на лестницу.'],
+    ['Вывески и форма', ''],
+    ['Запасные планшеты, листовки, мелочи', '']
+  ];
+  const rows = names.map(function (n, i) { return [n[0], n[1], A.c[i], Math.max(0, B.c[i] - A.c[i]), 0]; });
+  rows.push(['Расходники на следующий месяц', 'Бумага, картриджи, лента, папки для документов. Около 17 ₽ на клиента: меньше клиентов — меньше расход.', A.cons, B.cons, B.cons]);
+  rows.push(['Связь и обслуживание', 'Мобильный интернет планшетов, управление планшетами, кассы, антивирус.', 0, A.serv, B.serv]);
+  return rows;
+}
+/* ФОТ: число ставок и цена ставки — из модели владельца от 20.11.2026, базовый сценарий (декабрь, январь, февраль) */
+const STAFF = [
+  { n: 'Старший смены', f: 'Ведёт смену и очередь, разбирает спорные случаи.', fte: [2.2, 4.4, 3.9], rate: 202000 },
+  { n: 'Сотрудник за столом', f: 'Оформляет клиента: документы, SIM, оплата, выдача пакета. Оклад 60 тыс. ₽ и 80 ₽ за каждого клиента.', fte: [2.2, 4.3, 15.4], rate: 60000, piece: [341240, 682480, 2238240] },
+  { n: 'Сотрудник на выдаче карт', f: 'Стол банка: биометрия и карта на оборудовании банка.', fte: [2.2, 4.4, 13.1], rate: 202000 },
+  { n: 'Агент у ленты, от подрядчика', f: 'Встречает рейс, находит клиента, выдаёт номер в офис.', fte: [2.2, 4.4, 8.9], rate: 202000 },
+  { n: 'Сотрудник стойки', f: 'Стойка в зале: вопросы, клиенты без талона, улетающие пассажиры.', fte: [4.4, 8.7, 7.9], rate: 202000 }
+];
+const MGMT = [
+  { n: 'Гендиректор, собственник', f: 'Договоры с аэропортом, банком и операторами связи; деньги; отчёт инвестору.', old: 400000, pay: 150000, pct: '1,5 %, после возврата вложений' },
+  { n: 'Операционный директор', f: 'Зал, смены, стандарты, пропуска, подрядчик у ленты.', old: 300000, pay: 250000, pct: '1 % (в модели 0,5 %)' },
+  { n: 'Коммерческий директор', f: 'Привлечение клиентов до вылета, работодатели, партнёры, стойки в странах вылета.', old: 300000, pay: 250000, pct: '1 % (в модели 0,5 %)' },
+  { n: 'Юрист', f: 'Договоры, согласия, персональные данные.', old: 180000, pay: 180000, pct: '—' },
+  { n: 'Кадры и пропуска', f: 'Найм, графики, пропуска в аэропорт.', old: 180000, pay: 180000, pct: '—' },
+  { n: 'Сопровождение бухгалтерии', f: 'Касса, первичные документы, связь с бухгалтерией.', old: 180000, pay: 180000, pct: '—' },
+  { n: 'Учредители без должности — в модели их пять', f: 'В компании каждый день не работают.', old: 1500000, pay: 0, pct: 'только дивиденды по доле (в модели по 1 %)' }
+];
+function staffSums() { return STAFF.map(function (r) { return [0, 1, 2].map(function (i) { return r.fte[i] * r.rate + (r.piece ? r.piece[i] : 0); }); }); }
+function mgmtMonth(kind) { return MGMT.reduce(function (a, r) { return a + (kind === 'model' ? r.old : r.pay); }, 0); }
+function cellsOf(a) { return a.map(function (v) { return '<td class="r">' + (v ? rub(v) : '—') + '</td>'; }).join(''); }
+function planHtml() {
+  const tot = [0, 0, 0];
+  const ss = staffSums();
+  const pay = [0, 1, 2].map(function (i) { return ss.reduce(function (a, r) { return a + r[i]; }, 0); });
+  const mm = mgmtMonth(O.mgmt), mg = [mm / 2, mm, mm];
+  const rent = [P.rent, P.rent, P.rent];
+  let h = '<div class="tw"><table class="pl3"><thead><tr><th>Что</th><th class="r">Декабрь 2026<small>подготовка</small></th><th class="r">Январь 2027<small>6 столов, 275 клиентов в день</small></th><th class="r">Февраль 2027<small>12 столов, 1 000 в день</small></th><th class="r">Всего</th></tr></thead><tbody>';
+  planRows().forEach(function (r) {
+    [0, 1, 2].forEach(function (i) { tot[i] += r[2 + i]; });
+    h += '<tr><td><b>' + esc(r[0]) + '</b>' + (r[1] ? '<small>' + esc(r[1]) + '</small>' : '') + '</td>' + cellsOf([r[2], r[3], r[4]]) + '<td class="r c-s">' + rub(r[2] + r[3] + r[4]) + '</td></tr>';
+  });
+  h += '<tr><td><b>Аренда</b><small>Сейчас стойка 200 тыс. ₽ и офис 450 тыс. ₽ в месяц. После реконструкции аэропорта — три стойки и офис: 1,05 млн ₽ в месяц.</small></td>' + cellsOf(rent) + '<td class="r c-s">' + rub(rent[0] + rent[1] + rent[2]) + '</td></tr>';
+  h += '<tr><td><b>Персонал точки</b><small>Старшие смен, столы, выдача карт, лента, стойка — расклад в таблице ниже.</small></td>' + cellsOf(pay) + '<td class="r c-s">' + rub(pay[0] + pay[1] + pay[2]) + '</td></tr>';
+  h += '<tr><td><b>Управление: оклады</b><small>' + (O.mgmt === 'model' ? 'Как в модели от 20.11: 3,04 млн ₽ в месяц, в декабре половина.' : 'Предложение: 1,19 млн ₽ в месяц вместо 3,04 млн по модели, в декабре половина.') + '</small></td>' + cellsOf(mg) + '<td class="r c-s">' + rub(mg[0] + mg[1] + mg[2]) + '</td></tr>';
+  const all = [0, 1, 2].map(function (i) { return tot[i] + rent[i] + pay[i] + mg[i]; });
+  h += '</tbody><tfoot><tr><td>Итого оснащение, расходники и связь</td>' + cellsOf(tot) + '<td class="r">' + rub(tot[0] + tot[1] + tot[2]) + '</td></tr>';
+  h += '<tr><td>Итого с арендой и оплатой труда</td>' + cellsOf(all) + '<td class="r">' + rub(all[0] + all[1] + all[2]) + '</td></tr></tfoot></table></div>';
+  return h;
+}
+function fotStaffHtml() {
+  const ss = staffSums(), tot = [0, 0, 0], ft = [0, 0, 0];
+  let h = '<div class="tw"><table class="pl3"><thead><tr><th>Кто</th><th class="r">Декабрь</th><th class="r">Январь</th><th class="r">Февраль</th><th class="r">За три месяца</th></tr></thead><tbody>';
+  STAFF.forEach(function (r, k) {
+    [0, 1, 2].forEach(function (i) { tot[i] += ss[k][i]; ft[i] += r.fte[i]; });
+    h += '<tr><td><b>' + esc(r.n) + '</b><small>' + esc(r.f) + '</small></td>' + [0, 1, 2].map(function (i) { return '<td class="r">' + rub(ss[k][i]) + '<div class="hw">' + nf(r.fte[i]) + ' ставки</div></td>'; }).join('') + '<td class="r c-s">' + rub(ss[k][0] + ss[k][1] + ss[k][2]) + '</td></tr>';
+  });
+  h += '</tbody><tfoot><tr><td>Всего на точке</td>' + [0, 1, 2].map(function (i) { return '<td class="r">' + rub(tot[i]) + '<div class="hw">' + nf(ft[i]) + ' ставки</div></td>'; }).join('') + '<td class="r">' + rub(tot[0] + tot[1] + tot[2]) + '</td></tr></tfoot></table></div>';
+  return h;
+}
+function fotMgmtHtml() {
+  const a = mgmtMonth('model'), b = mgmtMonth('new');
+  let h = '<div class="tw"><table class="pl3"><thead><tr><th>Кто</th><th class="r">Оклад в модели</th><th class="r">Предложение</th><th>Процент от прибыли</th></tr></thead><tbody>';
+  MGMT.forEach(function (r) {
+    h += '<tr><td><b>' + esc(r.n) + '</b><small>' + esc(r.f) + '</small></td><td class="r">' + rub(r.old) + '</td><td class="r c-s">' + (r.pay ? rub(r.pay) : '—') + '</td><td>' + esc(r.pct) + '</td></tr>';
+  });
+  h += '</tbody><tfoot><tr><td>Оклады в месяц</td><td class="r">' + rub(a) + '</td><td class="r">' + rub(b) + '</td><td></td></tr>';
+  h += '<tr><td>За три месяца, декабрь — половина</td><td class="r">' + rub(a * 2.5) + '</td><td class="r">' + rub(b * 2.5) + '</td><td></td></tr></tfoot></table></div>';
+  return h;
+}
+
+/* ---------- Схема офиса ---------- */
+function desksFor(w) {
+  const side = [0, w, 2 * w + 800, 6800, 6800 + w], out = [];
+  side.forEach(function (x, i) { out.push({ id: 'P0' + (i + 1), x: x, y: 1000, sy: 575, vy: 1850 }); });
+  for (let i = 0; i < 10; i++) out.push({ id: 'P' + ('0' + (i + 6)).slice(-2), x: 100 + i * w, y: 3900, sy: 3575, vy: 4825 });
+  side.forEach(function (x, i) { out.push({ id: 'P' + (16 + i), x: x, y: 6800, sy: 7825, vy: 6550 }); });
+  return out;
+}
+/* вторые половины двойных столов 160 × 60 */
+const PAIR2 = { P02: 1, P05: 1, P07: 1, P09: 1, P11: 1, P13: 1, P15: 1, P17: 1, P20: 1 };
+
+const ORDER = {
+  senior: ['P05'],
+  bank: ['P06', 'P07', 'P08', 'P09', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P04', 'P03', 'P02', 'P01', 'P20', 'P19', 'P18', 'P17', 'P16'],
+  partner: ['P04', 'P03', 'P02', 'P01', 'P15', 'P14', 'P13', 'P12', 'P11', 'P10', 'P09', 'P08', 'P07', 'P06', 'P20', 'P19', 'P18', 'P17', 'P16'],
+  own: ['P16', 'P17', 'P18', 'P19', 'P20', 'P01', 'P02', 'P03', 'P04', 'P15', 'P14', 'P13', 'P12', 'P11', 'P10', 'P09', 'P08', 'P07', 'P06', 'P05']
+};
+function assign(p) {
+  const m = {};
+  function take(type, n) { ORDER[type].forEach(function (id) { if (n > 0 && !m[id]) { m[id] = type; n--; } }); }
+  take('senior', p.senior); take('bank', p.bank); take('partner', p.partner); take('own', p.own);
+  return m;
+}
+
+function planSvg(p) {
+  const S = 0.05, RX = 88, RY = 40, W = 15950 * S, H = 8450 * S;
+  const cx = RX + 2500 * S, tx = RX + 12950 * S, m = assign(p);
+  const w = O.desk === '100' ? 1000 : 800, dw = w * S, dbl = O.desk === '160';
+  let o = '<svg viewBox="0 0 920 500" role="img" aria-label="Схема офиса: три ряда столов между зоной ожидания у лестницы и техзоной; цвет стола показывает, кто за ним работает">';
+  o += '<defs><marker id="pl-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="pl-arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>';
+  /* лестница */
+  o += '<rect class="pl-stairs" x="14" y="' + RY + '" width="74" height="' + H + '"/>';
+  for (let y = RY + 72; y < RY + H - 4; y += 15) o += '<line class="pl-step" x1="14" y1="' + y + '" x2="88" y2="' + y + '"/>';
+  o += '<text class="pl-l mid" transform="translate(51 ' + (RY + 260) + ') rotate(-90)">лестница с первого этажа</text>';
+  /* помещение и зоны */
+  o += '<rect class="pl-room" x="' + RX + '" y="' + RY + '" width="' + W + '" height="' + H + '"/>';
+  o += '<rect class="pl-zone" x="' + (RX + 1) + '" y="' + (RY + 1) + '" width="' + (2500 * S - 1) + '" height="' + (H - 2) + '"/>';
+  o += '<rect class="pl-zone" x="' + tx + '" y="' + (RY + 1) + '" width="' + (3000 * S - 1) + '" height="' + (H - 2) + '"/>';
+  o += '<rect class="pl-aisle" x="' + cx + '" y="' + (RY + 2100 * S) + '" width="' + (10450 * S) + '" height="' + (1150 * S) + '"/>';
+  o += '<rect class="pl-aisle" x="' + cx + '" y="' + (RY + 5150 * S) + '" width="' + (10450 * S) + '" height="' + (1150 * S) + '"/>';
+  o += '<text class="pl-l mid" x="' + (cx + 261) + '" y="' + (RY + 2100 * S + 33) + '">проход 1 · 1,15 м · эвакуационный, ничего не ставить</text>';
+  o += '<text class="pl-l mid" x="' + (cx + 261) + '" y="' + (RY + 5150 * S + 33) + '">проход 2 · 1,15 м · по нему ходит клиент</text>';
+  /* вход */
+  o += '<line class="pl-arrow" x1="58" y1="' + (RY + 34) + '" x2="' + (RX + 46) + '" y2="' + (RY + 34) + '" marker-end="url(#pl-ah)"/>';
+  o += '<text class="pl-l" x="' + (RX + 8) + '" y="' + (RY + 22) + '">вход</text>';
+  /* ожидание */
+  [[115, 255], [267, 407]].forEach(function (b) {
+    o += '<rect class="pl-bench" x="' + (RX + 16) + '" y="' + (RY + b[0]) + '" width="30" height="' + (b[1] - b[0]) + '" rx="3"/>';
+    for (let k = 1; k < 5; k++) { const yy = RY + b[0] + k * (b[1] - b[0]) / 5; o += '<line class="pl-step" x1="' + (RX + 16) + '" y1="' + yy + '" x2="' + (RX + 46) + '" y2="' + yy + '"/>'; }
+  });
+  o += '<text class="pl-l mid strong" transform="translate(' + (RX + 78) + ' ' + (RY + 262) + ') rotate(-90)">ОЖИДАНИЕ · 10 МЕСТ</text>';
+  /* резерв у пожарных кранов, колонны */
+  [3800, 8800].forEach(function (x) {
+    o += '<rect class="pl-res" x="' + (cx + x * S) + '" y="' + (RY + 150 * S) + '" width="' + (1650 * S) + '" height="' + (850 * S) + '"/>';
+    o += '<rect class="pl-res" x="' + (cx + x * S) + '" y="' + (RY + 7400 * S) + '" width="' + (1650 * S) + '" height="' + (850 * S) + '"/>';
+  });
+  o += '<rect class="pl-col" x="' + (cx + 5450 * S) + '" y="' + RY + '" width="25" height="23"/>';
+  o += '<rect class="pl-col" x="' + (cx + 5450 * S) + '" y="' + (RY + H - 23) + '" width="25" height="23"/>';
+  /* столы */
+  desksFor(w).forEach(function (d) {
+    const t = m[d.id] || 'free', x = cx + d.x * S, y = RY + d.y * S;
+    const second = dbl && PAIR2[d.id], first = dbl && !second && PAIR2['P' + ('0' + (Number(d.id.slice(1)) + 1)).slice(-2)];
+    o += '<circle class="pl-st ' + t + '" cx="' + (x + dw / 2) + '" cy="' + (RY + d.sy * S) + '" r="6"/>';
+    o += '<circle class="pl-vis" cx="' + (x + dw / 2) + '" cy="' + (RY + d.vy * S) + '" r="6"/>';
+    o += '<rect class="pl-desk ' + t + '" x="' + (x + (second ? 0 : 1)) + '" y="' + y + '" width="' + (dw - (first || second ? 1 : 2)) + '" height="30" rx="' + (first || second ? 0 : 3) + '"/>';
+    o += '<text class="pl-t" x="' + (x + dw / 2) + '" y="' + (y + 19) + '">' + d.id + '</text>';
+  });
+  if (w < 1000) {
+    const fx = cx + (100 + 10 * w) * S + 6;
+    o += '<rect class="pl-furn dash" x="' + fx + '" y="' + (RY + 3900 * S) + '" width="' + (tx - 12 - fx) + '" height="30"/><text class="pl-l mid" x="' + ((fx + tx - 12) / 2) + '" y="' + (RY + 3900 * S + 19) + '">принтер, кулер</text>';
+  }
+  /* стойки питания */
+  [100 + 3 * w, 100 + 7 * w].forEach(function (x) { const px = cx + x * S, py = RY + 3900 * S - 9; o += '<rect class="pl-pole" x="' + (px - 5) + '" y="' + (py - 5) + '" width="10" height="10" transform="rotate(45 ' + px + ' ' + py + ')"/>'; });
+  /* техзона */
+  o += '<line class="pl-wall" x1="' + tx + '" y1="' + RY + '" x2="' + tx + '" y2="' + (RY + 111) + '"/>';
+  o += '<line class="pl-wall" x1="' + tx + '" y1="' + (RY + 156) + '" x2="' + tx + '" y2="' + (RY + H) + '"/>';
+  o += '<path class="pl-door" d="M' + tx + ' ' + (RY + 111) + 'L' + (tx + 45) + ' ' + (RY + 111) + 'A45 45 0 0 1 ' + tx + ' ' + (RY + 156) + '"/>';
+  o += '<rect class="pl-board" x="' + (tx - 6) + '" y="' + (RY + 186) + '" width="5" height="50"/>';
+  o += '<rect class="pl-furn" x="' + (tx + 14) + '" y="' + (RY + 6) + '" width="108" height="24"/><text class="pl-l mid" x="' + (tx + 68) + '" y="' + (RY + 22) + '">шкафчики</text>';
+  o += '<rect class="pl-furn" x="' + (tx + 14) + '" y="' + (RY + H - 30) + '" width="108" height="24"/><text class="pl-l mid" x="' + (tx + 68) + '" y="' + (RY + H - 14) + '">шкафчики</text>';
+  o += '<rect class="pl-furn" x="' + (tx + 8) + '" y="' + (RY + 190) + '" width="20" height="196"/><text class="pl-l mid" transform="translate(' + (tx + 22) + ' ' + (RY + 288) + ') rotate(-90)">вешала 4 м</text>';
+  o += '<rect class="pl-furn" x="' + (tx + 104) + '" y="' + (RY + 236) + '" width="32" height="30"/><text class="pl-l mid" x="' + (tx + 120) + '" y="' + (RY + 255) + '">IT</text>';
+  o += '<rect class="pl-furn dash" x="' + (tx + 78) + '" y="' + (RY + 290) + '" width="58" height="60"/><text class="pl-l mid" x="' + (tx + 107) + '" y="' + (RY + 324) + '">кабина</text>';
+  o += '<text class="pl-l mid strong" x="' + (tx + 80) + '" y="' + (RY + 78) + '">ТЕХЗОНА</text><text class="pl-l mid" x="' + (tx + 80) + '" y="' + (RY + 93) + '">сейфы, зарядка</text>';
+  /* размеры */
+  const dy = RY + H + 16;
+  [[RX, cx, '2,5 м'], [cx, tx, 'зал с рабочими местами · 10,45 м'], [tx, RX + W, '3,0 м']].forEach(function (s) {
+    o += '<line class="pl-dim" x1="' + (s[0] + 3) + '" y1="' + dy + '" x2="' + (s[1] - 3) + '" y2="' + dy + '"/>';
+    o += '<line class="pl-dim" x1="' + (s[0] + 3) + '" y1="' + (dy - 4) + '" x2="' + (s[0] + 3) + '" y2="' + (dy + 4) + '"/><line class="pl-dim" x1="' + (s[1] - 3) + '" y1="' + (dy - 4) + '" x2="' + (s[1] - 3) + '" y2="' + (dy + 4) + '"/>';
+    o += '<text class="pl-l mid" x="' + ((s[0] + s[1]) / 2) + '" y="' + (dy + 17) + '">' + s[2] + '</text>';
+  });
+  o += '<text class="pl-l mid" transform="translate(' + (RX + W + 16) + ' ' + (RY + H / 2) + ') rotate(-90)">8,45 м</text>';
+  return o + '</svg>';
+}
+
+/* ---------- Вывод ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+function tableHtml(sec, R) {
+  const rows = R.rows.filter(r => r.it.s === sec.id && r.q);
+  let h = '<div class="blk"><h3>' + esc(sec.t) + '</h3>' + (sec.note ? '<p>' + esc(sec.note) + '</p>' : '');
+  h += '<div class="tw"><table><thead><tr><th class="c-chk" aria-label="Учитывать в итоге"></th><th>Что</th><th class="r">Сколько</th><th class="r">Цена</th><th class="r">Сумма</th></tr></thead><tbody>';
+  rows.forEach(function (r) {
+    const it = r.it;
+    const sub = [it.d, r.model].filter(Boolean).join(' ');
+    h += '<tr class="' + (r.on ? '' : 'off') + '"><td class="c-chk"><input type="checkbox" id="c-' + it.id + '" data-id="' + it.id + '"' + (r.on ? ' checked' : '') + ' aria-label="Учитывать: ' + esc(it.n).replace(/"/g, '&quot;') + '"></td>';
+    h += '<td><div class="nm">' + esc(it.n) + (it.opt ? '<span class="tag opt">по желанию</span>' : '') + (it.ask ? '<span class="tag ask">зависит от аэропорта</span>' : '') + '</div>' + (sub ? '<div class="ds">' + esc(sub) + '</div>' : '') + '</td>';
+    h += '<td class="r">' + nf(r.q) + ' <span class="u">' + it.u + '</span>' + (r.how ? '<div class="hw">' + esc(r.how) + '</div>' : '') + '</td>';
+    h += '<td class="r">' + rub(r.price) + (r.est ? '<div class="hw">оценка</div>' : '') + '</td>';
+    h += '<td class="r c-s">' + rub(r.sum) + '</td></tr>';
+  });
+  h += '</tbody><tfoot><tr><td></td><td colspan="3">Итого по разделу</td><td class="r">' + rub(R.bySec[sec.id] || 0) + '</td></tr></tfoot></table></div></div>';
+  return h;
+}
+
+function render() {
+  const keep = document.activeElement && document.activeElement.id;
+  const R = calc(P), D = R.D;
+  for (const k in DEF) { const o = $('v-' + k); if (o) o.textContent = P[k]; }
+  const w = $('seats-warn');
+  if (D.seats > 20) { w.hidden = false; w.className = 'warn'; w.textContent = 'В расстановке «вариант C» 20 мест, а сейчас набрано ' + D.seats + '. Лишние места на схему не попадут, и людей в помещении станет больше 50.'; }
+  else if (D.seats < 20) { w.hidden = false; w.className = 'note'; w.textContent = 'Оснащаем ' + D.seats + ' из 20 мест. Свободные столы на схеме серые. Сеть, свет и электрика всё равно посчитаны на весь зал: делать их второй раз дороже.'; }
+  else { w.hidden = true; }
+  document.querySelectorAll('#presets button').forEach(function (b) {
+    const t = Object.assign({}, DEF, PRESETS[b.dataset.preset]);
+    b.setAttribute('aria-pressed', SHAPE.every(k => t[k] === P[k]) ? 'true' : 'false');
+  });
+  document.querySelectorAll('button[data-o]').forEach(function (b) { b.setAttribute('aria-pressed', O[b.dataset.o] === b.dataset.v ? 'true' : 'false'); });
+  document.querySelectorAll('input[data-n]').forEach(function (i) { if (document.activeElement !== i) i.value = P[i.dataset.n]; });
+
+  const mon = monthlyRows(P, D), monSum = mon.reduce((a, r) => a + r[1] * r[2], 0);
+  $('tiles').innerHTML =
+    '<div class="tile main"><span>На запуск</span><b>' + rub(R.total) + '</b><small>Из них ' + rub(R.ask) + ' зависит от аэропорта: работы по помещению, вывески, места под табло и багаж.</small></div>' +
+    '<div class="tile"><span>Планшеты</span><b>' + (D.tabMain + D.lenQty + D.lenAgQty + D.tabDesk) + '</b><small>' + (D.tabMain ? 'Galaxy Tab Active5 — ' + D.tabMain + ' вместе с запасными. ' : '') + (D.lenQty + D.lenAgQty ? 'Lenovo 12,7″ — ' + (D.lenQty + D.lenAgQty) + '. ' : '') + 'Простых на столы банка — ' + D.tabDesk + '.</small></div>' +
+    '<div class="tile"><span>Людей в смене</span><b>' + D.shift + '</b><small>' + D.seats + ' в офисе, из них наших ' + (P.own + P.senior) + '. Внизу до ' + D.agents + ' агентов в загруженный час.</small></div>' +
+    '<div class="tile"><span>Каждый месяц</span><b>' + rub(monSum) + '</b><small>Связь, расходники, обслуживание касс и планшетов. Без аренды и зарплат.</small></div>';
+
+  $('flow').innerHTML =
+    '<div class="fl"><h3>Выдача багажа</h3><div class="who">агентов: до ' + P.agBag + '</div><p>Встречают рейс у ленты. Находят клиента по талону из Душанбе или по паспорту, снимают миграционную карту, печатают номер в офис.</p><div class="kit">У каждого планшет и принтер талонов на поясе. Дальше — с номером к лестнице.</div></div>' +
+    '<div class="fl"><h3>Стойка в зале прилёта</h3><div class="who">агентов: ' + P.counter + '</div><p>Те, кого не встретили у ленты, и все вопросы. За стойкой табло: какой номер вызывают наверх.</p><div class="kit">Планшеты на держателях с замком, принтеры талонов, табло 55″, листовки.</div></div>' +
+    '<div class="fl"><h3>Вход на лестницу</h3><div class="who">на посту: ' + P.stairs + '</div><p>Пускает наверх по вызову номера: в офисе не больше 50 человек. Чемоданы остаются здесь.</p><div class="kit">Планшет, ограждение с лентой, табло 55″, стеллажи для багажа.</div></div>' +
+    '<div class="fl"><h3>Офис, второй этаж</h3><div class="who">мест: ' + D.seats + '</div><p>Наших окон — ' + P.own + ', столов банка — ' + P.bank + ', столов страховой и нотариуса — ' + P.partner + ', место старшего смены. Ещё 10 мест ожидания.</p><div class="kit">Компьютеров — ' + D.pc + ', планшетов — ' + (P.own + P.senior) + ', принтеров — ' + D.printers + ', табло 65″.</div></div>';
+
+  $('plan').innerHTML = planSvg(P);
+  $('legend').innerHTML =
+    '<span><i class="sw own"></i>наше окно — ' + P.own + '</span><span><i class="sw bank"></i>стол банка — ' + P.bank + '</span><span><i class="sw partner"></i>страховая, нотариус — ' + P.partner + '</span><span><i class="sw senior"></i>старший смены — ' + P.senior + '</span>' +
+    (D.seats < 20 ? '<span><i class="sw free"></i>свободно — ' + (20 - D.seats) + '</span>' : '') +
+    '<span><i class="sw dot"></i>сотрудник</span><span><i class="sw ring"></i>посетитель</span><span><i class="sw pole"></i>стойка питания с потолка</span><span><i class="sw col"></i>колонна</span><span><i class="sw board"></i>табло очереди</span><span><i class="sw res"></i>не занимать: пожарные краны и щиты</span>';
+
+  ['office', 'agents', 'common'].forEach(function (part) {
+    $('t-' + part).innerHTML = SECS.filter(s => s.part === part).map(s => tableHtml(s, R)).join('');
+  });
+
+  $('total').innerHTML =
+    '<div><span>Офис на втором этаже</span><span>' + rub(R.byPart.office) + '</span></div>' +
+    '<div><span>Агенты внизу</span><span>' + rub(R.byPart.agents) + '</span></div>' +
+    '<div><span>Общее: вывески, форма, запас и расходники</span><span>' + rub(R.byPart.common) + '</span></div>' +
+    '<div class="big"><span>Всего на запуск</span><span>' + rub(R.total) + '</span></div>' +
+    '<div><span>Из них зависит от аэропорта: работы по помещению, вывески, места под табло и багаж</span><span>' + rub(R.ask) + '</span></div>' +
+    '<div><span>Без этих строк</span><span>' + rub(R.total - R.ask) + '</span></div>';
+
+  let mh = '<div class="tw"><table><thead><tr><th>Что</th><th class="r">Сколько</th><th class="r">Цена</th><th class="r">В месяц</th></tr></thead><tbody>';
+  mon.forEach(function (r) { mh += '<tr><td>' + esc(r[0]) + '</td><td class="r">' + nf(r[1]) + '</td><td class="r">' + rub(r[2]) + '</td><td class="r c-s">' + rub(r[1] * r[2]) + '</td></tr>'; });
+  mh += '</tbody><tfoot><tr><td colspan="3">Итого в месяц</td><td class="r">' + rub(monSum) + '</td></tr></tfoot></table></div>';
+  $('monthly').innerHTML = mh;
+  $('plan3').innerHTML = planHtml();
+  $('fot-staff').innerHTML = fotStaffHtml();
+  $('fot-mgmt').innerHTML = fotMgmtHtml();
+
+  /* сколько стоит одно окно и один агент — той же формулой */
+  const cur = R.total;
+  const pWin = Object.assign({}, P, { own: P.own + 1, bank: Math.max(0, P.bank - 1) });
+  const pAg = Object.assign({}, P, { agBag: P.agBag + 1 });
+  const dWin = calc(pWin).total - cur, dAg = calc(pAg).total - cur;
+  $('decide').innerHTML = DECIDE.map(function (d) {
+    return '<li><b>' + esc(d[0]) + '</b> <span>' + esc(d[1]).replace('{win}', rub(dWin)).replace('{ag}', rub(dAg)).replace('{len}', rub(PR.tabLenovo.p + PR.caseLenovo.p + PR.nfcReader.p)) + '</span></li>';
+  }).join('');
+
+  if (keep && $(keep)) $(keep).focus();
+}
+
+const DECIDE = [
+  ['Сколько мест оснащать сразу.', 'Расстановка рассчитана на 20. В вашей модели от 20.11 в самый загруженный час нужно 12 столов, а на открытие — 6. Кнопки над цифрами переключают эти три набора. Сеть, свет и электрику выгоднее сделать сразу на весь зал, а мебель и технику докупать.'],
+  ['Сколько из мест — наши окна, а сколько — столы банка.', 'В модели от 20.11 поровну: за столом и на выдаче карт по 4–5 человек. В макете было 10 банк, 3 связь, 3 оператор. Я взял поровну, 9 и 9, плюс стол нотариуса и место старшего. Каждое наше окно вместо стола банка добавляет около {win}.'],
+  ['Паспорт снимаем камерой планшета или сканером.', 'В ТЗ от 5 октября съёмка камерой была запрещена, нужен был сканер документов. В ноябрьских макетах паспорт и миграционную карту снимает камера планшета. Я считал по ноябрю. Если возвращаемся к сканерам — это около 60 тыс. ₽ на каждое место и другой комплект агента; строка есть в таблице, она выключена.'],
+  ['Какие планшеты брать.', 'Lenovo Xiaoxin Pad Pro 12.7 дешевле, но у него нет NFC и SIM-карты, а прошивка китайская. На окнах он годится после проверки. Агентам — только если они работают за стойкой, а не ходят вдоль ленты: 620 г в одной руке не удержать. Интернет ему даёт роутер, чип паспорта — внешний считыватель на кабеле, и под считыватель надо дорабатывать программу. С чехлом и считывателем такой комплект стоит около {len} — почти как Galaxy Tab Active5 на маркетплейсах (40–44 тыс. ₽), у которого всё это есть сразу. У самой Lenovo NFC подтверждён только у Tab K11 Plus: 11,5 дюйма, есть версия с SIM-картой, от 32 тыс. ₽, но обновления безопасности у него закончились в июле 2026 года, а продажи в России не подтверждены. Планшета Lenovo на 12–13 дюймов с NFC нет. До партии купить один планшет и проверить на нём нашу программу, приложение оператора связи и печать.'],
+  ['Читаем ли чип паспорта у ленты.', 'Программа умеет работать и без чипа: документ остаётся с пометкой «снят по строке паспорта», а проверенным становится позже — например, по ответу банка. Если у ленты чип не нужен, планшету агента не нужен и NFC. Это решение о том, насколько строго проверяем документы, а не о технике: оно за вами и юристом.'],
+  ['Какой экран ставить на стол 80 см.', 'Раньше я считал под стол 100 см. На столе 80 см монитор 24 дюйма оставляет между оператором и клиентом просвет 26 см, а моноблок 27 дюймов — 19 см: клиент сидит за экраном. Варианты: ноутбук 15,6 дюйма — клиент видит оператора поверх экрана; монитор поменьше, сдвинутый вбок; моноблок 27 дюймов — только на столе 160 см с одним оператором. Все три варианта есть в переключателе.'],
+  ['Сколько агентов у ленты.', 'В модели от 20.11 — трое на рейс, минута на человека. В docs/00 — шесть на рейс и 10–12 на два рейса подряд. Я посчитал технику на шестерых у ленты. Каждый следующий агент — около {ag} вместе с формой.'],
+  ['Допуск в зал выдачи багажа.', 'По вашим документам нужны письменный допуск аэропорта, пропуска, а планшет и принтер — в перечне технических средств. Пока этого нет, агенты встречают людей на выходе из таможенного коридора и у стойки.'],
+  ['Касса на каждом окне или одна-две на зал. Принимаем ли наличные.', 'В макете окно без кассы не открывается, поэтому касса с приёмом карт заложена на каждое наше окно. В финмодели касс нет совсем. Решение за бухгалтером [проверить].'],
+  ['Куда клиент ставит багаж.', 'Наверху места нет. Я заложил стеллажи у входа на лестницу, но оставлять вещи в терминале можно только с согласия службы безопасности аэропорта.'],
+  ['Что делает и даёт аэропорт.', 'Свет, электрика, перегородка, пожарная сигнализация, место в сетевом шкафу, Wi‑Fi для клиентов. В вашей модели на работы заложен 1 млн ₽. Если помещение сдают с работающим светом и розетками, а сеть дают свою, выйдет заметно меньше. Спросить до заказа проекта.'],
+  ['Экраны: обычные телевизоры или панели для круглосуточной работы.', 'Я посчитал три обычных телевизора с компьютерами и кронштейнами. Панель, рассчитанная на работу без выключения, стоит от 104 тыс. ₽ за 55 дюймов. Табло с вакансиями аэропорт может посчитать рекламой — так записано в вашей презентации.'],
+  ['Нужна ли видеозапись каждого стола.', 'В паспорте планшета от 22 октября над столом стоит камера, запись хранится 30 дней. Сейчас заложено 6 общих камер. Требование проверить у оператора связи и юриста [проверить].'],
+  ['Как обслуживать тех, кто не может подняться по лестнице.', 'Лифта на фото нет. Я заложил запасной планшет, чтобы оператор спускался к стойке. Подходит ли это банку — вопрос к нему.']
+];
+
+const BASIS = [
+  ['Расстановка «вариант C», помещение 2.101.', '15,95 × 8,45 м, 133,74 м²; 20 столов 1000 × 600, 20 + 20 стульев, 10 мест ожидания, техзона 3 м, шкафчиков около 28, вешала 4 м, проходы 1,15 м, предел 50 человек.'],
+  ['Ваши фотографии.', 'Антресоль без светильников, остекление в зал, пожарные шкафы, лестница с ограждением, модуль стойки рядом с кассой авиакомпании, зал прилёта, рендер вывесок.'],
+  ['Ваши документы из папки загрузок.', 'Комплект «версия 43» от 20.11.2026: 12 столов в пик из 25 возможных, 6 на открытие, трое у ленты. Финмодель от 12.11.2026 с перечнем закупок. Смета счётчиков посетителей от 12.10.2026. ТЗ и поправка от 05.10.2026 об отказе от кабинок. Сезонная модель и расписание.'],
+  ['Документы проекта и макеты.', 'docs/00, разделы 3, 6, 8 и 13. Макеты офиса и агента от 18–22 ноября: оператор работает за компьютером и планшетом; бумагу и паспорт снимает камера планшета; биометрию и карту оформляет банк за своим столом; оплата у окна картой или по QR; пакет документов печатают у окна.'],
+  ['Ваши слова от 26.11.2026.', 'Стол не шире 80 см на оператора или 160 см на двоих. Планшеты думаете брать Lenovo Xiaoxin Pad Pro 12.7, компьютер — моноблок Lecoo на 27 дюймов из Китая. У ленты ставим 4G-роутер с Wi‑Fi. Нужны план расходов на три месяца с зарплатой и перечень того, что идёт долго.'],
+  ['Цены.', 'Сняты 26.11.2026 из поисковой выдачи по страницам DNS, Ситилинка, Регарда, xcom-shop, Комуса, ОфисМага, ВсеИнструментов, ЭТМ, сайтов производителей и прайсов подрядчиков. Сами страницы магазинов открыть не удалось, поэтому наличие и точную цену нужно сверить. Строки с пометкой «оценка» страницей магазина не подтверждены.']
+];
+$('basis').innerHTML = BASIS.map(b => '<li><b>' + esc(b[0]) + '</b> <span>' + esc(b[1]) + '</span></li>').join('');
+$('foot').textContent = 'Это расчёт для бюджета, а не смета. Перед закупкой запросить коммерческие предложения, а по работам — смету подрядчика после выезда на место.';
+
+/* ---------- Действия ---------- */
+$('params-sec').addEventListener('click', function (e) {
+  const ob = e.target.closest('button[data-o]');
+  if (ob) { O[ob.dataset.o] = ob.dataset.v; save(); render(); return; }
+  const b = e.target.closest('button[data-k]');
+  if (!b) return;
+  const k = b.dataset.k, st = STEP[k] || 1;
+  P[k] = Math.min(LIM[k][1], Math.max(LIM[k][0], P[k] + Number(b.dataset.d) * st));
+  save(); render();
+});
+$('presets').addEventListener('click', function (e) {
+  const b = e.target.closest('button[data-preset]');
+  if (!b) return;
+  const t = Object.assign({}, DEF, PRESETS[b.dataset.preset]);
+  SHAPE.forEach(function (k) { P[k] = t[k]; });
+  save(); render();
+});
+$('plan3-sec').addEventListener('click', function (e) {
+  const ob = e.target.closest('button[data-o]');
+  if (ob) { O[ob.dataset.o] = ob.dataset.v; save(); render(); }
+});
+$('reset').addEventListener('click', function () { P = Object.assign({}, DEF); X = {}; O = Object.assign({}, ODEF); save(); render(); });
+document.addEventListener('change', function (e) {
+  const c = e.target;
+  if (c && c.matches && c.matches('input[type="checkbox"][data-id]')) { X[c.dataset.id] = c.checked; save(); render(); }
+});
+document.addEventListener('input', function (e) {
+  const i = e.target;
+  if (!i || !i.matches || !i.matches('input[data-n]')) return;
+  const v = parseFloat(i.value);
+  if (isFinite(v) && v >= 0) { P[i.dataset.n] = v; save(); render(); }
+});
+$('copy').addEventListener('click', function () {
+  const R = calc(P), lines = [['Раздел', 'Позиция', 'Количество', 'Ед.', 'Цена, ₽', 'Сумма, ₽', 'Пометка'].join('\t')];
+  R.rows.forEach(function (r) {
+    if (!r.on || !r.q) return;
+    const sec = SECS.find(s => s.id === r.it.s);
+    lines.push([sec.t, r.it.n + (r.model ? ' (' + r.model + ')' : ''), String(r.q).replace('.', ','), r.it.u, Math.round(r.price), Math.round(r.sum), [r.it.ask ? 'зависит от аэропорта' : '', r.est ? 'цена — оценка' : ''].filter(Boolean).join('; ')].join('\t'));
+  });
+  lines.push(['', 'Итого', '', '', '', Math.round(R.total), ''].join('\t'));
+  const text = lines.join('\n'), out = $('copy-out'), msg = $('copy-msg');
+  function fallback() { out.hidden = false; out.value = text; out.focus(); out.select(); msg.textContent = 'Выделено ниже — скопируйте и вставьте в Excel.'; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { msg.textContent = 'Скопировано. Откройте Excel и вставьте.'; }, fallback);
+  } else { fallback(); }
+});
+
+render();
+})();
+</script>
+<script>
+/* кнопка темы: без неё страница следует теме системы */
+(function () {
+  var b = document.getElementById('theme'), root = document.documentElement;
+  function cur() { return root.getAttribute('data-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  function label() { b.textContent = cur() === 'dark' ? 'Светлая тема' : 'Тёмная тема'; }
+  b.addEventListener('click', function () {
+    var n = cur() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', n);
+    try { localStorage.setItem('zia-fitout-theme', n); } catch (e) { /* без хранилища тема держится до закрытия */ }
+    label();
+  });
+  label();
+})();
+</script>
+</body>
+</html>
