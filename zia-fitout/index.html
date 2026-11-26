@@ -1081,7 +1081,7 @@ function render() {
     '<div class="tile main"><span>На запуск</span><b>' + rub(R.total) + '</b><small>Из них ' + rub(R.ask) + ' зависит от аэропорта: работы по помещению, вывески, места под табло и багаж.</small></div>' +
     '<div class="tile"><span>Планшеты</span><b>' + (D.tabMain + D.lenQty + D.lenAgQty + D.tabDesk) + '</b><small>' + (D.tabMain ? 'Galaxy Tab Active5 — ' + D.tabMain + ' вместе с запасными. ' : '') + (D.lenQty + D.lenAgQty ? 'Lenovo 12,7″ — ' + (D.lenQty + D.lenAgQty) + '. ' : '') + 'Простых на столы банка — ' + D.tabDesk + '.</small></div>' +
     '<div class="tile"><span>Людей в смене</span><b>' + D.shift + '</b><small>' + D.seats + ' в офисе, из них наших ' + (P.own + P.senior) + '. Внизу до ' + D.agents + ' агентов в загруженный час.</small></div>' +
-    '<div class="tile"><span>Каждый месяц</span><b>' + rub(monSum) + '</b><small>Связь, расходники, обслуживание касс и планшетов. Без аренды и зарплат.</small></div>';
+    '<div class="tile"><span>Каждый месяц</span><b>' + rub(monSum) + '</b><small>Связь, расходники, обслуживание касс и планшетов, сервер в облаке. Без аренды и зарплат.</small></div>';
 
   $('flow').innerHTML =
     '<div class="fl"><h3>Выдача багажа</h3><div class="who">агентов: до ' + P.agBag + '</div><p>Встречают рейс у ленты. Находят клиента по талону из Душанбе или по паспорту, снимают миграционную карту, печатают номер в офис.</p><div class="kit">У каждого планшет и принтер талонов на поясе. Дальше — с номером к лестнице.</div></div>' +
