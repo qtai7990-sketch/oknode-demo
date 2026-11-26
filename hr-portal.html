@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>HR-портал · кабинет работодателя · макет</title>
+<title>HR-портал · работодатели и соискатели · макет</title>
 <!-- Макет HR-портала (26.11.2026). Исходник — этот файл и parts/*.js, сборка node build.mjs → hr-portal.html.
      Правила: hr-portal/CLAUDE.md «Правила данных» и «Комплаенс», docs/01 §HR и Ю10: карточка без ФИО и телефона,
      контакт — только после согласия на конкретного работодателя, паспорт и банк — никогда. Данные вымышленные. -->
@@ -619,6 +619,12 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50
 .jp{font-size:18px;font-weight:800;margin-top:10px;color:var(--text-hi)}
 .ul{padding-left:18px;font-size:14px;line-height:1.6;color:var(--text-2)}
 .logos button{padding:10px 14px;border-radius:var(--r-lg);border:1px solid var(--line);font-weight:700;font-size:13.5px;color:var(--text-2);background:var(--control-bg);overflow-wrap:anywhere;text-align:left}.logos button:hover{border-color:var(--cyan)}
+/* соискатель: переключатель «Я работодатель / Я ищу работу», два пути, шаги регистрации */
+.top .aud{flex:none}.aud button{height:34px;padding:0 12px;font-size:13px;white-space:nowrap}.audS{display:none}
+.pathc{display:flex;flex-direction:column}.pathc .pact{margin-top:auto;padding-top:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.stp{display:flex;gap:6px;margin:2px 0 8px}.stp i{flex:1;height:4px;border-radius:2px;background:var(--fill-soft)}.stp i.on{background:var(--cyan);box-shadow:0 0 6px rgb(var(--cyan-rgb) / calc(.6 * var(--gk)))}
+.demo .seg button,.dlg .seg button{height:34px}
+.dlg .cc h3{font-size:16px;letter-spacing:normal;text-transform:none;color:var(--text);margin:6px 0 2px}
 /* уведомления */
 .nt.un b{color:var(--text-hi)}.udot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px rgb(var(--cyan-rgb) / .8);flex:none}
 .ib{position:relative}.ib .dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red)}
@@ -706,6 +712,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50
 /* ===== Планшет и телефон ===== */
 @media (max-width:1199px){
   .desk{grid-template-columns:minmax(0,1fr)} .demo{display:none} .demoBtn{display:inline-flex}
+  .top{gap:10px;padding-left:20px;padding-right:20px} .top .brand small{display:none} .hide-m{display:none}
   .cab{grid-template-columns:204px minmax(0,1fr)}
   .mhd,.cont{padding-left:20px;padding-right:20px}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -718,15 +725,19 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50
   .tbl td[data-l]::before{content:attr(data-l) ": ";color:var(--muted);font-size:12px}
   .tbl td .contact,.tbl td .note{max-width:520px}
 }
+@media (max-width:899px){
+  .top .links{display:none}
+  .psub{display:flex;gap:6px;overflow-x:auto;padding:8px 20px;border-bottom:1px solid var(--line);scrollbar-width:none}
+  .psub button{flex:none;height:32px;padding:0 12px;border-radius:var(--r-pill);border:1px solid var(--line2);font-size:12.5px;font-weight:600;color:var(--text-2)}
+  .psub button.on{border-color:var(--cyan);color:var(--cyan)}
+}
 @media (max-width:759px){
+  .audT{display:none} .audS{display:block;padding:10px 14px 0} .psub{padding:8px 14px}
   .top{padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));gap:8px} .top .links{display:none}
   .top .brand b{font-size:14px}.top .brand small{display:none}
   .wrap{padding:16px 14px 40px}
   .hero2 h1{font-size:30px}
   .steps,.two,.jgrid{grid-template-columns:minmax(0,1fr)}
-  .psub{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;border-bottom:1px solid var(--line);scrollbar-width:none}
-  .psub button{flex:none;height:32px;padding:0 12px;border-radius:var(--r-pill);border:1px solid var(--line2);font-size:12.5px;font-weight:600;color:var(--text-2)}
-  .psub button.on{border-color:var(--cyan);color:var(--cyan)}
   .hide-s{display:none}
   .fl select.inp{flex:1 1 100%;max-width:none}
   .cab{grid-template-columns:minmax(0,1fr)}
@@ -880,7 +891,7 @@ for(const e of EMPS)PLAN[e.id].forEach(([sph,i],k)=>{
     housing:rnd()<.45,meals:rnd()<.4,noexp:/Без опыта/.test(req.join()),duty,req,cond:pick(COND),about:'',addr:e.addr,way:e.way,date:ago(rint(0,25),9,rint(0,59)),st:'pub'})});
 // длинное название — для проверки вёрстки
 JOBS[1].t='Сварщик-аргонщик на монтаж технологических трубопроводов из нержавеющей стали, вахта 30/15 с проживанием';
-const myJobs0=()=>JOBS.filter(j=>j.e==='e1').map((j,i)=>({...j,id:'v'+(i+1),st:['pub','draft','pub','pub','pub','blocked'][i],why:j.sph==='Розничная торговля'?ruleCheck(j.reg,j.sph).why:null}));
+const myJobs0=()=>JOBS.filter(j=>j.e==='e1').map((j,i)=>({...j,id:'v'+(i+1),src:j.id,st:['pub','draft','pub','pub','pub','blocked'][i],why:j.sph==='Розничная торговля'?ruleCheck(j.reg,j.sph).why:null}));
 
 // ----- кандидаты: псевдоним, профессия, опыт, регион, русский, дата проверки документов. ФИО и телефон — только после согласия
 const SUR=['Абдуллоев','Рахимов','Каримов','Назаров','Юсупов','Сафаров','Турсунов','Хамидов','Мирзоев','Шарипов','Исмоилов','Олимов','Давлатов','Холматов','Эргашев','Бекмуратов','Асанов','Жумабаев','Токтогулов','Усмонов','Раджабов','Камолов'];
@@ -892,7 +903,8 @@ for(let i=1;i<52;i++){
   const prof=i<14?pick(PRO.slice(0,6)):pick(PRO),reg=pick(REG.slice(0,i%5?2:5)),d=rnd()<.12?null:ago(rint(0,45));
   CANDS.push({id:'c'+(i+1),al:'К-'+(1500+i*13+rint(0,9)),prof,exp:pick(EXP),reg,ru:pick(RU),docs:d,right:d?'патент · '+reg:null,fio:pick(SUR)+' '+pick(NAMES),ph:'+7 900 000-'+two(10+i)+'-'+two(rint(10,99))});
 }
-const cand=id=>CANDS.find(c=>c.id===id);
+// кандидат — из демо-набора или соискатель, зарегистрированный на сайте в этой странице (parts/hr4.js)
+const cand=id=>CANDS.find(c=>c.id===id)||seekCand(id);
 const PROFS=['Все',...new Set(CANDS.map(c=>c.prof))];
 
 // ----- отклики на вакансии «СтройДемо» за 30 дней и запросы контактов — по псевдонимам
@@ -946,9 +958,9 @@ const ST=[
   {k:'empty',t:'Пустой кабинет',s:'ни вакансий, ни откликов'},
   {k:'off',t:'Нет сети',s:'показаны сохранённые данные'}];
 const LOOK={
-  new:['<b>Публичная часть</b>: каталог из 34 вакансий 8 компаний с поиском, фильтрами и «Показать ещё»; карточки вакансий и компаний.','<b>Регистрация</b>: ИНН (10 или 12 цифр), компания, регион, контактное лицо, почта или телефон; четыре галочки — три обязательные, реклама выключена. После — «компания на проверке».','<b>Вход</b> по почте или телефону, код 1234, повтор через 60 секунд.'],
+  new:['<b>Публичная часть</b>: каталог из 34 вакансий 8 компаний с поиском, фильтрами и «Показать ещё»; карточки вакансий и компаний.','<b>Регистрация</b>: ИНН (10 или 12 цифр), компания, регион, контактное лицо, почта и телефон; четыре галочки — три обязательные, реклама выключена. После — «компания на проверке».','<b>Вход</b> по почте или телефону, код 1234, повтор через 60 секунд.'],
   pub:['<b>Сводка</b> за неделю и за месяц, «Требует внимания».','<b>Кандидаты</b> — 52 карточки без имени и телефона, поиск, фильтры, «Показать ещё». Порядок — по дате проверки документов, без рейтингов.','<b>Отклики</b> за месяц, поиск по псевдониму и профессии. «Запросить контакты» — двойное нажатие не отправит второй запрос.','<b>Уведомления</b> и <b>Настройки</b>: карточка компании, пользователи (владелец, рекрутер), рассылки.'],
-  wait:['Отклик К-2041 — «Ждём согласия». Кандидат видит запрос в «Моём маршруте» (вкладка «Работа»).','Кнопки «демо: согласился / отказал» — вместо кандидата.'],
+  wait:['Отклик К-2041 — «Ждём согласия». Кандидат видит запрос в кабинете соискателя на портале («Контакты») или в «Моём маршруте» (вкладка «Работа»).','Кнопки «демо: согласился / отказал» — вместо кандидата.'],
   ok:['<b>Контакты открыты</b> только ООО «СтройДемо»: длинное ФИО, телефон, «Скопировать».','<b>Журнал раскрытий</b> за месяц: кто, когда, что передано и на каком основании. Журнал не правится.','Паспорт и банковские данные — «не передаются никогда».'],
   rev:['К-2041 отозвал согласие — контакты скрыты из кабинета, в журнале — «отозвано».','Отзыв не возвращает уже переданное — он прекращает дальнейшую передачу (docs/01 §4); что работодатель делает с уже полученным номером — [проверить].'],
   empty:['Пустые состояния во всех разделах: что сделать первым.','Кандидаты видны, но запросить контакты нельзя без опубликованной вакансии.'],
@@ -961,9 +973,12 @@ const S={st:'pub',view:'sum',theme:'dark',off:false,slow:false,fail:false,loadin
   rg:{inn:'',name:'',reg:'',fio:'',by:'mail',mail:'',phone:'',agree:{terms:false,pd:false,cand:false,ads:false},err:{}},
   f:{prof:'Все',reg:'Все',docs:true},rf:{v:'all',s:'all'},jf:{sph:'Все',reg:'Все',housing:false},q:{cand:'',resp:'',jobs:'',vac:''},pg:{cand:12,resp:15,jobs:10,log:15},
   form:null,ferr:{},chk:'idle',reqC:null,reqV:null,cardC:null,closeV:null,jobId:null,empId:null,doc:null,
-  set:{mailNew:true,smsNew:false,digest:true,ads:false},inv:{mail:'',role:'рекрутер',err:''}};
-function seed(k){
-  Object.assign(S,{st:k,dlg:null,busy:{},err:false,loading:false,form:null,ferr:{},off:k==='off',pending:false,pg:{cand:12,resp:15,jobs:10,log:15},q:{cand:'',resp:'',jobs:'',vac:''}});
+  set:{mailNew:true,smsNew:false,digest:true,ads:false},inv:{mail:'',role:'рекрутер',err:''},
+  aud:'emp',dside:'emp',me:null,meLast:null,seekers:[],other:[],sr:null,sf:null,nid:500,pendJob:null,applyJ:null,revR:null,sjAll:false};
+// ситуации соискателя (s-…) строятся поверх «Вакансии опубликованы»: одна демо-база для обеих сторон
+function seed(k0){
+  const sk=k0.startsWith('s-'),k=sk?'pub':k0;
+  Object.assign(S,{st:k0,dlg:null,busy:{},err:false,loading:false,form:null,ferr:{},off:k==='off',pending:false,pg:{cand:12,resp:15,jobs:10,log:15,sjobs:10},q:{cand:'',resp:'',jobs:'',vac:''}});
   S.vacs=k==='empty'||k==='new'?[]:myJobs0();
   S.logged=k!=='new';S.view=k==='new'?'home':'sum';
   S.lg={by:'mail',mail:'',phone:'',code:'',err:'',step:'id',tries:5,until:0};
@@ -976,6 +991,8 @@ function seed(k){
   S.log.sort((a,b)=>b.at-a.at);
   S.users=USERS0();S.set={mailNew:true,smsNew:false,digest:true,ads:false};
   S.notifs=k==='new'?[]:buildNotifs();
+  Object.assign(S,{aud:sk?'seek':'emp',dside:sk?'seek':'emp',me:null,meLast:null,seekers:[],other:[],sr:freshSr('reg'),sf:null,nid:500,pendJob:null,applyJ:null,revR:null,sjAll:false});
+  if(sk)seekSeed(k0);
 }
 function buildNotifs(){
   const N=[];
@@ -990,23 +1007,30 @@ function buildNotifs(){
 
 // ----- «Демо»
 function demoHtml(sheet){
-  return (sheet?'':`<div class="brand"><span class="mark"><i></i></span><div><b>HR-портал</b><small>Кабинет работодателя · макет</small></div></div>`)+
-    `<div><h3>Ситуации</h3><div class="sit">${ST.map((x,i)=>`<button class="${x.k===S.st?'on':''}" data-st="${x.k}"><i>${i+1}</i><span>${x.t}<small>${x.s}</small></span></button>`).join('')}</div></div>`+
-    `<div><h3>Показ</h3><div class="tgl">${[['theme','Светлая тема',S.theme==='light'],['off','Нет сети',S.off],['slow','Медленная сеть — загрузка',S.slow],['fail','Ошибка сервера',S.fail]].map(([k,t,on])=>`<button class="sw ${on?'on':''}" data-a="${k}"><span class="k"></span>${t}</button>`).join('')}</div></div>`+
+  const sk=S.dside==='seek',L=sk?ST2:ST,M=S.me;
+  return (sheet?'':`<div class="brand"><span class="mark"><i></i></span><div><b>HR-портал</b><small>Работодатели и соискатели · макет</small></div></div>`)+
+    `<div><h3>Ситуации</h3><div class="seg" role="tablist" style="margin-bottom:8px">${[['emp','Работодатель'],['seek','Соискатель']].map(([k,t])=>`<button role="tab" aria-selected="${S.dside===k}" class="${S.dside===k?'on':''}" data-dside="${k}">${t}</button>`).join('')}</div>`+
+    `<div class="sit">${L.map((x,i)=>`<button class="${x.k===S.st?'on':''}" data-st="${x.k}"><i>${i+1}</i><span>${x.t}<small>${x.s}</small></span></button>`).join('')}</div></div>`+
+    `<div><h3>Другая сторона</h3><div class="sit">${[['empCab','Р','Кабинет работодателя','ООО «СтройДемо»: отклики и запросы'],['seekCab','С','Кабинет соискателя',M?M.al+' · '+esc(M.fio):'анкеты нет — регистрация']].map(([a,i,t,x])=>`<button data-sa="${a}"><i>${i}</i><span>${t}<small>${x}</small></span></button>`).join('')}</div></div>`+
+    `<div><h3>Показ</h3><div class="tgl">${[['theme','Светлая тема',S.theme==='light'],['off','Нет сети',S.off],['slow','Медленная сеть — загрузка',S.slow],['fail','Ошибка сервера',S.fail]].map(([k,t,on])=>`<button class="sw ${on?'on':''}" data-a="${k}"><span class="k"></span>${t}</button>`).join('')}`+
+    (sk?`<button class="sw ${M&&M.docs?'on':''}" data-sa="docs"${M?'':' style="opacity:.55"'}><span class="k"></span>Документы проверены в офисе</button>`:'')+`</div></div>`+
     `<div><h3>Что смотреть</h3><ul class="look">${(LOOK[S.st]||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>`+
-    `<p class="look" style="margin-top:auto">Компании, люди и вакансии вымышлены, данные одинаковы при каждом открытии. Правовые утверждения — с пометкой [проверить], юристом не проверено.</p>`;
+    `<p class="look" style="margin-top:auto">Компании, люди и вакансии вымышлены, данные одинаковы при каждом открытии. Обе стороны работают с одной демо-базой этой страницы. Правовые утверждения — с пометкой [проверить], юристом не проверено.</p>`;
 }
 
 // ----- публичная часть: шапка и разводка (экраны каталога, компаний и регистрации — parts/hr3.js)
-const PUB=['home','login','reg','regdone','jobs','job','emps','emp'];
+const PUB=['home','login','reg','regdone','jobs','job','emps','emp','sreg','slogin'];
 const brandH=(sub)=>`<div class="brand"><span class="mark"><i></i></span><div style="min-width:0"><b>HR-портал</b><small>${sub}</small></div></div>`;
 function pubView(){
-  const L=[['jobs','Вакансии'],['emps','Работодатели']],on=k=>S.view===k||S.view===k.slice(0,-1);
-  const right=S.logged?`<button class="btn blue sm" data-a="toCab">В кабинет</button>`
-    :`<button class="btn ghost sm hide-s" data-a="toReg">Регистрация</button><button class="btn blue sm" data-a="toLogin">Войти</button>`;
-  return `<div class="pub" id="scroll"><div class="top"><button data-view="home" style="min-width:0" aria-label="На главную">${brandH('работа с проверенными документами')}</button><nav class="links">${L.map(([k,t])=>`<a href="#${k}" data-pv="${k}" class="${on(k)?'on':''}">${t}</a>`).join('')}<a href="#seek" data-pv="seek">Соискателям</a></nav><span class="grow"></span>`+
-    `<button class="demoBtn" data-a="demo">Демо</button>${right}</div>`+
-    `<div class="psub">${L.map(([k,t])=>`<button class="${on(k)?'on':''}" data-pv="${k}">${t}</button>`).join('')}<button data-pv="seek">Соискателям</button>${S.logged?'':'<button data-a="toReg">Регистрация</button>'}</div>`+
+  const L=[['jobs','Вакансии'],['emps','Работодатели']],on=k=>S.view===k||S.view===k.slice(0,-1),sk=S.aud==='seek';
+  const right=sk?(S.me?`<button class="btn blue sm" data-sa="me">${ico('user',16)}Моя анкета</button>`:`<button class="btn ghost sm hide-m" data-sa="reg">Регистрация</button><button class="btn blue sm" data-sa="login">Войти</button>`)
+    :(S.logged?`<button class="btn blue sm" data-a="toCab">В кабинет</button>`:`<button class="btn ghost sm hide-m" data-a="toReg">Регистрация</button><button class="btn blue sm" data-a="toLogin">Войти</button>`);
+  const aud=cls=>`<div class="seg aud ${cls}" role="tablist" aria-label="Кто вы">${[['emp','Я работодатель'],['seek','Я ищу работу']].map(([k,t])=>`<button role="tab" aria-selected="${S.aud===k}" class="${S.aud===k?'on':''}" data-aud="${k}">${t}</button>`).join('')}</div>`;
+  const regChip=sk?(S.me?'':'<button data-sa="reg">Регистрация</button>'):(S.logged?'':'<button data-a="toReg">Регистрация</button>');
+  return `<div class="pub" id="scroll"><div class="top"><button data-view="home" style="min-width:0" aria-label="На главную">${brandH('работа с проверенными документами')}</button><nav class="links">${L.map(([k,t])=>`<a href="#${k}" data-pv="${k}" class="${on(k)?'on':''}">${t}</a>`).join('')}</nav><span class="grow"></span>`+
+    `${aud('audT')}<button class="demoBtn" data-a="demo">Демо</button>${right}</div>`+
+    `<div class="audS">${aud('')}</div>`+
+    `<div class="psub">${L.map(([k,t])=>`<button class="${on(k)?'on':''}" data-pv="${k}">${t}</button>`).join('')}${regChip}</div>`+
     `<div class="wrap fadein">${PUBV[S.view]()}</div></div>`;
 }
 
@@ -1127,7 +1151,7 @@ function formView(){
     fi('about','О работе',`<textarea class="inp${E.about?' bad':''}" id="f_about" data-f="about" placeholder="Что делать, условия, спецодежда">${esc(F.about||'')}</textarea>`,0,'Телефоны, почту и ссылки не указывайте: контакты кандидатов придут после их согласия.')+
     `</div>${chkBox}${Object.keys(E).length?`<div class="note r" id="ferrNote">${ico('alert',18)}<span>Заполните отмеченные поля.</span></div>`:''}`+
     `<div class="row" style="margin-top:16px"><button class="btn go" data-a="publish" ${b||C==='block'||C==='busy'?'disabled':''}>${b?'Публикуем…':ico('send',18)+'Опубликовать'}</button><button class="btn ghost" data-a="saveDraft" ${b?'disabled':''}>Сохранить черновик</button></div></div>`+
-    `<div><div class="sec" style="margin-top:0">Так вакансию увидят кандидаты</div><div id="pv">${previewCard(F)}</div><div class="note">${ico('info',18)}<span>Кандидаты видят вакансию в «Моём маршруте» и откликаются без имени и телефона.</span></div></div></div>`;
+    `<div><div class="sec" style="margin-top:0">Так вакансию увидят кандидаты</div><div id="pv">${previewCard(F)}</div><div class="note">${ico('info',18)}<span>Кандидаты видят вакансию на портале и в «Моём маршруте» и откликаются без имени и телефона.</span></div></div></div>`;
 }
 function previewCard(F){
   const pay=+F.from?rub(+F.from)+(+F.to?' – '+rub(+F.to):''):'Зарплата не указана';
@@ -1137,14 +1161,15 @@ function previewCard(F){
 
 // ----- кандидаты: поиск, фильтры, «Показать ещё»
 function candView(){
-  const L=CANDS.filter(c=>(S.f.prof==='Все'||c.prof===S.f.prof)&&(S.f.reg==='Все'||c.reg===S.f.reg)&&(!S.f.docs||c.docs)&&has(c.al+' '+c.prof,S.q.cand))
+  const ALL=CANDS.concat(S.me&&!S.me.hidden?[S.me]:[]);
+  const L=ALL.filter(c=>(S.f.prof==='Все'||c.prof===S.f.prof)&&(S.f.reg==='Все'||c.reg===S.f.reg)&&(!S.f.docs||c.docs)&&has(c.al+' '+c.prof,S.q.cand))
     .sort((a,b)=>(b.docs||0)-(a.docs||0));
   let h=`<div class="card" style="padding:14px 16px">${search('cand','Профессия или псевдоним: «сварщик», «К-2041»')}`+
     `<div class="fl"><select class="inp" data-fsel="prof" aria-label="Профессия">${PROFS.map(p=>`<option${S.f.prof===p?' selected':''}>${p}</option>`).join('')}</select>`+
     `<select class="inp" data-fsel="reg" aria-label="Регион">${['Все',...REG].map(r=>`<option${S.f.reg===r?' selected':''}>${r}</option>`).join('')}</select>`+
     `<button class="sw ${S.f.docs?'on':''}" data-a="fdocs" style="width:auto"><span class="k"></span>Только с проверенными документами</button></div></div>`;
   if(!S.vacs.some(v=>v.st==='pub'))h+=`<div class="note a">${ico('info',18)}<span>Чтобы запросить контакты, опубликуйте вакансию: запрос идёт на конкретную вакансию.</span></div>`;
-  h+=`<div class="sec">Найдено: ${L.length} из ${CANDS.length} · без рейтингов и оценок</div>`;
+  h+=`<div class="sec">Найдено: ${L.length} из ${ALL.length} · без рейтингов и оценок</div>`;
   return h+(L.length?`<div class="cards">${L.slice(0,S.pg.cand).map(c=>candCard(c)).join('')}</div>`+more('cand',Math.min(S.pg.cand,L.length),L.length)
     :emptyBox('users','Под фильтр никто не подходит','Уберите часть фильтров — например, профессию или регион.',`<button class="btn ghost sm" data-a="fclear">Сбросить фильтры</button>`));
 }
@@ -1165,10 +1190,11 @@ function respRow(r){
   const c=cand(r.c),v=vac(r.v),[pc,pt]=RST[r.st],b=S.busy['q'+r.id];
   let act='';
   if(r.st==='new')act=`<button class="btn blue sm" data-a="reqR" data-r="${r.id}" ${b?'disabled':''}>${b?'Отправляем…':ico('send',16)+'Запросить контакты'}</button>`;
-  if(r.st==='wait')act=`<div class="sm mut">Запрос отправлен ${fdt(r.req)}. Кандидат ответит в «Моём маршруте».</div><div class="row" style="margin-top:8px"><button class="btn ghost sm" data-a="dYes" data-r="${r.id}">демо: согласился</button><button class="btn ghost sm" data-a="dNo" data-r="${r.id}">демо: отказал</button></div>`;
+  if(r.st==='wait')act=`<div class="sm mut">Запрос отправлен ${fdt(r.req)}. Кандидат ответит на портале или в «Моём маршруте».</div><div class="row" style="margin-top:8px"><button class="btn ghost sm" data-a="dYes" data-r="${r.id}">демо: согласился</button><button class="btn ghost sm" data-a="dNo" data-r="${r.id}">демо: отказал</button></div>`;
   if(r.st==='ok')act=`<div class="contact"><div class="nm">${esc(c.fio)}</div><div class="ph">${c.ph}</div><div class="row" style="margin-top:8px"><button class="btn ghost sm" data-a="copy" data-ph="${c.ph}">${ico('copy',16)}Скопировать номер</button><button class="btn ghost sm" data-a="dRev" data-r="${r.id}">демо: отозвал</button></div><div class="xs mut" style="margin-top:8px">Передано только ${CO} · ${fdt(r.at)} · по согласию кандидата на вашу компанию</div></div>`;
   if(r.st==='no')act=`<div class="sm mut">Кандидат отказал. Карточка остаётся без контактов.</div>`;
   if(r.st==='rev')act=`<div class="note r" style="margin-top:0">${ico('lock',18)}<span>Кандидат отозвал согласие ${fdt(r.rev)}. Контакты скрыты из кабинета. Уже полученный номер не используйте ${CHK}.</span></div>`;
+  if(c.gone)act=(r.st==='rev'?act:'')+`<div class="note" style="margin-top:${r.st==='rev'?8:0}px">${ico('info',18)}<span>Соискатель удалил анкету. Карточка снята, контакты не передаются.</span></div>`;
   return `<tr><td><span class="al">${c.al}</span><div><b>${esc(c.prof)}</b></div><div class="xs mut">${c.exp} · ${c.reg} · русский ${c.ru}</div><div style="margin-top:4px">${c.docs?`<span class="pl g">${ico('shield',12)}проверены ${fdd(c.docs)}</span>`:'<span class="pl d">не проверены</span>'}</div></td>`+
     `<td data-l="Вакансия">${esc(v?v.t:'—')}<div class="xs mut">${r.how==='отклик'?'отклик кандидата':'ваш запрос'}</div></td><td data-l="Когда" class="num">${fdt(r.when)}</td><td data-l="Статус"><span class="pl ${pc}">${pt}</span></td><td>${act}</td></tr>`;
 }
@@ -1190,7 +1216,7 @@ function dlgView(){
   if(d==='req'){const c=cand(S.reqC),pubs=S.vacs.filter(v=>v.st==='pub'),bz=S.busy.req;
     b=head('Запросить контакты · '+c.al)+`<p class="t">${esc(c.prof)} · ${c.exp} · ${c.reg}</p>`+
       (pubs.length?`<div class="f" style="margin-top:14px"><label for="reqV">На какую вакансию</label><select class="inp" id="reqV" data-reqv>${pubs.map(v=>`<option value="${v.id}"${S.reqV===v.id?' selected':''}>${esc(v.t)}</option>`).join('')}</select></div>`:`<div class="note a">${ico('info',18)}<span>Нет опубликованных вакансий — запрос идёт на конкретную вакансию.</span></div>`)+
-      `<div class="note">${ico('lock',18)}<span>Кандидат получит запрос в «Моём маршруте». Если согласится — вы увидите ФИО и телефон. Разрешение — только для ${CO}: другим работодателям оно не передаётся.</span></div>`+
+      `<div class="note">${ico('lock',18)}<span>Кандидат получит запрос на портале или в «Моём маршруте». Если согласится — вы увидите ФИО и телефон. Разрешение — только для ${CO}: другим работодателям оно не передаётся.</span></div>`+
       `<div class="never">${ico('ban',15)}<span>Паспорт и банковские данные не передаются никогда.</span></div>`+
       `<div class="row" style="margin-top:16px"><button class="btn blue" data-a="reqSend" ${bz||!pubs.length?'disabled':''}>${bz?'Отправляем…':ico('send',18)+'Отправить запрос'}</button><button class="btn ghost" data-a="dclose">Отмена</button></div>`}
   if(d==='card'){const c=cand(S.cardC);b=head('Карточка кандидата')+candCard(c).replace('class="card cc"','class="cc"')}
@@ -1199,6 +1225,7 @@ function dlgView(){
   if(d==='moreNav')b=head('Ещё')+NAV.slice(4).map(([k,t,ic])=>`<button class="li" data-view="${k}"><span class="lic">${ico(ic,19)}</span><span class="lt"><b>${t}</b></span>${k==='notif'&&unread()?`<span class="pl c">${unread()}</span>`:''}${ico('chev',18)}</button>`).join('')+
     `<button class="li" data-a="toHome"><span class="lic">${ico('globe',19)}</span><span class="lt"><b>Портал</b><small>каталог вакансий и компаний</small></span></button><button class="li" data-a="logout"><span class="lic">${ico('out',19)}</span><span class="lt"><b>Выйти</b></span></button>`;
   if(d==='doc')b=head(DOCS[S.doc][0])+`<div class="note a" style="margin-top:0">${ico('info',18)}<span>Демо-текст. Перед запуском его готовит юрист [проверить у юристов].</span></div>`+DOCS[S.doc][1].map(([t,x])=>`<div class="sec" style="margin:16px 0 6px">${t}</div><p class="t">${x}</p>`).join('');
+  if(!b&&SDLG[d])b=SDLG[d](head);
   return `<div class="scrim" data-a="dclose"></div><div class="dlg" role="dialog" aria-modal="true">${b}</div>`;
 }
 
@@ -1213,6 +1240,7 @@ function jobMini(j){const e=emp(j.e);
 
 const PUBV={
   home(){
+    if(S.aud==='seek')return seekHome();
     const fresh=pubJobs().slice(0,4);
     return `<section class="hero2"><div><div class="sec" style="margin:0 0 10px">Для работодателей</div><h1>Работники <span>с проверенными документами</span></h1>`+
       `<p>Документы кандидатов проверяют в офисе «Документ Экспресс» в аэропорту Жуковский. Вы видите профессию, опыт и регион. Имя и телефон — когда кандидат согласится именно на вашу компанию.</p>`+
@@ -1222,8 +1250,7 @@ const PUBV={
       `<div class="sec">Свежие вакансии</div><div class="jgrid">${fresh.map(jobMini).join('')}</div><div style="margin-top:12px"><button class="btn ghost sm" data-pv="jobs">Все вакансии ${ico('chev',16)}</button></div>`+
       `<div class="sec">Что видит работодатель</div><div class="two"><div class="card"><div class="ch"><span class="ic">${ico('eye',22)}</span><h2>Видно сразу</h2></div><p class="t">Профессия, опыт, регион, русский язык, отметка «документы проверены в офисе» с датой и основание работать ${CHK}.</p></div>`+
       `<div class="card"><div class="ch"><span class="ic">${ico('lock',22)}</span><h2>Только после согласия</h2></div><p class="t">ФИО и телефон — когда кандидат разрешит вашей компании. Он может отозвать разрешение.</p><div class="never">${ico('ban',16)}<span>Паспорт и банковские данные не передаются никогда.</span></div></div></div>`+
-      `<div class="sec" id="seek">Соискателям</div><div class="card glow"><div class="ch"><span class="ic">${ico('bag',22)}</span><h2>Ищете работу?</h2></div><p class="t">Вакансии, отклик без имени и телефона и разрешение на конкретного работодателя — в приложении «Мой маршрут». Там же сроки, документы и патент.</p>`+
-      `<div class="row" style="margin-top:14px"><a class="btn blue" href="${MYROUTE}" target="_blank" rel="noopener" style="text-decoration:none">${ico('ext',18)}Найти работу в «Моём маршруте»</a></div></div>`+
+      `<div class="sec" id="seek">Соискателям · два способа</div>${seekPaths()}`+
       `<div class="sec">Нанимают через портал</div><div class="logos">${EMPS.map(e=>`<button data-emp="${e.id}">${esc(e.name)}</button>`).join('')}</div>`+
       `<div class="foot">HR-портал — демо-макет. Компании, вакансии и люди вымышлены. Портал получает только производную карточку кандидата: профессия, регион, отметка о проверке документов. Проверка вакансий по региону и сфере — демо-правило ${CHK}.<br><button class="lnk" data-doc="terms">Условия использования</button> · <button class="lnk" data-doc="pd">Политика обработки персональных данных</button></div>`;
   },
@@ -1238,7 +1265,8 @@ const PUBV={
         :emptyBox('search','Ничего не нашли','Уберите часть фильтров или измените запрос.',`<button class="btn ghost sm" data-a="jclear">Сбросить</button>`));
   },
   job(){
-    const j=JOBS.find(x=>x.id===S.jobId),e=emp(j.e);
+    const j=JOBS.find(x=>x.id===S.jobId);if(!j){S.view='jobs';return PUBV.jobs()}
+    const e=emp(j.e);
     const list=(t,a)=>`<div class="card"><div class="ch"><h2>${t}</h2></div><ul class="ul">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
     return `<button class="lnk" data-pv="jobs" style="display:inline-flex;gap:6px;align-items:center;margin-bottom:12px">${ico('back',16)}Все вакансии</button>`+
       `<div class="grid2"><div style="display:flex;flex-direction:column;gap:12px;min-width:0"><div class="card glow"><div class="h1" style="font-size:24px">${esc(j.t)}</div>`+
@@ -1249,7 +1277,7 @@ const PUBV={
       list('Обязанности',j.duty)+list('Требования',j.req)+list('Условия',j.cond)+`</div>`+
       `<div style="display:flex;flex-direction:column;gap:12px;min-width:0"><div class="card"><div class="ch"><span class="ic">${ico('pin',20)}</span><h2>Где работать</h2></div><p class="t"><b>${esc(j.addr)}</b></p><p class="t">${esc(j.way)}</p></div>`+
       `<div class="card"><div class="ch"><span class="ic">${ico('phone',20)}</span><h2>Отдел кадров</h2></div><dl class="fld"><dt>Контакт</dt><dd>${esc(e.hr[0])}</dd><dt>Телефон</dt><dd class="num">${e.hr[1]}</dd><dt>Почта</dt><dd>${esc(e.hr[2])}</dd></dl><p class="xs mut" style="margin-top:8px">Контакты компании вымышлены.</p></div>`+
-      `<div class="card"><div class="ch"><span class="ic">${ico('send',20)}</span><h2>Откликнуться</h2></div><p class="t">Отклик — в приложении «Мой маршрут»: без имени и телефона. Компания увидит профессию, опыт и проверку документов; контакты — только если вы разрешите.</p><a class="btn blue w" style="margin-top:12px;text-decoration:none" href="${MYROUTE}" target="_blank" rel="noopener">${ico('ext',18)}Откликнуться в «Моём маршруте»</a></div></div></div>`;
+      applyBox(j)+`</div></div>`;
   },
   emps(){
     return `<div class="h1">Работодатели</div><p class="lead">${EMPS.length} компаний · демо</p><div class="note">${ico('shield',18)}<span>«Проверен» — менеджер портала сверил компанию: ИНН и адрес по открытым реестрам, подписанный договор с порталом. Это не гарантия условий труда. Что именно проверяем — [проверить у юристов].</span></div>`+
@@ -1265,17 +1293,16 @@ const PUBV={
   },
   reg(){
     const R=S.rg,A=R.agree,E=R.err,b=S.busy.reg,reqOk=A.terms&&A.pd&&A.cand;
-    const fi=(k,l,inp,hint='')=>`<div class="f${k==='name'||k==='contact'?' full':''}"><label for="r_${k}">${l} <span class="req">*</span></label>${inp}<div class="err">${E[k]||''}</div>${hint?`<small>${hint}</small>`:''}</div>`;
+    const fi=(k,l,inp,hint='')=>`<div class="f${k==='name'?' full':''}"><label for="r_${k}">${l} <span class="req">*</span></label>${inp}<div class="err">${E[k]||''}</div>${hint?`<small>${hint}</small>`:''}</div>`;
     const tx=(k,ph,im='text',ml=120)=>`<input class="inp${E[k]?' bad':''}" id="r_${k}" data-rg="${k}" value="${esc(R[k])}" placeholder="${ph}" inputmode="${im}" maxlength="${ml}">`;
     const cb=(k,txt,doc,req)=>`<div class="agr"><button class="cbx${A[k]?' on':''}" data-agr="${k}" role="checkbox" aria-checked="${A[k]}" aria-label="${txt.replace(/<[^>]+>/g,'')}">${A[k]?ico('check',14,3):''}</button><span><span data-agr="${k}" style="cursor:pointer">${txt}</span>${doc?` <button class="lnk" data-doc="${doc}">Читать</button>`:''}<small>${req?'<span class="req">Обязательно</span>':'Необязательно — можно включить позже в настройках'}</small></span></div>`;
-    return `<div class="login" style="max-width:720px"><div class="card glow"><div class="ch"><span class="ic">${ico('office',22)}</span><h2>Регистрация работодателя</h2></div><p class="t">Бесплатно. Паролей нет — вход по коду на почту или телефон. После регистрации менеджер портала проверит компанию.</p>`+
+    return `<div class="login" style="max-width:720px"><div class="card glow"><div class="ch"><span class="ic">${ico('office',22)}</span><h2>Регистрация работодателя</h2></div><p class="t">Бесплатно. Паролей нет — вход по коду на почту или телефон, нужны оба. После регистрации менеджер портала проверит компанию.</p>`+
       `<div class="sec">Компания</div><div class="fgrid">`+fi('inn','ИНН',tx('inn','10 цифр — организация, 12 — ИП','numeric',12),'Проверим формат: 10 или 12 цифр')+
       fi('reg','Регион',`<select class="inp${E.reg?' bad':''}" id="r_reg" data-rg="reg"><option value="">Выберите регион</option>${REG.map(r=>`<option${R.reg===r?' selected':''}>${r}</option>`).join('')}</select>`)+
       fi('name','Название',tx('name','ООО «Ваша компания»'))+`</div>`+
       `<div class="sec">Контактное лицо</div><div class="fgrid">`+fi('fio','Имя и фамилия',tx('fio','Как к вам обращаться'))+
-      `<div class="f"><label>Как связаться <span class="req">*</span></label><div class="seg">${[['mail','Почта'],['phone','Телефон']].map(([k,t])=>`<button class="${R.by===k?'on':''}" data-rby="${k}">${t}</button>`).join('')}</div></div>`+
-      (R.by==='mail'?fi('contact','Рабочая почта',`<input class="inp${E.contact?' bad':''}" id="r_contact" data-rg="mail" type="email" inputmode="email" value="${esc(R.mail)}" placeholder="hr@company.ru">`)
-        :fi('contact','Телефон',`<div class="phw"><span>+7</span><input class="inp num${E.contact?' bad':''}" id="r_contact" data-rg="phone" type="tel" inputmode="tel" value="${esc(R.phone)}" placeholder="900 123-45-67" maxlength="15"></div>`))+`</div>`+
+      fi('mail','Рабочая почта',`<input class="inp${E.mail?' bad':''}" id="r_mail" data-rg="mail" type="email" inputmode="email" autocomplete="email" value="${esc(R.mail)}" placeholder="hr@company.ru">`,'Сюда — код для входа, отклики и счета')+
+      fi('phone','Телефон',`<div class="phw"><span>+7</span><input class="inp num${E.phone?' bad':''}" id="r_phone" data-rg="phone" type="tel" inputmode="tel" autocomplete="tel-national" value="${esc(R.phone)}" placeholder="900 123-45-67" maxlength="15"></div>`,'Сюда — код для входа и срочные ответы кандидатов')+`</div>`+
       `<div class="sec">Условия</div><div class="card" style="padding:4px 16px">`+
       cb('terms','Принимаю <b>условия использования портала</b>','terms',1)+cb('pd','Ознакомлен с <b>политикой обработки персональных данных</b>','pd',1)+
       cb('cand','Обязуюсь <b>запрашивать контакты кандидата только с его согласия</b> и не передавать их третьим лицам','cand',1)+
@@ -1287,16 +1314,26 @@ const PUBV={
   regdone(){
     const R=S.rg;
     return `<div class="login" style="max-width:560px"><div class="card glow" style="text-align:center"><div class="empty" style="padding:10px 0 0"><div class="ei">${ico('clock',28)}</div><b>Компания на проверке</b>`+
-      `<p>${esc(R.name)} · ИНН ${esc(R.inn)}. Менеджер портала сверит данные — обычно до одного рабочего дня [демо]. Сообщим ${R.by==='mail'?'на '+esc(R.mail):'в SMS на +7 '+esc(R.phone)}.</p></div>`+
+      `<p>${esc(R.name)} · ИНН ${esc(R.inn)}. Менеджер портала сверит данные — обычно до одного рабочего дня [демо]. Сообщим на ${esc(R.mail)} и в SMS на <span class="num" style="white-space:nowrap">+7 ${esc(R.phone)}</span>.</p></div>`+
       `<div class="note" style="text-align:left">${ico('info',18)}<span>Пока идёт проверка, можно войти и подготовить вакансии: они опубликуются после проверки. Принятые условия — в настройках компании.</span></div>`+
       `<button class="btn go w" style="margin-top:14px" data-a="regEnter">Войти в кабинет</button></div></div>`;
   }
 };
 
+// ----- отклик с карточки вакансии: на сайте (регистрация → возврат к отклику) или в «Моём маршруте»
+function applyBox(j){
+  const ap=S.me&&appliedTo(j.id);
+  return `<div class="card"><div class="ch"><span class="ic">${ico('send',20)}</span><h2>Откликнуться</h2></div><p class="t">Компания увидит анкету: профессию, опыт, регион, русский и отметку о проверке документов. Имя и телефон — только если вы разрешите.</p>`+
+    (ap?`<div class="note g">${ico('check',18)}<span>Вы откликнулись ${fdt(ap.when)}. Ответ — в разделе «Отклики».</span></div><button class="btn ghost w" style="margin-top:12px" data-view="sResp">Мои отклики</button>`
+      :`<button class="btn go w" style="margin-top:12px" data-sa="apply" data-j="${j.id}">${ico('send',18)}${S.me?'Откликнуться':'Откликнуться на сайте'}</button>`+(S.me?'':`<p class="xs mut" style="margin-top:6px">Нужна анкета: регистрация по телефону, потом вернём к отклику.</p>`)+
+        `<a class="btn ghost w" style="margin-top:10px;text-decoration:none" href="${MYROUTE}" target="_blank" rel="noopener">${ico('ext',18)}Откликнуться в «Моём маршруте»</a>`)+
+    `<div class="never">${ico('ban',15)}<span>Паспорт и банковские данные не передаются никогда.</span></div></div>`;
+}
+
 // ----- тексты условий (демо)
 const DOCS={
   terms:['Условия использования портала',[['Что это','HR-портал помогает работодателям найти работников с проверенными в офисе документами. Размещение вакансий бесплатно.'],['Вакансии','Работодатель отвечает за достоверность вакансии. Перед публикацией вакансия проходит проверку по региону и сфере деятельности; портал может остановить публикацию.'],['Кандидаты','Работодатель видит производную карточку без ФИО и контактов. Контакты передаются только после согласия кандидата на конкретного работодателя.'],['Ответственность','Отметки «документы проверены» и «основание работать» — сведения на дату проверки, без гарантии.']]],
-  pd:['Политика обработки персональных данных',[['Чьи данные','Контактного лица работодателя (имя, почта или телефон) и кандидатов — в объёме карточки и, после согласия, ФИО и телефон.'],['Зачем','Вход в кабинет, связь по вакансиям, передача контактов кандидата работодателю по его согласию.'],['Чего не передаём','Паспортные и банковские данные кандидатов портал не получает и не передаёт.'],['Журнал','Каждое раскрытие контакта записывается в журнал: кто, когда и что получил.']]],
+  pd:['Политика обработки персональных данных',[['Чьи данные','Контактного лица работодателя (имя, почта и телефон) и кандидатов — в объёме карточки и, после согласия, ФИО и телефон.'],['Зачем','Вход в кабинет, связь по вакансиям, передача контактов кандидата работодателю по его согласию.'],['Чего не передаём','Паспортные и банковские данные кандидатов портал не получает и не передаёт.'],['Журнал','Каждое раскрытие контакта записывается в журнал: кто, когда и что получил.']]],
   cand:['Обязательство работодателя',[['Только по согласию','Запрашивать контакты кандидата только через портал и использовать их только для связи по вакансии.'],['Без передачи','Не передавать контакты третьим лицам, в том числе другим компаниям группы.'],['Отзыв согласия','Если кандидат отозвал согласие, прекратить связь и не использовать полученный номер [проверить].']]],
   ads:['Согласие на рассылки',[['Что пришлём','Новости портала и предложения партнёров — не чаще раза в неделю.'],['Как отказаться','В настройках компании или по ссылке в письме. На работу кабинета не влияет.']]]};
 
@@ -1328,12 +1365,11 @@ function setView(){
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-job],[data-emp],[data-doc],[data-agr],[data-rby],[data-set],[data-ufire],[data-nt],[data-jsph],[data-pv]');if(!t||t.disabled)return;
   const d=t.dataset;
-  if(d.pv){e.preventDefault();if(d.pv==='seek'){if(S.view!=='home'){S.view='home';render()}const el=document.getElementById('seek');el&&el.scrollIntoView({behavior:'smooth'});return}S.pg.jobs=10;return go(d.pv)}
+  if(d.pv){e.preventDefault();if(d.pv==='seek'){S.aud='seek';return go('home')}S.pg.jobs=10;return go(d.pv)}
   if(d.job){S.jobId=d.job;return go('job')}
   if(d.emp){S.empId=d.emp;return go('emp')}
   if(d.doc){S.doc=d.doc;S.dlg='doc';return render()}
   if(d.agr){S.rg.agree[d.agr]=!S.rg.agree[d.agr];return render()}
-  if(d.rby){S.rg.by=d.rby;delete S.rg.err.contact;render();const i=$('#r_contact');i&&i.focus();return}
   if(d.set){S.set[d.set]=!S.set[d.set];render();return toast(S.set[d.set]?'Включено':'Выключено')}
   if(d.ufire){const u=S.users.find(x=>x.id===d.ufire);S.users=S.users.filter(x=>x.id!==d.ufire);render();return toast('Доступ закрыт: '+u.name)}
   if(d.nt){const n=S.notifs.find(x=>x.id===d.nt);n.read=true;return go(n.view)}
@@ -1347,6 +1383,401 @@ document.addEventListener('change',e=>{
   if(t.dataset.rg==='reg'){S.rg.reg=t.value;delete S.rg.err.reg}
 });
 
+// ----- HR-портал: сторона соискателя (26.11.2026). Регистрация на сайте по телефону, анкета, отклики, запросы контактов,
+// согласие на конкретного работодателя и отзыв. Одна демо-база в памяти страницы: отклик соискателя виден в «Откликах» работодателя,
+// запрос работодателя — в «Контактах» соискателя. Правила: hr-portal/CLAUDE.md «Правила данных» и «Комплаенс», docs/01 §HR, §4, Ю10.
+// Работодатель видит профессию, опыт, регион, русский и отметку о документах; ФИО и телефон — после согласия на эту компанию;
+// паспорт и банковские данные не запрашиваются и не передаются. Свободного текста в анкете нет: он стал бы каналом утечки контактов (docs/01 §HR).
+const CCS=['+992','+998','+996','+7'],PH_LEN={'+992':9,'+998':9,'+996':9,'+7':10},PH_PH={'+992':'90 123 45 67','+998':'90 123 45 67','+996':'700 123 456','+7':'900 123-45-67'};
+const CIT=[['TJ','Таджикистан'],['UZ','Узбекистан'],['KG','Кыргызстан'],['XX','Другое']];
+const citName=k=>(CIT.find(c=>c[0]===k)||['',''])[1];
+const SREG=[...REG,'Любой регион'];
+const SSPH=SPH.filter(s=>s!=='Розничная торговля');
+const profsOf=sph=>sph&&TPL[sph]?[...new Set(TPL[sph].map(t=>t[0]))]:[];
+const RU_HINT='Базовый — понимаю простые фразы. Разговорный — объясняюсь на работе. Свободный — говорю и читаю свободно.';
+// основание работать — только после проверки в офисе, с датой и без гарантии (Ю10, текст утверждает юрист)
+const rightOf=M=>M.cit==='KG'?'гражданин ЕАЭС':M.cit==='XX'?'по документам, проверенным в офисе':'патент'+(M.reg!=='Любой регион'?' · '+M.reg:'');
+
+// ----- ситуации соискателя в меню «Демо»
+const ST2=[
+  {k:'s-new',t:'Новый соискатель',s:'главная → регистрация на сайте'},
+  {k:'s-filled',t:'Анкета заполнена',s:'документы не проверены, два отклика'},
+  {k:'s-req',t:'Пришёл запрос контактов',s:'«СтройДемо» и склад в Подольске'},
+  {k:'s-ok',t:'Согласие дано',s:'контакты — только «СтройДемо»'},
+  {k:'s-rev',t:'Согласие отозвано',s:'передача прекращена'}];
+Object.assign(LOOK,{
+  's-new':['<b>Главная для соискателя</b>: переключатель «Я работодатель / Я ищу работу» в шапке; два равных пути — «Зарегистрироваться на сайте» и «Через „Мой маршрут“».','<b>Регистрация</b>: телефон (+992, +998, +996, +7) и условия → код 1234 (5 попыток, повтор через 60 с) → имя → анкета. Реклама выключена.','<b>Отклик из каталога</b>: «Откликнуться на сайте» на карточке вакансии → регистрация → возврат к отклику.'],
+  's-filled':['<b>Моя анкета</b>: как её видит работодатель — псевдоним К-2107, без имени и телефона.','<b>Документы не проверены</b> — путь получить отметку: офис в Жуковском или «Мой маршрут». Переключатель «Документы проверены в офисе» — ниже.','<b>Вакансии</b>: фильтр по сфере и региону анкеты, по дате, без оценок. Отклик на «СтройДемо» сразу виден в его кабинете — кнопка «Кабинет работодателя».'],
+  's-req':['<b>Контакты</b>: два запроса — «СтройДемо» и «Склад-Логистик Подольск». Разрешение даётся каждой компании отдельно.','Разрешите «СтройДемо» — в его «Откликах» появятся ФИО и телефон; склад по-прежнему видит только анкету.'],
+  's-ok':['Контакты открыты только «СтройДемо»: видно в «Кому открыты мои контакты» и в «Откликах» работодателя.','«Отозвать согласие» — с пояснением: отзыв прекращает дальнейшую передачу, уже переданное не возвращает.'],
+  's-rev':['Согласие отозвано: в истории соискателя — дата отзыва; у работодателя контакты скрыты, в журнале — «отозвано».','Запрос склада в Подольске ещё ждёт ответа — разрешение «СтройДемо» на него не распространялось.']});
+
+// ----- демо-соискатель, зарегистрированный на сайте: документы не проверены
+const ME0=()=>({id:'cme',al:'К-2107',fio:'Назаров Далер Рустамович',mail:'daler.n@mail.example',cc:'+7',phone:'900 000-21-07',ph:'+7 900 000-21-07',sph:'Строительство',prof:'Монтажник вентиляции',reg:'Москва',exp:'1–3 года',ru:'разговорный',cit:'TJ',docs:null,right:null,hidden:false,src:'site',since:ago(2,20,15),ads:false,sms:true});
+const freshSr=mode=>({mode,step:'phone',cc:'+992',phone:'',code:'',tries:5,until:0,err:'',fio:'',mail:'',sph:'',prof:'',reg:'',exp:'',ru:'',cit:'',agree:{terms:false,pd:false,ads:false},e:{}});
+function seekCand(id){return (S.seekers||[]).find(c=>c.id===id)}
+// отклики и запросы других работодателей — у них своих кабинетов в макете нет, поэтому хранятся отдельно
+function other0(k){
+  const j4=JOBS.find(j=>j.e==='e4'&&j.sph==='Строительство'),j2=JOBS.find(j=>j.e==='e2'&&j.t==='Грузчик')||JOBS.find(j=>j.e==='e2');
+  const O=[{id:'o1',e:'e4',job:j4.id,how:'отклик',when:ago(3,18,5),st:'seen'},{id:'o2',e:'e2',job:j2.id,how:'отклик',when:ago(2,12,40),st:'new'}];
+  if(k!=='s-filled'){O[1].st='wait';O[1].req=ago(0,8,30)}
+  return O;
+}
+function seekSeed(k){
+  if(k==='s-new'){S.view='home';return}
+  S.me=ME0();S.seekers.push(S.me);S.other=other0(k);
+  const r={id:'rme',c:S.me.id,v:'v1',how:'отклик',when:ago(1,19,20),st:'new'};
+  if(k!=='s-filled'){r.st='wait';r.req=ago(0,9,50)}
+  if(k==='s-ok'||k==='s-rev'){r.st='ok';r.at=ago(0,10,5);S.log.push({at:r.at,c:r.c,v:r.v,ev:'g'})}
+  if(k==='s-rev'){r.st='rev';r.rev=ago(0,10,20);S.log.push({at:r.rev,c:r.c,v:r.v,ev:'r'})}
+  S.resp.push(r);S.resp.sort((a,b)=>b.when-a.when);S.log.sort((a,b)=>b.at-a.at);
+  S.notifs=buildNotifs();
+  S.view=k==='s-filled'?'sProf':'sReq';
+}
+
+// ----- общая база: отклики соискателя у «СтройДемо» (S.resp — их видит кабинет работодателя) и у других компаний (S.other)
+function myResp(){
+  if(!S.me)return [];
+  const a=S.resp.filter(r=>r.c===S.me.id).map(r=>{const v=vac(r.v);return {...r,e:'e1',jt:v?v.t:'вакансия',job:v&&v.src}});
+  const b=S.other.map(o=>({...o,jt:(JOBS.find(j=>j.id===o.job)||{}).t||'вакансия'}));
+  return [...a,...b].sort((x,y)=>(y.req||y.when)-(x.req||x.when));
+}
+const recOf=id=>S.resp.find(r=>r.id===id)||S.other.find(o=>o.id===id);
+const appliedTo=jid=>myResp().find(r=>r.job===jid&&r.how!=='запрос');
+const reqCnt=()=>myResp().filter(r=>r.st==='wait').length;
+const isSeek=()=>SEEKV.includes(S.view);
+const SEEKV=['sProf','sJobs','sResp','sReq','sSet','sEdit'];
+function notify(n){S.notifs.unshift({...n,at:nowD(),id:'n'+(S.nid++),read:false})}
+function doApply(jid){
+  const j=JOBS.find(x=>x.id===jid),M=S.me;
+  if(j.e==='e1'){const v=S.vacs.find(x=>x.src===jid);
+    if(v){S.resp.unshift({id:'r'+(S.nid++),c:M.id,v:v.id,how:'отклик',when:nowD(),st:'new'});notify({ic:'inbox',t:'Новый отклик: '+M.al,s:M.prof+' · на «'+v.t+'»',view:'resp'});return}}
+  S.other.unshift({id:'o'+(S.nid++),e:j.e,job:jid,how:'отклик',when:nowD(),st:'new'});
+}
+function createMe(){
+  const R=S.sr,ph=R.phone.trim();
+  S.me={id:'cn'+(S.nid++),al:'К-'+(2200+S.nid%700),fio:R.fio.trim().replace(/\s+/g,' '),mail:R.mail.trim(),cc:R.cc,phone:ph,ph:R.cc+' '+ph,sph:R.sph,prof:R.prof,reg:R.reg,exp:R.exp,ru:R.ru,cit:R.cit,docs:null,right:null,hidden:false,src:'site',since:nowD(),ads:R.agree.ads,sms:true};
+  S.seekers.push(S.me);S.aud='seek';afterEnter('Анкета создана · документы пока не проверены');
+}
+function afterEnter(msg){
+  if(S.pendJob){S.jobId=S.pendJob;S.applyJ=S.pendJob;S.pendJob=null;S.view='job';S.dlg=appliedTo(S.jobId)?null:'sApply';toast(S.dlg?msg+' — осталось отправить отклик':msg)}
+  else{S.view='sProf';toast(msg)}
+}
+function withdraw(){
+  const M=S.me;
+  S.resp.filter(r=>r.c===M.id).forEach(r=>{if(r.st==='ok'){r.st='rev';r.rev=nowD();S.log.unshift({at:r.rev,c:r.c,v:r.v,ev:'r'})}});
+  if(S.resp.some(r=>r.c===M.id))notify({ic:'alert',t:M.al+' удалил анкету',s:'карточка снята, контакты больше не передаются',view:'resp'});
+  M.gone=true;S.me=null;S.meLast=null;
+}
+function setDocs(on){const M=S.me;M.docs=on?ago(0,10,0):null;M.right=on?rightOf(M):null}
+
+// ----- проверка полей
+function anketaErr(F){
+  const E={};
+  if(!F.sph)E.sph='Выберите сферу';
+  if(!F.prof)E.prof=F.sph?'Выберите профессию':'Сначала выберите сферу';
+  if(!F.reg)E.reg='Выберите регион';
+  if(!F.exp)E.exp='Выберите опыт';
+  if(!F.ru)E.ru='Выберите уровень';
+  if(!F.cit)E.cit='Выберите гражданство';
+  return E;
+}
+const SF=()=>S.view==='sEdit'?S.sf:S.sr;
+
+// ----- карточка «так видит работодатель»: ровно те поля, что получает кабинет работодателя
+function meCard(M,o={}){
+  const pill=o.pill||(M.hidden?'<span class="pl d">скрыта</span>':'<span class="pl c">видна работодателям</span>');
+  return `<div class="${o.plain?'cc':'card cc glow'}"><div class="row" style="justify-content:space-between"><span class="al">${M.al}</span>${pill}</div>`+
+    `<h3>${esc(M.prof)}</h3><dl class="fld"><dt>Опыт</dt><dd>${esc(M.exp)}</dd><dt>Регион</dt><dd>${esc(M.reg)}</dd><dt>Русский</dt><dd>${esc(M.ru)}</dd>`+
+    `<dt>Документы</dt><dd>${M.docs?`<span class="pl g">${ico('shield',12)}проверены ${fdd(M.docs)}</span>`:'<span class="pl a">не проверены</span>'}</dd>`+
+    (M.right?`<dt>Основание</dt><dd>${esc(M.right)} · без гарантии ${CHK}</dd>`:'')+
+    `<dt>Имя, телефон</dt><dd class="no">только компаниям, которым вы разрешили</dd></dl>`+
+    `<div class="never">${ico('ban',15)}<span>Паспорт и банковские данные не передаются никогда</span></div></div>`;
+}
+
+// ----- публичная часть: два пути для соискателя и главная соискателя
+function seekPaths(){
+  return `<div class="two paths"><div class="card glow pathc"><div class="ch"><span class="ic">${ico('user',22)}</span><h2>Зарегистрироваться на сайте</h2></div>`+
+    `<p class="t">По номеру телефона: +992, +998, +996 или +7. Анкета — профессия, опыт, регион — за несколько минут. Откликайтесь прямо здесь.</p>`+
+    `<p class="t sm mut">При регистрации на сайте документы не проверяются — отметку можно получить потом в офисе.</p>`+
+    `<div class="pact">${S.me?`<button class="btn go" data-sa="me">${ico('user',18)}Моя анкета</button>`:`<button class="btn go" data-sa="reg">${ico('plus',18)}Зарегистрироваться</button><button class="lnk" data-sa="login">Уже есть анкета — войти</button>`}</div></div>`+
+    `<div class="card glow pathc"><div class="ch"><span class="ic">${ico('route',22)}</span><h2>Через «Мой маршрут»</h2></div>`+
+    `<p class="t">Приложение для тех, кто прилетел через аэропорт Жуковский: вход по талону, сроки, документы, патент и вакансии.</p>`+
+    `<p class="t sm mut">Если документы проверили в офисе, анкета будет с отметкой «документы проверены».</p>`+
+    `<div class="pact"><a class="btn blue" href="${MYROUTE}" target="_blank" rel="noopener" style="text-decoration:none">${ico('ext',18)}Найти работу в «Моём маршруте»</a></div></div></div>`;
+}
+function seekHome(){
+  const fresh=pubJobs().slice(0,4),sample={...ME0(),hidden:false};
+  return `<section class="hero2"><div><div class="sec" style="margin:0 0 10px">Для соискателей</div><h1>Работа в России — <span>контакты только с вашего разрешения</span></h1>`+
+    `<p>Создайте анкету: профессия, опыт, регион. Работодатели видят её без имени и телефона. Имя и номер получит только та компания, которой вы разрешите, — разрешение можно отозвать.</p>`+
+    `<div class="row">${S.me?`<button class="btn go" data-sa="me">${ico('user',18)}Моя анкета</button>`:`<button class="btn go" data-sa="reg">${ico('plus',18)}Зарегистрироваться</button>`}<button class="btn ghost" data-pv="jobs">Вакансии · ${pubJobs().length}</button></div></div>`+
+    `<div><div class="sec" style="margin:0 0 8px">Так анкету видит работодатель · пример</div>${meCard(sample,{pill:'<span class="pl d">пример</span>'})}</div></section>`+
+    `<div class="sec">Два способа начать</div>${seekPaths()}`+
+    `<div class="sec">Как это работает</div><div class="steps">${[['Анкета','Профессия, опыт, регион и русский язык. Имя и телефон работодатели не видят.'],['Отклик','Откликайтесь на вакансии. Компания видит анкету и отметку о проверке документов.'],['Контакты — по вашему решению','Компания просит контакты — вы разрешаете именно ей или отказываете. Разрешение можно отозвать.']].map(([t,x],i)=>`<div class="card"><span class="stepn">${i+1}</span><b>${t}</b><p class="t">${x}</p></div>`).join('')}</div>`+
+    `<div class="sec">Свежие вакансии</div><div class="jgrid">${fresh.map(jobMini).join('')}</div><div style="margin-top:12px"><button class="btn ghost sm" data-pv="jobs">Все вакансии ${ico('chev',16)}</button></div>`+
+    `<div class="sec">Что получает работодатель</div><div class="steps"><div class="card"><div class="ch"><span class="ic">${ico('eye',22)}</span><h2>Сразу</h2></div><p class="t">Профессия, опыт, регион, русский язык и отметка о проверке документов с датой.</p></div>`+
+    `<div class="card"><div class="ch"><span class="ic">${ico('lock',22)}</span><h2>С вашего разрешения</h2></div><p class="t">Имя и телефон — одной компании, которой вы разрешили. Другие их не видят.</p></div>`+
+    `<div class="card"><div class="ch"><span class="ic">${ico('ban',22)}</span><h2>Никогда</h2></div><p class="t">Паспорт и банковские данные портал не запрашивает и никому не передаёт.</p></div></div>`+
+    `<div class="note">${ico('info',18)}<span>Портал не обещает трудоустройство: решение о найме принимает работодатель. Отметка «документы проверены» — сведения на дату проверки, без гарантии ${CHK}.</span></div>`+
+    `<div class="foot">HR-портал — демо-макет. Компании, вакансии и люди вымышлены.<br><button class="lnk" data-doc="sterms">Условия для соискателей</button> · <button class="lnk" data-doc="spd">Согласие на обработку персональных данных</button></div>`;
+}
+
+// ----- регистрация и вход соискателя: телефон → код → имя → анкета
+const scb=(k,txt,doc,req)=>{const A=S.sr.agree;return `<div class="agr"><button class="cbx${A[k]?' on':''}" data-sagr="${k}" role="checkbox" aria-checked="${A[k]}" aria-label="${txt.replace(/<[^>]+>/g,'')}">${A[k]?ico('check',14,3):''}</button><span><span data-sagr="${k}" style="cursor:pointer">${txt}</span>${doc?` <button class="lnk" data-doc="${doc}">Читать</button>`:''}<small>${req?'<span class="req">Обязательно</span>':'Необязательно — можно включить или выключить в настройках'}</small></span></div>`};
+function sResend(){const left=Math.max(0,Math.ceil((S.sr.until-Date.now())/1000));
+  return `<button class="lnk" id="sres" data-sa="again" ${left?'disabled style="color:var(--muted)"':''}>${left?'Отправить ещё раз через '+Math.floor(left/60)+':'+two(left%60):'Отправить код ещё раз'}</button>`}
+function sStartTimer(){S.sr.until=Date.now()+60000;clearInterval(sStartTimer.t);sStartTimer.t=setInterval(()=>{const b=$('#sres');if(!b||S.sr.step!=='code'){clearInterval(sStartTimer.t);return}b.outerHTML=sResend();if(Date.now()>S.sr.until)clearInterval(sStartTimer.t)},1000)}
+function anketaFields(F,E){
+  const sel=(k,l,opts,ph,hint='')=>`<div class="f"><label for="sf_${k}">${l} <span class="req">*</span></label><select class="inp${E[k]?' bad':''}" id="sf_${k}" data-sf="${k}"${opts.length?'':' disabled'}><option value="">${ph}</option>${opts.map(o=>`<option${F[k]===o?' selected':''}>${esc(o)}</option>`).join('')}</select><div class="err">${E[k]||''}</div>${hint?`<small>${hint}</small>`:''}</div>`;
+  const chips=(k,l,opts,hint)=>`<div class="f full"><label id="lb_${k}">${l} <span class="req">*</span></label><div class="chips" role="radiogroup" aria-labelledby="lb_${k}">${opts.map(([v,t])=>`<button role="radio" aria-checked="${F[k]===v}" class="${F[k]===v?'on':''}" data-sfc="${k}" data-v="${esc(v)}">${esc(t)}</button>`).join('')}</div><div class="err">${E[k]||''}</div>${hint?`<small>${hint}</small>`:''}</div>`;
+  return `<div class="fgrid">`+sel('sph','Сфера',SSPH,'Выберите сферу','Те же сферы, что у вакансий')+sel('prof','Профессия',profsOf(F.sph),F.sph?'Выберите профессию':'Сначала выберите сферу')+
+    sel('reg','Где ищете работу',SREG,'Выберите регион')+sel('exp','Опыт',EXP,'Выберите опыт')+
+    chips('ru','Русский язык',RU.map(x=>[x,x]),RU_HINT)+chips('cit','Гражданство',CIT,'Работодатель гражданство не видит. Оно нужно офису, чтобы подсказать, какие документы проверить.')+`</div>`;
+}
+function sRegView(){
+  const R=S.sr,login=S.view==='slogin',b=S.busy.sr,A=R.agree,STEPS=['phone','code','name','form'],si=Math.max(0,STEPS.indexOf(R.step));
+  let h=`<div class="login" style="max-width:${R.step==='form'?720:480}px"><div class="card glow"><div class="ch"><span class="ic">${ico('user',22)}</span><h2>${login?'Вход для соискателя':'Регистрация соискателя'}</h2></div>`;
+  if(!login)h+=`<div class="stp">${STEPS.map((_,i)=>`<i class="${i<=si?'on':''}"></i>`).join('')}</div><p class="xs mut" style="margin:0 0 12px">Шаг ${si+1} из 4 · ${['Телефон и условия','Код из SMS','Имя и почта','Анкета'][si]}</p>`;
+  if(S.pendJob){const j=JOBS.find(x=>x.id===S.pendJob);h+=`<div class="note" style="margin:0 0 12px">${ico('send',18)}<span>После ${login?'входа':'регистрации'} вернём вас к отклику на «${esc(j.t)}».</span></div>`}
+  if(R.step==='phone'){
+    const ok=login||(A.terms&&A.pd);
+    h+=`<div class="f"><label for="sphone">Телефон</label><div class="chips" role="radiogroup" aria-label="Код страны" style="margin-bottom:4px">${CCS.map(c=>`<button role="radio" aria-checked="${R.cc===c}" class="${R.cc===c?'on':''}" data-cc="${c}">${c}</button>`).join('')}</div>`+
+      `<div class="phw"><span>${R.cc}</span><input class="inp num${R.err?' bad':''}" id="sphone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="${PH_LEN[R.cc]+4}" placeholder="${PH_PH[R.cc]}" value="${esc(R.phone)}"></div><div class="err">${R.err}</div>`+
+      `<small>Подойдёт номер вашей страны или российский. Пришлём код в SMS. Демо: любой номер нужной длины, код 1234</small></div>`;
+    if(!login)h+=`<div class="sec">Условия</div><div class="card" style="padding:4px 16px">${scb('terms','Принимаю <b>условия использования портала</b>','sterms',1)}`+
+      `${scb('pd','Согласен на <b>обработку персональных данных</b>: телефон, имя и анкета — для входа и показа анкеты работодателям без имени и телефона','spd',1)}`+
+      `${scb('ads','Хочу получать <b>новости и рекламу портала</b>','sads',0)}</div>`;
+    h+=`<button class="btn go w" style="margin-top:14px" data-sa="send" ${!ok||b?'disabled':''}>${b?'Отправляем…':'Получить код'}</button>`+(ok?'':`<p class="xs mut" style="margin-top:8px;text-align:center">Отметьте два обязательных пункта</p>`)+
+      `<div class="never">${ico('ban',15)}<span>Паспорт и банковские данные портал не запрашивает и не передаёт никогда.</span></div>`+
+      (login?`<p class="xs mut" style="margin-top:10px">Нет анкеты? <button class="lnk" data-sa="toReg">Зарегистрироваться</button></p>`
+        :`<p class="xs mut" style="margin-top:10px">Тексты условий — демо, [проверить у юристов]. Уже есть анкета? <button class="lnk" data-sa="toLogin">Войти</button></p>`);
+  }else if(R.step==='code'){
+    h+=`<p class="t">Код отправили в SMS на <b class="num" style="white-space:nowrap">${R.cc} ${esc(R.phone)}</b>.</p>`+
+      `<div class="f" style="margin-top:14px"><label for="scode">Код из SMS</label><input class="inp num${R.err?' bad':''}" id="scode" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="••••" value="${esc(R.code)}" style="letter-spacing:.4em;font-size:20px;text-align:center"><div class="err">${R.err}</div><small>Демо: 1234 · попыток осталось: ${R.tries}</small></div>`+
+      (R.tries<=0?`<div class="note r">${ico('lock',18)}<span>Попытки закончились. Запросите новый код.</span></div>`:'')+
+      `<button class="btn go w" style="margin-top:14px" data-sa="code" ${b||R.tries<=0?'disabled':''}>${b?'Проверяем…':'Подтвердить'}</button>`+
+      `<div class="row" style="justify-content:space-between;margin-top:12px"><button class="lnk" data-sa="back">Другой номер</button>${sResend()}</div>`;
+  }else if(R.step==='name'){
+    h+=`<div class="f"><label for="sfio">Фамилия и имя <span class="req">*</span></label><input class="inp${R.e.fio?' bad':''}" id="sfio" autocomplete="name" maxlength="80" placeholder="Как к вам обращаться" value="${esc(R.fio)}"><div class="err">${R.e.fio||''}</div>`+
+      `<small>Имя увидит только та компания, которой вы сами разрешите. Остальные видят псевдоним вида «К-2107».</small></div>`+
+      `<div class="f" style="margin-top:12px"><label for="smail">Почта <span class="req">*</span></label><input class="inp${R.e.mail?' bad':''}" id="smail" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="name@mail.ru" value="${esc(R.mail)}"><div class="err">${R.e.mail||''}</div>`+
+      `<small>Сюда — ответы компаний и запасной вход, если сменится номер. Работодатели почту не видят.</small></div>`+
+      `<button class="btn go w" style="margin-top:14px" data-sa="nameOk">Дальше</button>`;
+  }else{
+    h+=`<p class="t">Работодатели увидят профессию, опыт, регион и уровень русского. Имени и телефона в анкете нет.</p><div style="height:12px"></div>`+anketaFields(R,R.e)+
+      (Object.keys(R.e).length?`<div class="note r">${ico('alert',18)}<span>Заполните отмеченные поля.</span></div>`:'')+
+      `<div class="note a">${ico('info',18)}<span>При регистрации на сайте документы не проверяются: анкета будет с пометкой «документы не проверены». Отметку можно получить в офисе в Жуковском или через «Мой маршрут».</span></div>`+
+      `<div class="row" style="margin-top:16px"><button class="btn go" data-sa="create" ${b?'disabled':''}>${b?'Создаём…':ico('check',18)+'Создать анкету'}</button><button class="btn ghost" data-sa="toName" ${b?'disabled':''}>Назад</button></div>`;
+  }
+  return h+`</div><div class="note">${ico('route',18)}<span>Есть талон из аэропорта? <a class="lnk" href="${MYROUTE}" target="_blank" rel="noopener">Войдите в «Мой маршрут»</a> — если документы проверили в офисе, анкета будет с отметкой.</span></div></div>`;
+}
+
+PUBV.sreg=PUBV.slogin=()=>sRegView();
+
+// ----- кабинет соискателя
+const SNAV=[['sProf','Моя анкета','user'],['sJobs','Вакансии','bag'],['sResp','Отклики','inbox'],['sReq','Контакты','lock'],['sSet','Настройки','gear']];
+const STITLE={sProf:['Моя анкета','Так вас видят работодатели — без имени и телефона'],sJobs:['Подходящие вакансии','По сфере и региону из анкеты · сначала новые · без оценок'],
+  sResp:['Мои отклики','Куда вы откликнулись и что ответили компании'],sReq:['Контакты','Кто просит имя и телефон и кому вы их открыли'],
+  sSet:['Настройки','Видимость анкеты, уведомления, аккаунт'],sEdit:['Изменить анкету','Работодатели увидят изменения сразу']};
+function seekCabView(){
+  const M=S.me,cnt=k=>k==='sReq'?reqCnt():0,on=k=>S.view===k||(k==='sProf'&&S.view==='sEdit');
+  const side=SNAV.map(([k,t,ic])=>`<button class="nv${on(k)?' on':''}" data-view="${k}">${ico(ic,19)}<span>${t}</span>${cnt(k)?`<i class="cnt">${cnt(k)}</i>`:''}</button>`).join('');
+  const bn=SNAV.map(([k,t,ic])=>`<button class="${on(k)?'on':''}" data-view="${k}">${ico(ic,22)}<span>${t}</span>${cnt(k)?`<i class="cnt">${cnt(k)}</i>`:''}</button>`).join('');
+  const [tt,ts]=STITLE[S.view];
+  let body;
+  if(S.err)body=`<div class="card empty"><div class="ei">${ico('alert',28)}</div><b>Не удалось загрузить</b><p>Сервер не ответил. Данные не потеряны — попробуйте ещё раз.</p><button class="btn blue sm" data-a="retry" ${S.busy.retry?'disabled':''}>${ico('refresh',16)}${S.busy.retry?'Повторяем…':'Повторить'}</button></div>`;
+  else if(S.loading)body=`<div class="card">${[90,70,80,55,75].map(w=>`<div class="skel" style="width:${w}%"></div>`).join('')}</div>`;
+  else body=({sProf:sProfView,sJobs:sJobsView,sResp:sRespView,sReq:sReqView,sSet:sSetView,sEdit:sEditView})[S.view]();
+  return `<div class="cab"><aside class="side">${brandH('кабинет соискателя')}<div class="co"><b>${esc(M.fio)}</b>${M.al} · ${M.hidden?'анкета скрыта':'анкета видна'}</div>${side}<span class="grow"></span>`+
+    `<button class="nv" data-sa="home">${ico('globe',19)}<span>Портал</span></button><button class="nv" data-sa="logout">${ico('out',19)}<span>Выйти</span></button></aside>`+
+    `<div class="main"><div class="mtop">${brandH('')}<span class="grow"></span><button class="demoBtn" data-a="demo">Демо</button></div>`+
+    `<div class="mhd"><div class="t"><b>${tt}</b><small>${ts}</small></div><button class="demoBtn" data-a="demo">Демо</button></div>`+
+    `<div class="cont" id="scroll">${S.off?`<div class="off">${ico('wifioff',16)}<span>Нет сети. Показаны данные на 26.11 09:20. Обновим сами, когда сеть появится.</span></div>`:''}<div class="fadein">${body}</div></div>`+
+    `<nav class="bnav">${bn}</nav></div></div>`;
+}
+function sProfView(){
+  const M=S.me,n=reqCnt();
+  let h='';
+  if(n)h+=`<div class="note a" style="margin:0 0 14px">${ico('lock',18)}<span><b>${n===1?'Компания просит':'Компании просят'} ваши контакты · ${n}.</b> Решаете вы. <button class="lnk" data-view="sReq">Ответить</button></span></div>`;
+  if(M.hidden)h+=`<div class="note" style="margin:0 0 14px">${ico('eye',18)}<span><b>Анкета скрыта.</b> Работодатели не находят её в поиске; компании, которым вы уже откликнулись, отклик видят [демо]. <button class="lnk" data-sa="hide">Показать снова</button></span></div>`;
+  h+=`<div class="grid2"><div><div class="sec" style="margin-top:0">Так видит работодатель</div>${meCard(M)}</div>`+
+    `<div><div class="sec" style="margin-top:0">Ваши данные</div><div class="card"><dl class="fld"><dt>Фамилия и имя</dt><dd>${esc(M.fio)}</dd><dt>Телефон</dt><dd class="num">${esc(M.ph)}</dd><dt>Почта</dt><dd>${esc(M.mail||'—')} <span class="xs mut">· работодатель не видит</span></dd>`+
+    `<dt>Гражданство</dt><dd>${citName(M.cit)} <span class="xs mut">· работодатель не видит</span></dd><dt>Сфера</dt><dd>${esc(M.sph)}</dd><dt>Анкета с</dt><dd>${fdd(M.since)} · ${M.src==='site'?'регистрация на сайте':'«Мой маршрут»'}</dd></dl>`+
+    `<p class="xs mut" style="margin-top:10px">Имя и телефон получит только компания, которой вы разрешите, — в разделе «Контакты».</p>`+
+    `<div class="row" style="margin-top:14px"><button class="btn ghost sm" data-sa="edit">${ico('edit',16)}Изменить анкету</button><button class="btn ghost sm" data-view="sJobs">${ico('bag',16)}Подходящие вакансии</button></div></div></div></div>`;
+  h+=`<div class="sec">Проверка документов</div>`;
+  if(M.docs)return h+`<div class="note g" style="margin-top:0">${ico('shield',18)}<span><b>Документы проверены в офисе ${fdd(M.docs)}.</b> Основание работать: ${esc(M.right)} — сведения на дату проверки, без гарантии ${CHK}. Отметка не обещает трудоустройство: решение о найме принимает работодатель.</span></div>`;
+  return h+`<div class="note a" style="margin-top:0">${ico('alert',18)}<span><b>Документы не проверены.</b> При регистрации на сайте документы не проверяются. Работодатели видят пометку «не проверены»; в их поиске по умолчанию — анкеты с отметкой, но на ваш отклик компания ответит.</span></div>`+
+    `<div class="two" style="margin-top:12px"><div class="card pathc"><div class="ch"><span class="ic">${ico('office',22)}</span><h2>Визит в офис</h2></div>`+
+    `<p class="t">«Документ Экспресс», аэропорт Жуковский, 2-й этаж, окна 14–16. Возьмите паспорт и документы для работы — оператор сверит их и поставит отметку с датой ${CHK}.</p>`+
+    `<p class="t sm mut">Копии документов на портал не попадают: работодатель видит только отметку и дату.</p></div>`+
+    `<div class="card pathc"><div class="ch"><span class="ic">${ico('route',22)}</span><h2>Через «Мой маршрут»</h2></div>`+
+    `<p class="t">Прилетели через Жуковский и получили талон? Войдите в «Мой маршрут» по талону. Если документы уже проверили в офисе, отметка появится в анкете [демо].</p>`+
+    `<div class="pact"><a class="btn ghost sm" href="${MYROUTE}" target="_blank" rel="noopener" style="text-decoration:none">${ico('ext',16)}Открыть «Мой маршрут»</a></div></div></div>`;
+}
+function sEditView(){
+  const F=S.sf,b=S.busy.se;
+  return `<button class="lnk" data-view="sProf" style="margin-bottom:12px;display:inline-flex;gap:6px;align-items:center">${ico('back',16)}К анкете</button>`+
+    `<div class="card" style="max-width:760px">${anketaFields(F,F.e)}${Object.keys(F.e).length?`<div class="note r">${ico('alert',18)}<span>Заполните отмеченные поля.</span></div>`:''}`+
+    `<div class="note">${ico('info',18)}<span>Имя и телефон меняются через поддержку портала [демо]: компании, которым вы их открыли, увидят новое только после нового разрешения.</span></div>`+
+    `<div class="row" style="margin-top:16px"><button class="btn go" data-sa="editSave" ${b?'disabled':''}>${b?'Сохраняем…':ico('check',18)+'Сохранить'}</button><button class="btn ghost" data-view="sProf">Отмена</button></div></div>`;
+}
+function sJobCard(j){
+  const e=emp(j.e),ap=appliedTo(j.id);
+  return `<div class="card jc"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><b class="jt">${esc(j.t)}</b><span class="xs mut" style="flex:none">${daysAgo(j.date)?daysAgo(j.date)+' дн. назад':'сегодня'}</span></div>`+
+    `<div class="row sm mut" style="margin-top:4px;gap:6px"><span style="overflow-wrap:anywhere">${esc(e.name)}</span>${vbadge(e)}</div>`+
+    `<div class="jp num">${payOf(j)}</div><div class="tags">${[j.place,j.sched,j.housing&&'жильё',j.noexp&&'без опыта'].filter(Boolean).map(t=>`<span>${esc(t)}</span>`).join('')}</div>`+
+    `<div class="row" style="margin-top:14px">${ap?`<span class="pl g">${ico('check',12)}отклик ${fdm(ap.when)}</span>`:`<button class="btn blue sm" data-sa="apply" data-j="${j.id}">${ico('send',16)}Откликнуться</button>`}<button class="btn ghost sm" data-job="${j.id}">Подробнее</button></div></div>`;
+}
+function sJobsView(){
+  const M=S.me,all=pubJobs(),mt=j=>j.sph===M.sph&&(M.reg==='Любой регион'||j.reg===M.reg),fit=all.filter(mt),L=S.sjAll?all:fit,n=S.pg.sjobs||10;
+  let h=`<div class="card" style="padding:14px 16px"><div class="chips"><button class="${S.sjAll?'':'on'}" data-sa="sjFit">Подходящие · ${fit.length}</button><button class="${S.sjAll?'on':''}" data-sa="sjAll">Все вакансии · ${all.length}</button></div>`+
+    `<p class="sm mut" style="margin-top:10px">Подходящие — сфера «${esc(M.sph)}» и регион «${esc(M.reg)}» из анкеты. Сначала новые. Без оценок и процентов «подходит». <button class="lnk" data-sa="edit">Изменить анкету</button></p></div>`;
+  if(!L.length)return h+emptyBox('search','Подходящих вакансий пока нет','Посмотрите все вакансии или выберите в анкете другой регион.',`<button class="btn ghost sm" data-sa="sjAll">Все вакансии</button>`);
+  return h+`<div class="sec">Найдено: ${L.length}</div><div class="jgrid">${L.slice(0,n).map(sJobCard).join('')}</div>`+more('sjobs',Math.min(n,L.length),L.length);
+}
+const SRST={new:['d','отправлен'],seen:['c','просмотрен'],wait:['a','просят контакты'],ok:['g','контакты открыты'],no:['d','вы отказали'],rev:['r','согласие отозвано']};
+function sRespView(){
+  const L=myResp().filter(r=>r.how!=='запрос');
+  if(!L.length)return emptyBox('inbox','Откликов пока нет','Откликнитесь на подходящую вакансию — компания увидит анкету без имени и телефона.',`<button class="btn go sm" data-view="sJobs">${ico('bag',18)}Подходящие вакансии</button>`);
+  const why=r=>({new:'Компания видит анкету без имени и телефона. Ответ придёт сюда.',seen:'Компания открыла анкету. Если попросит контакты — решите вы.',
+    wait:`Компания просит контакты. <button class="lnk" data-view="sReq">Ответить</button>`,ok:'Имя и телефон открыты только этой компании · '+(r.at?fdt(r.at):''),
+    no:'Вы отказали — имя и телефон не переданы.',rev:'Вы отозвали согласие '+(r.rev?fdt(r.rev):'')+' — дальнейшая передача прекращена.'})[r.st];
+  return `<div class="card" style="padding:4px 16px">${L.map(r=>{const e=emp(r.e),[pc,pt]=SRST[r.st];return `<div class="li" style="align-items:flex-start"><span class="lic">${ico('bag',19)}</span><span class="lt"><b>${esc(r.jt)}</b><small>${esc(e.name)} · отклик ${fdt(r.when)}</small><small style="color:var(--text-2)">${why(r)}</small></span><span class="pl ${pc}">${pt}</span></div>`}).join('')}</div>`+
+    `<div class="never">${ico('ban',15)}<span>Паспорт и банковские данные не передаются никогда — ни в отклике, ни после разрешения.</span></div>`;
+}
+function sReqView(){
+  const M=S.me,R=myResp(),W=R.filter(r=>r.st==='wait'),O=R.filter(r=>r.st==='ok'),H=R.filter(r=>r.st==='no'||r.st==='rev');
+  const co=r=>{const e=emp(r.e);return `<b class="jt" style="font-size:15.5px">${esc(e.name)}</b> ${vbadge(e)}`};
+  const reqCard=r=>{const b=S.busy['al'+r.id]||S.busy['dn'+r.id];return `<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0;flex:1">${co(r)}<div class="sm mut" style="margin-top:4px">${r.how==='запрос'?'нашли вашу анкету':'по вашему отклику'} на «${esc(r.jt)}» · запрос ${fdt(r.req)}</div></div><span class="pl a">ждёт ответа</span></div>`+
+    `<dl class="fld" style="margin-top:12px"><dt>Если разрешите, увидит</dt><dd>${esc(M.fio)} · <span class="num" style="white-space:nowrap">${esc(M.ph)}</span></dd><dt>Не увидит никогда</dt><dd class="no">паспорт, банковские данные</dd></dl>`+
+    `<div class="row" style="margin-top:14px"><button class="btn go sm" data-sa="allow" data-r="${r.id}" ${b||S.off?'disabled':''}>${b?'Сохраняем…':ico('check',16)+'Разрешить этой компании'}</button><button class="btn ghost sm" data-sa="deny" data-r="${r.id}" ${b?'disabled':''}>Отказать</button></div></div>`};
+  const okCard=r=>`<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0;flex:1">${co(r)}<div class="sm mut" style="margin-top:4px">«${esc(r.jt)}» · открыто ${fdt(r.at)}</div></div><span class="pl g">контакты открыты</span></div>`+
+    `<div class="contact"><div class="nm">${esc(M.fio)}</div><div class="ph">${esc(M.ph)}</div><div class="xs mut" style="margin-top:6px">Передано только этой компании. Другие видят анкету без имени и телефона.</div></div>`+
+    `<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-sa="revoke" data-r="${r.id}">${ico('lock',16)}Отозвать согласие</button></div></div>`;
+  let h=`<div class="note" style="margin:0 0 4px">${ico('shield',18)}<span>Разрешение действует только для одной компании. Остальные по-прежнему видят анкету без имени и телефона. Паспорт и банковские данные не передаются никогда.</span></div>`;
+  h+=`<div class="sec">Запросы контактов · ${W.length}</div>`+(W.length?`<div class="cards" style="grid-template-columns:minmax(0,1fr)">${W.map(reqCard).join('')}</div>`:`<p class="t mut">Новых запросов нет. Когда компания попросит контакты, запрос появится здесь${M.sms?' и придёт SMS':''}.</p>`);
+  h+=`<div class="sec">Кому открыты мои контакты · ${O.length}</div>`+(O.length?`<div class="cards" style="grid-template-columns:minmax(0,1fr)">${O.map(okCard).join('')}</div>`:`<p class="t mut">Вы пока никому не открывали имя и телефон.</p>`);
+  if(H.length)h+=`<div class="sec">История</div><div class="card" style="padding:4px 16px">${H.map(r=>`<div class="li" style="align-items:flex-start"><span class="lic">${ico(r.st==='rev'?'lock':'x',19)}</span><span class="lt"><b>${esc(emp(r.e).name)}</b><small>«${esc(r.jt)}»</small><small style="color:var(--text-2)">${r.st==='rev'?'Согласие отозвано '+fdt(r.rev)+'. Дальнейшая передача прекращена; то, что компания уже получила, отзыв не возвращает '+CHK+'.':'Вы отказали — имя и телефон не переданы.'}</small></span><span class="pl ${SRST[r.st][0]}">${SRST[r.st][1]}</span></div>`).join('')}</div>`;
+  return h;
+}
+function sSetView(){
+  const M=S.me,sw=(k,on,t,s)=>`<div class="li"><span class="lt"><b>${t}</b><small>${s}</small></span><button class="sw ${on?'on':''}" data-sa="${k}" style="width:auto" aria-label="${t}" aria-pressed="${on}"><span class="k"></span></button></div>`;
+  return `<div class="grid2"><div class="card"><div class="ch"><span class="ic">${ico('eye',22)}</span><h2>Анкета</h2></div>`+
+    sw('hide',!M.hidden,'Анкета видна работодателям','Выключите — анкету не найдут в поиске. Отклики, которые вы уже отправили, компании видят [демо].')+
+    `<div class="li"><span class="lt"><b>Псевдоним</b><small>так вас видят компании до разрешения</small></span><span class="al">${M.al}</span></div></div>`+
+    `<div class="card"><div class="ch"><span class="ic">${ico('bell',22)}</span><h2>Уведомления</h2></div>`+
+    sw('sms',M.sms,'SMS о запросах контактов','чтобы не пропустить, когда компания просит имя и телефон')+
+    sw('ads',M.ads,'Новости и реклама портала','необязательно · по умолчанию выключено')+
+    `<div class="li"><span class="lt"><b>Принятые условия</b><small>условия портала и согласие на обработку ПДн — ${fdd(M.since)}</small></span><span class="row" style="gap:12px"><button class="lnk" data-doc="sterms">Условия</button><button class="lnk" data-doc="spd">Согласие</button></span></div></div></div>`+
+    `<div class="sec">Аккаунт</div><div class="card"><dl class="fld"><dt>Вход</dt><dd class="num">${esc(M.ph)} · по коду из SMS</dd><dt>Почта</dt><dd>${esc(M.mail||'—')} · ответы компаний, запасной вход [демо]</dd></dl>`+
+    `<div class="row" style="margin-top:14px"><button class="btn ghost sm" data-sa="home">${ico('globe',16)}Портал</button><button class="btn ghost sm" data-sa="logout">${ico('out',16)}Выйти</button><button class="btn ghost sm" data-sa="del" style="color:var(--tone-r-ink)">${ico('x',16)}Удалить аккаунт</button></div>`+
+    `<p class="xs mut" style="margin-top:10px">Удаление снимает анкету и прекращает передачу контактов. Как долго хранится журнал раскрытий — [проверить у юристов].</p></div>`;
+}
+
+// ----- окна поверх (подключаются в dlgView, parts/hr1.js)
+const SDLG={
+  sApply(head){const j=JOBS.find(x=>x.id===S.applyJ),e=emp(j.e),M=S.me,b=S.busy.apply;
+    return head('Отклик на вакансию')+`<p class="t"><b>${esc(j.t)}</b><br>${esc(e.name)} · ${esc(j.place)} · <span class="num">${payOf(j)}</span></p>`+
+      `<div class="sec" style="margin:14px 0 8px">Компания увидит</div>${meCard(M,{plain:true,pill:' '})}`+
+      (M.docs?'':`<div class="note a">${ico('alert',18)}<span>Документы не проверены — компания увидит это в отклике. Отметку можно получить в офисе в Жуковском или через «Мой маршрут».</span></div>`)+
+      `<div class="note">${ico('lock',18)}<span>Имя и телефон компания не получит. Если она попросит контакты, решите вы — в разделе «Контакты».</span></div>`+
+      `<div class="row" style="margin-top:16px"><button class="btn go" data-sa="applyGo" ${b?'disabled':''}>${b?'Отправляем…':ico('send',18)+'Отправить отклик'}</button><button class="btn ghost" data-a="dclose">Отмена</button></div>`},
+  sRevoke(head){const r=myResp().find(x=>x.id===S.revR),e=emp(r.e),b=S.busy.rv;
+    return head('Отозвать согласие?')+`<p class="t"><b>${esc(e.name)}</b> больше не получит ваши имя и телефон через портал, и они пропадут из её кабинета.</p>`+
+      `<div class="note a">${ico('info',18)}<span>Отзыв прекращает дальнейшую передачу. То, что компания уже получила, отзыв не возвращает. Что компания обязана сделать с уже полученным номером — ${CHK}.</span></div>`+
+      `<div class="row" style="margin-top:16px"><button class="btn go" data-sa="revokeGo" ${b?'disabled':''}>${b?'Отзываем…':'Отозвать согласие'}</button><button class="btn ghost" data-a="dclose">Отмена</button></div>`},
+  sDel(head){const b=S.busy.del;
+    return head('Удалить аккаунт?')+`<p class="t">Анкета исчезнет из поиска, передача ваших контактов компаниям прекратится, компании получат уведомление. Уже переданное удаление не возвращает.</p>`+
+      `<div class="note a">${ico('info',18)}<span>Демо: аккаунт удаляется только на этой странице. Срок хранения журнала раскрытий — [проверить у юристов].</span></div>`+
+      `<div class="row" style="margin-top:16px"><button class="btn go" data-sa="delGo" ${b?'disabled':''}>${b?'Удаляем…':'Удалить аккаунт'}</button><button class="btn ghost" data-a="dclose">Отмена</button></div>`}};
+
+// ----- тексты условий для соискателя (демо)
+Object.assign(DOCS,{
+  sterms:['Условия для соискателей',[['Что это','HR-портал помогает найти работу у компаний, которые сверил портал. Регистрация и отклики бесплатны.'],['Анкета','Работодатели видят псевдоним, профессию, опыт, регион, уровень русского и отметку о проверке документов. Имени и телефона в анкете нет.'],['Контакты','Имя и телефон передаются только компании, которой вы разрешили. Разрешение можно отозвать.'],['Без гарантии','Портал не обещает трудоустройство. Решение о найме принимает работодатель. Отметка «документы проверены» — сведения на дату проверки.']]],
+  spd:['Согласие на обработку персональных данных',[['Что обрабатываем','Телефон, фамилию и имя, анкету: сферу, профессию, регион, опыт, уровень русского, гражданство.'],['Зачем','Вход по коду, показ анкеты работодателям без имени и телефона, передача имени и телефона компании, которой вы разрешили.'],['Кому передаём','Только компании, которой вы разрешили, — имя и телефон. Каждое такое раскрытие записывается в журнал.'],['Чего не делаем','Паспортные и банковские данные портал не запрашивает и не передаёт никогда.'],['Отзыв','В кабинете соискателя. Отзыв прекращает дальнейшую передачу; уже переданное не возвращает. Сроки хранения — [проверить].']]],
+  sads:['Согласие на рекламу',[['Что пришлём','Новости портала и предложения партнёров — не чаще раза в неделю.'],['Как отказаться','В настройках кабинета. На анкету и отклики не влияет.']]]});
+
+// ----- действия
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-sa],[data-aud],[data-dside],[data-cc],[data-sagr],[data-sfc]');if(!t||t.disabled)return;
+  const d=t.dataset,R=S.sr,M=S.me;
+  if(d.aud){S.aud=d.aud;return ['home','login','reg','regdone','sreg','slogin'].includes(S.view)?go('home'):render()}
+  if(d.dside){S.dside=d.dside;return render()}
+  if(d.cc){R.cc=d.cc;R.err='';render();const i=$('#sphone');i&&i.focus();return}
+  if(d.sagr){R.agree[d.sagr]=!R.agree[d.sagr];return render()}
+  if(d.sfc){const F=SF();F[d.sfc]=d.v;delete F.e[d.sfc];return render()}
+  switch(d.sa){
+    case 'reg':S.sr=freshSr('reg');S.aud='seek';S.dlg=null;return go('sreg');
+    case 'login':S.sr=freshSr('login');S.aud='seek';S.dlg=null;return go('slogin');
+    case 'toReg':S.sr={...freshSr('reg'),cc:R.cc,phone:R.phone};return go('sreg');
+    case 'toLogin':S.sr={...freshSr('login'),cc:R.cc,phone:R.phone};return go('slogin');
+    case 'send':{const v=($('#sphone').value||'').trim(),dg=v.replace(/\D/g,'');R.phone=v;
+      if(dg.length!==PH_LEN[R.cc]){R.err='Номер для '+R.cc+' — '+PH_LEN[R.cc]+' цифр, без кода страны';render();const i=$('#sphone');i&&i.focus();return}
+      R.err='';return call('sr',700,()=>{R.step='code';R.code='';R.tries=5;sStartTimer();toast('Код отправлен в SMS · демо 1234');setTimeout(()=>{const i=$('#scode');i&&i.focus()},30)})}
+    case 'again':if(Date.now()<R.until)return;return call('sr',500,()=>{R.code='';R.err='';R.tries=5;sStartTimer();toast('Новый код отправлен в SMS · демо 1234')});
+    case 'code':{const c=($('#scode').value||'').trim();R.code=c;
+      if(c.length<4){R.err='Введите 4 цифры из SMS';return render()}
+      if(c!=='1234'){R.tries--;R.err=R.tries>0?'Код не подходит. Осталось попыток: '+R.tries:'Попытки закончились — запросите новый код';return render()}
+      R.err='';return call('sr',600,()=>{
+        if(S.view==='slogin'){let m=S.meLast;if(!m){m={...ME0(),id:'cl'+(S.nid++),cc:R.cc,phone:R.phone,ph:R.cc+' '+R.phone};S.seekers.push(m)}S.me=m;S.meLast=null;S.aud='seek';afterEnter('Вход выполнен')}
+        else{R.step='name';setTimeout(()=>{const i=$('#sfio');i&&i.focus()},30)}})}
+    case 'back':R.step='phone';R.err='';return render();
+    case 'nameOk':{const v=($('#sfio').value||'').trim(),m=($('#smail').value||'').trim();R.fio=v;R.mail=m;const E={};
+      if(!/^[\p{L}][\p{L}\s'’.-]{2,79}$/u.test(v)||!/\p{L}{2,}/u.test(v))E.fio='Только буквы: фамилия и имя, без телефона и почты';
+      if(!MAIL_RE.test(m))E.mail='Проверьте почту: нужен вид имя@домен';
+      if(Object.keys(E).length){R.e=E;render();const i=$(E.fio?'#sfio':'#smail');i&&i.focus();return}
+      R.e={};R.step='form';render();const s=$('#scroll');s&&(s.scrollTop=0);return}
+    case 'toName':R.step='name';R.e={};return render();
+    case 'create':{const E=anketaErr(R);R.e=E;if(Object.keys(E).length){render();const i=$('#sf_'+Object.keys(E)[0]);i&&i.focus();return}
+      return call('sr',900,()=>createMe())}
+    case 'me':S.aud='seek';return go(reqCnt()?'sReq':'sProf');
+    case 'home':S.aud='seek';return go('home');
+    case 'logout':S.meLast=S.me;S.me=null;S.aud='seek';go('home');return toast('Вы вышли из кабинета соискателя');
+    case 'apply':if(!M){S.pendJob=d.j;S.sr=freshSr('reg');S.aud='seek';return go('sreg')}
+      if(appliedTo(d.j))return toast('Вы уже откликнулись на эту вакансию');
+      S.applyJ=d.j;S.dlg='sApply';return render();
+    case 'applyGo':if(appliedTo(S.applyJ)){S.dlg=null;return render()}
+      return call('apply',800,()=>{doApply(S.applyJ);S.dlg=null;toast('Отклик отправлен — компания увидит анкету без имени и телефона')});
+    case 'allow':{const r=recOf(d.r);return call('al'+r.id,700,()=>{r.st='ok';r.at=nowD();const e=emp(r.e||'e1');
+      if(r.c){S.log.unshift({at:r.at,c:r.c,v:r.v,ev:'g'});notify({ic:'user',t:M.al+' согласился — контакты открыты',s:'только для '+CO,view:'resp'})}
+      toast('Имя и телефон открыты только «'+e.name.replace(/^[^«]*«|»$/g,'')+'»')})}
+    case 'deny':{const r=recOf(d.r);return call('dn'+r.id,600,()=>{r.st='no';if(r.c)notify({ic:'x',t:M.al+' отказал в контактах',s:'карточка остаётся без контактов',view:'resp'});toast('Вы отказали — имя и телефон не переданы')})}
+    case 'revoke':S.revR=d.r;S.dlg='sRevoke';return render();
+    case 'revokeGo':{const r=recOf(S.revR);return call('rv',700,()=>{r.st='rev';r.rev=nowD();
+      if(r.c){S.log.unshift({at:r.rev,c:r.c,v:r.v,ev:'r'});notify({ic:'alert',t:M.al+' отозвал согласие',s:'контакты скрыты из кабинета',view:'resp'})}
+      S.dlg=null;toast('Согласие отозвано — дальнейшая передача прекращена')})}
+    case 'hide':M.hidden=!M.hidden;render();return toast(M.hidden?'Анкета скрыта из поиска':'Анкета снова видна работодателям');
+    case 'sms':M.sms=!M.sms;render();return toast(M.sms?'SMS о запросах включены':'SMS о запросах выключены');
+    case 'ads':M.ads=!M.ads;render();return toast(M.ads?'Согласие на рекламу дано · отозвать можно здесь':'Согласие на рекламу отозвано');
+    case 'edit':S.sf={sph:M.sph,prof:M.prof,reg:M.reg,exp:M.exp,ru:M.ru,cit:M.cit,e:{}};return go('sEdit');
+    case 'editSave':{const E=anketaErr(S.sf);S.sf.e=E;if(Object.keys(E).length){render();const i=$('#sf_'+Object.keys(E)[0]);i&&i.focus();return}
+      return call('se',600,()=>{const {e:_,...F}=S.sf;Object.assign(M,F);if(M.docs)M.right=rightOf(M);S.view='sProf';toast('Анкета обновлена — компании видят новые данные')})}
+    case 'del':S.dlg='sDel';return render();
+    case 'delGo':return call('del',800,()=>{withdraw();S.dlg=null;S.view='home';S.aud='seek';toast('Аккаунт удалён · демо')});
+    case 'sjFit':S.sjAll=false;S.pg.sjobs=10;return render();
+    case 'sjAll':S.sjAll=true;S.pg.sjobs=10;return render();
+    case 'docs':if(!M)return toast('Сначала войдите как соискатель — ситуация «Анкета заполнена»',true);
+      setDocs(!M.docs);render();return toast(M.docs?'Документы проверены в офисе · демо':'Отметка о проверке снята · демо');
+    case 'empCab':S.logged=true;S.aud='emp';S.dlg=null;return go('resp');
+    case 'seekCab':S.aud='seek';S.dlg=null;if(S.me)return go(reqCnt()?'sReq':'sProf');S.sr=freshSr('reg');return go('sreg');
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target,R=S.sr;
+  if(t.id==='sphone'){t.value=t.value.replace(/[^\d\s-]/g,'');R.phone=t.value;if(R.err){R.err='';t.classList.remove('bad');const er=t.closest('.f').querySelector('.err');er&&(er.textContent='')}}
+  if(t.id==='scode'){t.value=t.value.replace(/\D/g,'').slice(0,4);R.code=t.value}
+  if(t.id==='sfio'){R.fio=t.value;if(R.e.fio){delete R.e.fio;t.classList.remove('bad');const er=t.closest('.f').querySelector('.err');er&&(er.textContent='')}}
+});
+document.addEventListener('change',e=>{
+  const t=e.target,k=t.dataset.sf;if(!k)return;
+  const F=SF();F[k]=t.value;delete F.e[k];if(k==='sph'){F.prof='';}render();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const m={sphone:'send',scode:'code',sfio:'nameOk'}[e.target.id];if(m){const b=$(`[data-sa="${m}"]`);b&&b.click()}
+});
+
 // ----- HR-портал: отрисовка и действия кабинета и входа (действия каталога и регистрации-галочек — parts/hr3.js)
 const nowD=()=>{const d=new Date(NOW);const n=new Date();d.setHours(n.getHours(),n.getMinutes());return d};
 const CONTACT_RE=/(\+?\d[\d\s\-()]{8,}\d)|@|https?:|www\./i;
@@ -1354,10 +1785,11 @@ const MAIL_RE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const isPub=()=>PUB.includes(S.view);
 function render(){
   document.documentElement.dataset.theme=S.theme;
-  if(!S.logged&&!isPub())S.view='home';
+  if(isSeek()&&!S.me)S.view='home';
+  if(!S.logged&&!isPub()&&!isSeek())S.view='home';
   $('#demo').innerHTML=demoHtml(false);
   const sc=$('#scroll'),y=sc?sc.scrollTop:0,same=S._v===S.view;
-  $('#app').innerHTML=isPub()?pubView():cabView();
+  $('#app').innerHTML=isPub()?pubView():isSeek()?seekCabView():cabView();
   const ns=$('#scroll');if(ns&&same)ns.scrollTop=y;
   S._v=S.view;
   $('#ov').innerHTML=dlgView();
@@ -1403,7 +1835,7 @@ function saveForm(st,extra={}){
 }
 function sendReq(cid,vid){
   const r=S.resp.find(x=>x.c===cid&&x.v===vid)||S.resp.find(x=>x.c===cid&&x.st==='new');
-  if(r){r.st='wait';r.req=nowD();r.v=r.v||vid}else S.resp.unshift({id:'r'+(S.resp.length+100),c:cid,v:vid,how:'запрос',when:nowD(),st:'wait',req:nowD()});
+  if(r){r.st='wait';r.req=nowD();r.v=r.v||vid}else S.resp.unshift({id:'r'+(S.nid++),c:cid,v:vid,how:'запрос',when:nowD(),st:'wait',req:nowD()});
 }
 // повтор кода: таймер 60 с, подпись обновляется раз в секунду без полной перерисовки
 function startTimer(){S.lg.until=Date.now()+60000;clearInterval(startTimer.t);startTimer.t=setInterval(()=>{const b=$('#lres');if(!b||S.lg.step!=='code'){clearInterval(startTimer.t);return}b.outerHTML=resendBtn();if(Date.now()>S.lg.until)clearInterval(startTimer.t)},1000)}
@@ -1413,7 +1845,8 @@ function regValidate(){
   if(R.name.trim().length<3)E.name='Укажите название компании';
   if(!R.reg)E.reg='Выберите регион';
   if(R.fio.trim().length<3)E.fio='Укажите имя и фамилию';
-  if(R.by==='mail'?!MAIL_RE.test(R.mail.trim()):R.phone.replace(/\D/g,'').length!==10)E.contact=R.by==='mail'?'Проверьте почту: нужен вид имя@домен':'Нужно 10 цифр после +7';
+  if(!MAIL_RE.test(R.mail.trim()))E.mail='Проверьте почту: нужен вид имя@домен';
+  if(R.phone.replace(/\D/g,'').length!==10)E.phone='Нужно 10 цифр после +7';
   R.err=E;return !Object.keys(E).length;
 }
 
@@ -1437,8 +1870,8 @@ document.addEventListener('click',e=>{
     case 'dclose':S.dlg=null;return render();
     case 'toLogin':S.lg={...S.lg,step:'id',code:'',err:'',tries:5};return go('login');
     case 'toReg':return go('reg');
-    case 'toHome':return go('home');
-    case 'toCab':return go('sum');
+    case 'toHome':S.aud='emp';return go('home');
+    case 'toCab':S.aud='emp';return go('sum');
     case 'logout':S.logged=false;return go('home');
     case 'lSend':{const v=($('#lid').value||'').trim();
       if(L.by==='mail'){L.mail=v;if(!MAIL_RE.test(v)){L.err='Проверьте почту: нужен вид имя@домен';return render()}}
@@ -1468,8 +1901,8 @@ document.addEventListener('click',e=>{
         else if(S.pending){saveForm('draft');S.view='vac';S.form=null;toast('Сохранено. Опубликуем, когда компания пройдёт проверку')}
         else{saveForm('pub');S.view='vac';S.form=null;toast('Вакансия опубликована')}})}
     case 'req':S.reqC=d.c;S.reqV=(S.vacs.find(v=>v.st==='pub')||{}).id;S.dlg='req';return render();
-    case 'reqSend':return call('req',800,()=>{sendReq(S.reqC,S.reqV);S.dlg=null;toast('Запрос отправлен — кандидат ответит в «Моём маршруте»')});
-    case 'reqR':{const r=S.resp.find(x=>x.id===d.r);return call('q'+r.id,800,()=>{sendReq(r.c,r.v);toast('Запрос отправлен — кандидат ответит в «Моём маршруте»')})}
+    case 'reqSend':return call('req',800,()=>{sendReq(S.reqC,S.reqV);S.dlg=null;toast('Запрос отправлен — кандидат ответит на портале или в «Моём маршруте»')});
+    case 'reqR':{const r=S.resp.find(x=>x.id===d.r);return call('q'+r.id,800,()=>{sendReq(r.c,r.v);toast('Запрос отправлен — кандидат ответит на портале или в «Моём маршруте»')})}
     case 'dYes':{const r=S.resp.find(x=>x.id===d.r);r.st='ok';r.at=nowD();S.log.unshift({at:r.at,c:r.c,v:r.v,ev:'g'});render();return toast('Кандидат согласился — контакты открыты только вам')}
     case 'dNo':{const r=S.resp.find(x=>x.id===d.r);r.st='no';render();return toast('Кандидат отказал — контакты не передаются')}
     case 'dRev':{const r=S.resp.find(x=>x.id===d.r);r.st='rev';r.rev=nowD();S.log.unshift({at:r.rev,c:r.c,v:r.v,ev:'r'});render();return toast('Кандидат отозвал согласие — контакты скрыты',true)}
@@ -1496,7 +1929,7 @@ document.addEventListener('input',e=>{
   if(t.id==='lid'){if(S.lg.by==='mail')S.lg.mail=t.value;else{t.value=t.value.replace(/[^\d\s-]/g,'');S.lg.phone=t.value}}
   if(t.id==='lcode'){t.value=t.value.replace(/\D/g,'').slice(0,4);S.lg.code=t.value}
   if(t.dataset.rg&&t.tagName!=='SELECT'){const f=t.dataset.rg;let v=t.value;if(f==='inn'){v=v.replace(/\D/g,'').slice(0,12);t.value=v}if(f==='phone'){v=v.replace(/[^\d\s-]/g,'');t.value=v}
-    S.rg[f]=v;const ek=f==='mail'||f==='phone'?'contact':f;if(S.rg.err[ek]){delete S.rg.err[ek];t.classList.remove('bad');const er=t.closest('.f').querySelector('.err');er&&(er.textContent='')}}
+    S.rg[f]=v;const ek=f;if(S.rg.err[ek]){delete S.rg.err[ek];t.classList.remove('bad');const er=t.closest('.f').querySelector('.err');er&&(er.textContent='')}}
   if(t.id==='invMail')S.inv.mail=t.value;
 });
 document.addEventListener('change',e=>{
@@ -1514,7 +1947,7 @@ document.addEventListener('keydown',e=>{
 
 // старт: ?st=…&view=…&theme=…&off=1 — только для тестов; владельцу — меню «Демо»
 const q0=new URLSearchParams(location.search);
-seed(ST.some(x=>x.k===q0.get('st'))?q0.get('st'):'pub');
+seed([...ST,...ST2].some(x=>x.k===q0.get('st'))?q0.get('st'):'pub');
 S.theme=q0.get('theme')||sessionStorage.getItem('hr-theme')||'dark';
 if(q0.get('view'))S.view=q0.get('view');
 if(q0.get('off'))S.off=true;

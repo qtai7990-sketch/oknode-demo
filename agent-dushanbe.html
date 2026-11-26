@@ -3511,6 +3511,23 @@ setTimeout(run,0);setTimeout(run,600);
 // Обновление раз в минуту и по вызову fbPaint() из макета (когда открыли раздел). Цвета — только переменные common/tokens.css.
 (function(){
 const FB_NOTE='Данные — демо. В продукте — табло аэропорта через наш сервер.';
+// Живое табло Жуковского со стенда (27.11.2026): сборщик zia.aero стоит в Yandex Cloud (hr-portal, deploy/flights).
+// Стенд не ответил, вернул демо или страница открыта с диска — показываем своё демо, как раньше. ?flights=demo — всегда демо.
+const FB_API='https://d5dldrc030v7rbel06fu.d8epmcec.apigw.yandexcloud.net/api/flights';
+const fbLive={}; // 'ZIA:arr' → {flights, at, stale, got}
+const fbLiveOn=()=>{try{return typeof fetch==='function'&&/^https?:$/.test(location.protocol)&&!/[?&]flights=demo/.test(location.search)}catch(e){return false}};
+async function fbPull(airport,dir){
+  const k=airport+':'+dir;
+  try{
+    const r=await fetch(FB_API+'?airport='+airport+'&dir='+dir,AbortSignal.timeout?{signal:AbortSignal.timeout(30000)}:{});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    if(!j||!Array.isArray(j.flights)||j.source==='demo'){delete fbLive[k];return}
+    fbLive[k]={flights:j.flights.map(f=>Object.assign({dir},f)),at:j.updatedAt,stale:!!j.stale,got:Date.now()};
+  }catch(e){const v=fbLive[k];if(v&&Date.now()-v.got>20*60e3)delete fbLive[k]}
+}
+const fbNote=(airport,dir)=>{const v=fbLive[airport+':'+dir];return v?'Данные — zia.aero через наш стенд'+(v.stale?' · могут отставать':'')+' · ленты — демо':FB_NOTE};
+const fbAt=(airport,dir,now)=>{const v=fbLive[airport+':'+dir];return v&&v.at?new Date(v.at):now};
 const FB_ST={scheduled:['d','по расписанию'],checkin:['c','регистрация'],boarding:['c','посадка'],departed:['d','вылетел'],enroute:['c','в пути'],delayed:['a','задержан'],
   arrived:['g','прибыл'],cancelled:['r','отменён'],unknown:['d','нет данных']};
 const FB_FIRST_MIN=40;   // от посадки до первых клиентов у офиса — оценка демо (паспортный контроль и багаж)
@@ -3524,6 +3541,8 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const mins=(a,b)=>Math.round((new Date(a)-new Date(b))/60000);
 const tm=f=>new Date(f.est||f.sched);
 function fbData(airport,dir,now){
+  const v=fbLive[airport+':'+dir];
+  if(v)return v.flights.slice().sort((a,b)=>new Date(a.sched)-new Date(b.sched));
   if(typeof flightsDemo!=='function')return null;
   try{return flightsDemo({airport,dir,now}).slice().sort((a,b)=>new Date(a.sched)-new Date(b.sched))}catch(e){console.warn('flights-demo:',e);return null}
 }
@@ -3560,7 +3579,7 @@ function arrHtml(key,who,now){
   const only=fbOn[key]!==false,nT=L.filter(f=>f.target).length;
   let R=only?L.filter(f=>f.target):L.slice();
   if(who==='zia'&&!only)R=R.filter(f=>f.target).concat(R.filter(f=>!f.target));   // у багажа целевые — сверху
-  let h=`<div class="fb-head"><div class="fb-ttl"><span class="fb-ic">${FB_PLANE}</span><div><h2>${who==='zia'?'Прилёты · у какой ленты встречать':'Прилёты в Жуковский сегодня'}</h2><small>обновлено ${hm(now,TZ.ZIA)} мск · ${FB_NOTE}</small></div></div>`+
+  let h=`<div class="fb-head"><div class="fb-ttl"><span class="fb-ic">${FB_PLANE}</span><div><h2>${who==='zia'?'Прилёты · у какой ленты встречать':'Прилёты в Жуковский сегодня'}</h2><small>обновлено ${hm(fbAt('ZIA','arr',now),TZ.ZIA)} мск · ${fbNote('ZIA','arr')}</small></div></div>`+
     `<button class="fb-sw${only?' on':''}" data-fbonly="${key}" role="switch" aria-checked="${only}"><span class="k"></span>Только целевые · ${nT}</button></div>`;
   h+=`<div class="fb-sum"><span class="fb-sic">${FB_PLANE}</span><b>${esc(stripText(L,now,who))}</b></div>`;
   h+=`<div class="fb-legend"><span><i class="fb-dot t"></i>целевые — Таджикистан, Узбекистан, Киргизия</span>${only?'':'<span><i class="fb-dot"></i>из России — не целевой поток</span>'}</div>`;
@@ -3670,6 +3689,7 @@ const st=document.createElement('style');st.id='fb-css';st.textContent=css;docum
 window.fbPaint=fbPaint;window.fbStrip=who=>stripHtml(who,new Date());window.fbStripText=(who)=>{const n=new Date(),L=fbData('ZIA','arr',n);return L?stripText(L,n,who):''};
 fbPaint();
 setInterval(fbPaint,60000);
+if(fbLiveOn()){const pull=()=>{if(!document.hidden)fbPull('ZIA','arr').then(fbPaint)};pull();setInterval(pull,60000)}
 })();
 </script>
 </body>
